@@ -3,6 +3,7 @@ package com.yd.yourdoctorandroid.fragments;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,16 +23,22 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckedTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -43,10 +50,15 @@ import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.activities.MainActivity;
 import com.yd.yourdoctorandroid.managers.AzureImageManager;
 import com.yd.yourdoctorandroid.networks.RetrofitFactory;
+import com.yd.yourdoctorandroid.networks.getSpecialistService.GetSpecialistService;
+import com.yd.yourdoctorandroid.networks.getSpecialistService.MainObjectSpecialist;
 import com.yd.yourdoctorandroid.networks.models.AuthResponse;
 import com.yd.yourdoctorandroid.networks.models.CommonErrorResponse;
 import com.yd.yourdoctorandroid.networks.models.Patient;
+import com.yd.yourdoctorandroid.networks.models.Specialist;
+import com.yd.yourdoctorandroid.networks.models.TypeAdvisory;
 import com.yd.yourdoctorandroid.networks.services.RegisterPatientService;
+import com.yd.yourdoctorandroid.utils.LoadDefaultModel;
 import com.yd.yourdoctorandroid.utils.SharedPrefs;
 import com.yd.yourdoctorandroid.utils.Utils;
 
@@ -56,8 +68,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -92,10 +106,25 @@ public class RegisterFragment extends Fragment {
     private static final int REQUEST_CHOOSE_PHOTO = 2;
     private static final String PASSWORD_PATTERN = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{6,15})";
 
+    private String phoneNumber;
+
     private String mImagePathToBeAttached;
     private Bitmap mImageToBeAttached;
-    private String phoneNumber;
     private String filename;
+
+    private String mImagePathToBeAttachedCertificate;
+    private Bitmap mImageToBeAttachedCertificate;
+    private String filenameCertificate;
+    //Dialog
+    Button btn_cancel_choose ;
+    Button btn_ok_choose ;
+    EditText ed_name_certificate ;
+    CircleImageView ivCertificate ;
+    CircleImageView ivUploadCertificate ;
+
+    private boolean isInProcessAddingCertificate;
+
+    private List<CertificateImage> listCertificateImage;
 
     public RegisterFragment setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
@@ -123,6 +152,13 @@ public class RegisterFragment extends Fragment {
     EditText edBirthday;
     @BindView(R.id.ed_address)
     EditText edAddress;
+    @BindView(R.id.ed_place_graduate)
+    EditText ed_place_graduate;
+    @BindView(R.id.ed_year_graduate)
+    EditText ed_year_graduate;
+    @BindView(R.id.ed_place_working)
+    EditText ed_place_working;
+
 
     @BindView(R.id.rg_gender)
     RadioGroup groupGender;
@@ -147,6 +183,21 @@ public class RegisterFragment extends Fragment {
     TextInputLayout tilPassword;
     @BindView(R.id.til_confirm_password)
     TextInputLayout tilConfirmPassword;
+    @BindView(R.id.til_place_graduate)
+    TextInputLayout til_place_graduate;
+    @BindView(R.id.til_year_graduate)
+    TextInputLayout til_year_graduate;
+    @BindView(R.id.til_place_working)
+    TextInputLayout til_place_working;
+
+    @BindView(R.id.cb_list_specialist)
+    ListView cb_list_specialist;
+
+    @BindView(R.id.btn_certificate)
+    Button btn_certificate;
+
+    @BindView(R.id.rl_certification)
+    RecyclerView rl_certification;
 
     private Unbinder unbinder;
 
@@ -177,10 +228,13 @@ public class RegisterFragment extends Fragment {
                 getActivity().onBackPressed();
             }
         });
+
+        listCertificateImage = new ArrayList<>();
         unbinder = ButterKnife.bind(this, view);
         edPhone.setText(phoneNumber);
         edPhone.setEnabled(false);
         setUpCalendar();
+        setUpCheckBoxListSpecialist();
         ivUploadAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -192,6 +246,105 @@ public class RegisterFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 onSubmit();
+            }
+        });
+
+        btn_certificate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                handleDialogImageCertificate();
+            }
+        });
+    }
+
+    private void handleDialogImageCertificate(){
+        final Dialog dialog = new Dialog(getContext());
+        dialog.setContentView(R.layout.dialog_add_certificate);
+        dialog.setTitle("Thêm Chứng chỉ");
+        isInProcessAddingCertificate = true;
+        // set the custom dialog components - text, image and button
+         btn_cancel_choose = dialog.findViewById(R.id.btn_cancel_add);
+         btn_ok_choose = dialog.findViewById(R.id.btn_ok_certificate);
+         ed_name_certificate = dialog.findViewById(R.id.ed_name_certificate);
+         ivCertificate = dialog.findViewById(R.id.iv_Certificate);
+         ivUploadCertificate = dialog.findViewById(R.id.iv_upload_certificate);
+
+         ivUploadCertificate.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View view) {
+                 displayAttachImageDialog();
+             }
+         });
+
+        btn_cancel_choose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isInProcessAddingCertificate = false;
+                dialog.dismiss();
+            }
+        });
+
+        btn_ok_choose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                MultipartBody.Part certificateUpload = null;
+                // Map is used to multipart the file using okhttp3.RequestBody
+                File file = null;
+                if (mImageToBeAttachedCertificate != null) {
+                    file = Utils.persistImage(mImageToBeAttachedCertificate, filename, getContext());
+                    RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), file);
+                    certificateUpload = MultipartBody.Part.createFormData("certificate", file.getName(), requestBody);
+                    listCertificateImage.add(new CertificateImage(ed_name_certificate.getText().toString(), certificateUpload));
+                }else {
+
+                }
+
+                dialog.dismiss();
+                isInProcessAddingCertificate = false;
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void setUpCheckBoxListSpecialist(){
+        cb_list_specialist.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+        cb_list_specialist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i(TAG, "onItemClick: " +position);
+                CheckedTextView v = (CheckedTextView) view;
+                boolean currentCheck = v.isChecked();
+                //UserAccount user = (UserAccount)currentCheck.getItemAtPosition(position);
+            }
+        });
+
+            loadSpecialist();
+
+    }
+
+    private void loadSpecialist(){
+        GetSpecialistService getSpecialistService = RetrofitFactory.getInstance().createService(GetSpecialistService.class);
+        getSpecialistService.getMainObjectSpecialist().enqueue(new Callback<MainObjectSpecialist>() {
+            @Override
+            public void onResponse(Call<MainObjectSpecialist> call, Response<MainObjectSpecialist> response) {
+                Log.e("AnhLe", "success: " + response.body());
+                MainObjectSpecialist mainObjectSpecialist = response.body();
+                ArrayList<Specialist> specialists = (ArrayList<Specialist>) mainObjectSpecialist.getSpecialist();
+                if(specialists != null){
+                    ArrayAdapter<Specialist> arrayAdapter
+                            = new ArrayAdapter<Specialist>(getContext(), android.R.layout.simple_list_item_checked , specialists);
+                    cb_list_specialist.setAdapter(arrayAdapter);
+                    LoadDefaultModel.getInstance().setSpecialists(specialists);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MainObjectSpecialist> call, Throwable t) {
+                Log.e("AnhLe", "Fail: " + t.getMessage());
             }
         });
     }
@@ -313,7 +466,7 @@ public class RegisterFragment extends Fragment {
                         }
                         if (response.code() == 200 || response.code() == 201) {
                             SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
-                            SharedPrefs.getInstance().put(USER_INFO, response.body().getPatient());
+                            SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
                             Intent intent = new Intent(getActivity(), MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -436,11 +589,21 @@ public class RegisterFragment extends Fragment {
     }
 
     public void updateUI() {
-        if (mImageToBeAttached != null) {
-            ivAvatar.setImageBitmap(mImageToBeAttached);
-        } else {
-            ivAvatar.setImageResource(R.drawable.patient_avatar);
+        if(isInProcessAddingCertificate){
+            if (mImageToBeAttachedCertificate != null) {
+                ivCertificate.setImageBitmap(mImageToBeAttachedCertificate);
+            } else {
+                ivCertificate.setImageResource(R.drawable.patient_avatar);
+            }
+        }else {
+            if (mImageToBeAttached != null) {
+                ivAvatar.setImageBitmap(mImageToBeAttached);
+            } else {
+                ivAvatar.setImageResource(R.drawable.patient_avatar);
+            }
         }
+
+
     }
 
     //avatar
@@ -453,43 +616,87 @@ public class RegisterFragment extends Fragment {
         }
 
         if (requestCode == REQUEST_TAKE_PHOTO) {
-            File file = new File(mImagePathToBeAttached);
-            if (file.exists()) {
-                final BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(mImagePathToBeAttached, options);
-                options.inJustDecodeBounds = false;
-                mImageToBeAttached = BitmapFactory.decodeFile(mImagePathToBeAttached, options);
+            if(isInProcessAddingCertificate){
+                File file = new File(mImagePathToBeAttachedCertificate);
+                if (file.exists()) {
+                    final BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(mImagePathToBeAttachedCertificate, options);
+                    options.inJustDecodeBounds = false;
+                    mImageToBeAttachedCertificate = BitmapFactory.decodeFile(mImagePathToBeAttachedCertificate, options);
+                    try {
+                        ExifInterface exif = new ExifInterface(mImagePathToBeAttachedCertificate);
+                        String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+                        int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
+                        int rotationAngle = 0;
+                        if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
+                        if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
+                        if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
+                        Matrix matrix = new Matrix();
+                        matrix.setRotate(rotationAngle, (float) mImageToBeAttachedCertificate.getWidth() / 2, (float) mImageToBeAttachedCertificate.getHeight() / 2);
+                        mImageToBeAttachedCertificate = Bitmap.createBitmap(mImageToBeAttachedCertificate, 0, 0, options.outWidth, options.outHeight, matrix, true);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    file.delete();
+                }
+                mImagePathToBeAttachedCertificate = null;
+            }else{
+                File file = new File(mImagePathToBeAttached);
+                if (file.exists()) {
+                    final BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(mImagePathToBeAttached, options);
+                    options.inJustDecodeBounds = false;
+                    mImageToBeAttached = BitmapFactory.decodeFile(mImagePathToBeAttached, options);
+                    try {
+                        ExifInterface exif = new ExifInterface(mImagePathToBeAttached);
+                        String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+                        int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
+                        int rotationAngle = 0;
+                        if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
+                        if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
+                        if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
+                        Matrix matrix = new Matrix();
+                        matrix.setRotate(rotationAngle, (float) mImageToBeAttached.getWidth() / 2, (float) mImageToBeAttached.getHeight() / 2);
+                        mImageToBeAttached = Bitmap.createBitmap(mImageToBeAttached, 0, 0, options.outWidth, options.outHeight, matrix, true);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    file.delete();
+                }
+                mImagePathToBeAttached = null;
+            }
+
+        } else if (requestCode == REQUEST_CHOOSE_PHOTO) {
+            if(isInProcessAddingCertificate){
                 try {
-                    ExifInterface exif = new ExifInterface(mImagePathToBeAttached);
-                    String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
-                    int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
-                    int rotationAngle = 0;
-                    if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
-                    if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
-                    if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
+
+                    Uri uri = data.getData();
+                    ContentResolver resolver = getActivity().getContentResolver();
+                    int rotationAngle = getOrientation(getActivity(), uri);
+                    mImageToBeAttachedCertificate = MediaStore.Images.Media.getBitmap(resolver, uri);
+                    Matrix matrix = new Matrix();
+                    matrix.setRotate(rotationAngle, (float) mImageToBeAttachedCertificate.getWidth() / 2, (float) mImageToBeAttachedCertificate.getHeight() / 2);
+                    mImageToBeAttachedCertificate = Bitmap.createBitmap(mImageToBeAttachedCertificate, 0, 0, mImageToBeAttachedCertificate.getWidth(), mImageToBeAttachedCertificate.getHeight(), matrix, true);
+                } catch (IOException e) {
+                    Log.e(TAG, "Cannot get a selected photo from the gallery.", e);
+                }
+            }else {
+                try {
+
+                    Uri uri = data.getData();
+                    ContentResolver resolver = getActivity().getContentResolver();
+                    int rotationAngle = getOrientation(getActivity(), uri);
+                    mImageToBeAttached = MediaStore.Images.Media.getBitmap(resolver, uri);
                     Matrix matrix = new Matrix();
                     matrix.setRotate(rotationAngle, (float) mImageToBeAttached.getWidth() / 2, (float) mImageToBeAttached.getHeight() / 2);
-                    mImageToBeAttached = Bitmap.createBitmap(mImageToBeAttached, 0, 0, options.outWidth, options.outHeight, matrix, true);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                    mImageToBeAttached = Bitmap.createBitmap(mImageToBeAttached, 0, 0, mImageToBeAttached.getWidth(), mImageToBeAttached.getHeight(), matrix, true);
+                } catch (IOException e) {
+                    Log.e(TAG, "Cannot get a selected photo from the gallery.", e);
                 }
-                file.delete();
             }
-            mImagePathToBeAttached = null;
-        } else if (requestCode == REQUEST_CHOOSE_PHOTO) {
-            try {
 
-                Uri uri = data.getData();
-                ContentResolver resolver = getActivity().getContentResolver();
-                int rotationAngle = getOrientation(getActivity(), uri);
-                mImageToBeAttached = MediaStore.Images.Media.getBitmap(resolver, uri);
-                Matrix matrix = new Matrix();
-                matrix.setRotate(rotationAngle, (float) mImageToBeAttached.getWidth() / 2, (float) mImageToBeAttached.getHeight() / 2);
-                mImageToBeAttached = Bitmap.createBitmap(mImageToBeAttached, 0, 0, mImageToBeAttached.getWidth(), mImageToBeAttached.getHeight(), matrix, true);
-            } catch (IOException e) {
-                Log.e(TAG, "Cannot get a selected photo from the gallery.", e);
-            }
         }
         updateUI();
     }
@@ -535,7 +742,12 @@ public class RegisterFragment extends Fragment {
         String fileName = "TODO_LITE-" + timeStamp + "_";
         File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(fileName, ".jpg", storageDir);
-        mImagePathToBeAttached = image.getAbsolutePath();
+        if(isInProcessAddingCertificate){
+            mImagePathToBeAttachedCertificate = image.getAbsolutePath();
+        }else {
+            mImagePathToBeAttached = image.getAbsolutePath();
+        }
+
         return image;
     }
 
@@ -547,19 +759,36 @@ public class RegisterFragment extends Fragment {
     }
 
     private void deleteCurrentPhoto() {
-        if (mImageToBeAttached != null) {
-            mImageToBeAttached.recycle();
-            mImageToBeAttached = null;
-            ivAvatar.setImageResource(R.drawable.patient_avatar);
+        if(isInProcessAddingCertificate){
+            if (mImageToBeAttachedCertificate != null) {
+                mImageToBeAttachedCertificate.recycle();
+                mImageToBeAttachedCertificate = null;
+                ivCertificate.setImageResource(R.drawable.patient_avatar);
+            }
+        }else {
+            if (mImageToBeAttached != null) {
+                mImageToBeAttached.recycle();
+                mImageToBeAttached = null;
+                ivAvatar.setImageResource(R.drawable.patient_avatar);
+            }
         }
+
     }
 
     private void displayAttachImageDialog() {
         CharSequence[] items;
-        if (mImageToBeAttached != null)
-            items = new CharSequence[]{"Chụp ảnh", "Chọn ảnh", "Xóa ảnh"};
-        else
-            items = new CharSequence[]{"Chụp ảnh", "Chọn ảnh"};
+
+        if(isInProcessAddingCertificate){
+            if (mImageToBeAttachedCertificate != null)
+                items = new CharSequence[]{"Chụp ảnh", "Chọn ảnh", "Xóa ảnh"};
+            else
+                items = new CharSequence[]{"Chụp ảnh", "Chọn ảnh"};
+        }else {
+            if (mImageToBeAttached != null)
+                items = new CharSequence[]{"Chụp ảnh", "Chọn ảnh", "Xóa ảnh"};
+            else
+                items = new CharSequence[]{"Chụp ảnh", "Chọn ảnh"};
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Ảnh đại diện");
@@ -612,6 +841,17 @@ public class RegisterFragment extends Fragment {
                 CAMERA);
         return result == PackageManager.PERMISSION_GRANTED &&
                 result1 == PackageManager.PERMISSION_GRANTED;
+    }
+
+
+    public class CertificateImage{
+        String name;
+        MultipartBody.Part certificateUpload;
+
+        public CertificateImage(String name, MultipartBody.Part certificateUpload) {
+            this.name = name;
+            this.certificateUpload = certificateUpload;
+        }
     }
 
 }

@@ -131,7 +131,7 @@ public class LoginFragment extends Fragment {
                 btnLogin.revertAnimation();
                 if (response.code() == 200 || response.code() == 201) {
                     SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
-                    SharedPrefs.getInstance().put(USER_INFO, response.body().getPatient());
+                    SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

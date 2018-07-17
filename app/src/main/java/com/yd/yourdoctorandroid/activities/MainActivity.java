@@ -1,11 +1,16 @@
 package com.yd.yourdoctorandroid.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -13,12 +18,15 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.adapters.PagerAdapter;
@@ -28,6 +36,8 @@ import com.yd.yourdoctorandroid.fragments.DoctorRankFragment;
 import com.yd.yourdoctorandroid.fragments.UserProfileFragment;
 import com.yd.yourdoctorandroid.managers.ScreenManager;
 import com.yd.yourdoctorandroid.networks.models.Patient;
+import com.yd.yourdoctorandroid.utils.Config;
+import com.yd.yourdoctorandroid.utils.NotificationUtils;
 import com.yd.yourdoctorandroid.utils.SharedPrefs;
 
 import butterknife.BindView;
@@ -58,15 +68,54 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     TextView tv_name_user;
     TextView tv_money_user;
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupUI();
-        Log.d("MainActivity", "USER_INFO");
-        Log.d("MainActivity", SharedPrefs.getInstance().get("USER_INFO", Patient.class).toString());
-        Log.d("MainActivity", SharedPrefs.getInstance().get("JWT_TOKEN", String.class));
+//        Log.d("MainActivity", "USER_INFO");
+//        Log.d("MainActivity", SharedPrefs.getInstance().get("USER_INFO", Patient.class).toString());
+//        Log.d("MainActivity", SharedPrefs.getInstance().get("JWT_TOKEN", String.class));
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                // Kiểm tra Intent Filter có khớp cái nào không.
+                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
+                    // GCM đã được đăng ký thành công.
+                    // Đăng ký vào topic có tên "Global".
+                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
+                    displayFirebaseRegId();
+
+                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    // Khi có tin nhắn mới về.
+                    String message = intent.getStringExtra("message");
+                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+                   // txtMessage.setText(message);
+                }
+            }
+        };
+
+        displayFirebaseRegId();
     }
+    private void displayFirebaseRegId() {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
+        String regId = pref.getString("regId", null);
+
+        Log.e(TAG, "Firebase reg id: " + regId);
+
+        if (!TextUtils.isEmpty(regId))
+            Toast.makeText(this, "Firebase Reg Id: " + regId, Toast.LENGTH_SHORT).show();
+
+        else
+            Toast.makeText(this, "Firebase Reg Id is not received yet", Toast.LENGTH_SHORT).show();
+           // txtRegId.setText("Firebase Reg Id is not received yet!");
+    }
+
+
 
     private void setupUI() {
         ButterKnife.bind(this);
@@ -203,12 +252,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         fab_question.setVisibility(View.VISIBLE);
+        // Đăng ký receiver vào LocalBroadcastManager.
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.REGISTRATION_COMPLETE));
+
+        // Đăng ký bộ nhận tin nhắn.
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+
+        // Xóa các notification khi app được bật.
+        NotificationUtils.clearNotifications(getApplicationContext());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         fab_question.setVisibility(View.INVISIBLE);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
     }
 }
 

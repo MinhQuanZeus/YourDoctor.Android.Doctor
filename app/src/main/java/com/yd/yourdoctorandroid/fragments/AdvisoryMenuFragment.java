@@ -1,7 +1,6 @@
 package com.yd.yourdoctorandroid.fragments;
 
 
-import android.animation.ValueAnimator;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -14,7 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -32,7 +30,7 @@ import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.adapters.DoctorChoiceAdapter;
 import com.yd.yourdoctorandroid.managers.ScreenManager;
-import com.yd.yourdoctorandroid.models.Doctor;
+import com.yd.yourdoctorandroid.networks.models.Doctor;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -313,9 +311,9 @@ public class AdvisoryMenuFragment extends Fragment implements View.OnClickListen
         for (int i = 0; i < 10; i++) {
             Doctor doctor = new Doctor();
             doctor.setAvatar("https://kenh14cdn.com/2016/160722-star-tzuyu-1469163381381-1473652430446.jpg");
-            doctor.setFirst_name("Le");
-            doctor.setLast_name("Anh");
-            doctor.setCurrent_rating((float) 3.3);
+//            doctor.setFirst_name("Le");
+//            doctor.setLast_name("Anh");
+//            doctor.setCurrent_rating((float) 3.3);
             chosenDoctorList.add(doctor);
         }
 
@@ -339,8 +337,8 @@ public class AdvisoryMenuFragment extends Fragment implements View.OnClickListen
                 if (doctorChoice != null) {
 
                     Picasso.with(getContext()).load(doctorChoice.getAvatar()).transform(new CropCircleTransformation()).into(iv_item_doctor_chosen);
-                    tv_name_doctor_chosen.setText(doctorChoice.getFirst_name() + " " + doctorChoice.getLast_name());
-                    rb_doctorChosen.setRating(doctorChoice.getCurrent_rating());
+//                    tv_name_doctor_chosen.setText(doctorChoice.getFirst_name() + " " + doctorChoice.getLast_name());
+//                    rb_doctorChosen.setRating(doctorChoice.getCurrent_rating());
                 }
                 dialog.dismiss();
 

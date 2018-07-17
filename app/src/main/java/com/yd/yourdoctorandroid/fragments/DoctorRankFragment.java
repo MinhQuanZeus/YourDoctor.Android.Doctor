@@ -20,7 +20,7 @@ import com.yd.yourdoctorandroid.managers.ScreenManager;
 import com.yd.yourdoctorandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorandroid.networks.getSpecialistService.GetSpecialistService;
 import com.yd.yourdoctorandroid.networks.getSpecialistService.MainObjectSpecialist;
-import com.yd.yourdoctorandroid.networks.getSpecialistService.Specialist;
+import com.yd.yourdoctorandroid.networks.models.Specialist;
 
 import java.util.ArrayList;
 import java.util.List;

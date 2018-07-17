@@ -4,29 +4,21 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.events.ItemClickListener;
-import com.yd.yourdoctorandroid.models.Certification;
-import com.yd.yourdoctorandroid.models.Doctor;
+import com.yd.yourdoctorandroid.networks.models.Certification;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
 public class DoctorCertificationAdapter extends RecyclerView.Adapter<DoctorCertificationAdapter.DoctorCertificationViewHolder> {
     private List<Certification> chosenCertificationList;

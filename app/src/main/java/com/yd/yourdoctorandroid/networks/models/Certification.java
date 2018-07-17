@@ -1,4 +1,4 @@
-package com.yd.yourdoctorandroid.models;
+package com.yd.yourdoctorandroid.networks.models;
 
 public class Certification {
     private String _id;

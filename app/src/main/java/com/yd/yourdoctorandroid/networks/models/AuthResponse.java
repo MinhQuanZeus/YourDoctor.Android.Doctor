@@ -10,7 +10,7 @@ public class AuthResponse {
     private String jwtToken;
     @SerializedName("user")
     @Expose
-    private Patient patient;
+    private Doctor doctor;
 
     public String getMessage() {
         return message;
@@ -28,12 +28,12 @@ public class AuthResponse {
         this.jwtToken = jwtToken;
     }
 
-    public Patient getPatient() {
-        return patient;
+    public Doctor getDoctor() {
+        return doctor;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
     }
 
     @Override
@@ -41,14 +41,14 @@ public class AuthResponse {
         return "AuthResponse{" +
                 "message='" + message + '\'' +
                 ", jwtToken='" + jwtToken + '\'' +
-                ", patient=" + patient.toString() +
+                ", doctor=" + doctor.toString() +
                 '}';
     }
 
-    public AuthResponse(String message, String jwtToken, Patient patient) {
+    public AuthResponse(String message, String jwtToken, Doctor doctor) {
 
         this.message = message;
         this.jwtToken = jwtToken;
-        this.patient = patient;
+        this.doctor = doctor;
     }
 }

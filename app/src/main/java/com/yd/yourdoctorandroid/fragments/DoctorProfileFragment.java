@@ -20,7 +20,7 @@ import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.adapters.DoctorCertificationAdapter;
 import com.yd.yourdoctorandroid.managers.ScreenManager;
-import com.yd.yourdoctorandroid.models.Certification;
+import com.yd.yourdoctorandroid.networks.models.Certification;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
-import jp.wasabeef.picasso.transformations.CropTransformation;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -1,6 +1,8 @@
-package com.yd.yourdoctorandroid.networks.getSpecialistService;
+package com.yd.yourdoctorandroid.networks.models;
 
-public class Specialist {
+import java.io.Serializable;
+
+public class Specialist implements Serializable{
     String _id;
     String name;
 
@@ -22,9 +24,6 @@ public class Specialist {
 
     @Override
     public String toString() {
-        return "Specialist{" +
-                "_id='" + _id + '\'' +
-                ", name='" + name + '\'' +
-                '}';
+        return name;
     }
 }
