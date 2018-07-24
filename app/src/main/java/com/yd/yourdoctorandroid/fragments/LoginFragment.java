@@ -14,9 +14,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.yd.yourdoctorandroid.R;
+import com.yd.yourdoctorandroid.activities.ChatActivity;
 import com.yd.yourdoctorandroid.activities.MainActivity;
 import com.yd.yourdoctorandroid.managers.ScreenManager;
 import com.yd.yourdoctorandroid.networks.RetrofitFactory;
@@ -24,6 +26,7 @@ import com.yd.yourdoctorandroid.networks.models.AuthResponse;
 import com.yd.yourdoctorandroid.networks.models.CommonErrorResponse;
 import com.yd.yourdoctorandroid.networks.models.Login;
 import com.yd.yourdoctorandroid.networks.services.LoginService;
+import com.yd.yourdoctorandroid.utils.LoadDefaultModel;
 import com.yd.yourdoctorandroid.utils.SharedPrefs;
 import com.yd.yourdoctorandroid.utils.Utils;
 
@@ -128,14 +131,18 @@ public class LoginFragment extends Fragment {
         loginService.register(login).enqueue(new Callback<AuthResponse>() {
             @Override
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                btnLogin.revertAnimation();
+
                 if (response.code() == 200 || response.code() == 201) {
                     SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
                     SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
+                    //for test
+                    FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getId());
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     getActivity().startActivity(intent);
+                    btnLogin.revertAnimation();
+
                 }else {
                     enableAll();
                     CommonErrorResponse commonErrorResponse = parseToCommonError(response);
@@ -144,12 +151,14 @@ public class LoginFragment extends Fragment {
                         Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
                         Log.d("RESPONSE", error);
                     }
+                    btnLogin.revertAnimation();
                 }
             }
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
                 btnLogin.revertAnimation();
+                Log.e("login", t.toString());
                 enableAll();
                 if (t instanceof SocketTimeoutException) {
                     Toast.makeText(getActivity(), getResources().getText(R.string.error_timeout), Toast.LENGTH_SHORT).show();

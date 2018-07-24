@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.yd.yourdoctorandroid.utils.Config;
+import com.yd.yourdoctorandroid.utils.SharedPrefs;
 
 public class YDFirebaseInstanceIDService extends FirebaseInstanceIdService {
     private static final String TAG = YDFirebaseInstanceIDService.class.getSimpleName();
@@ -35,9 +36,10 @@ public class YDFirebaseInstanceIDService extends FirebaseInstanceIdService {
     }
 
     private void storeRegIdInPref(String token) {
-        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString("regId", token);
-        editor.apply();
+//        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
+//        SharedPreferences.Editor editor = pref.edit();
+        SharedPrefs.getInstance().put("regId",token);
+//        editor.putString("regId", token);
+//        editor.apply();
     }
 }

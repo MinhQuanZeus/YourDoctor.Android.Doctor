@@ -1,5 +1,8 @@
 package com.yd.yourdoctorandroid.networks.models;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -7,38 +10,43 @@ public class Doctor {
     private String id;
     private String phoneNumber;
     private String password;
-    private String lastName;
     private String firstName;
     private String middleName;
-    private Date birthday;
+    private String lastName;
+    private String avatar;
+    private String birthday;
     private String address;
     private int status;
-    private String avatar;
-    private long remain_money;
+    private long remainMoney;
     private float currentRating;
     private ArrayList<Certification> certificates;
     private ArrayList<String> idSpecialist;
     private String universityGraduate;
-    private int yearGraduate;
+    private String yearGraduate;
     private String placeWorking;
 
-    public Doctor(String phoneNumber, String password, String lastName, String firstName, String middleName, Date birthday, String address, long remain_money, float currentRating, ArrayList<String> idSpecialist, String universityGraduate, int yearGraduate, String placeWorking) {
+    public Doctor() {
+
+    }
+
+    public Doctor(String id, String phoneNumber, String password, String firstName, String middleName, String lastName, String avatar, String birthday, String address, int status, long remainMoney, float currentRating, ArrayList<Certification> certificates, ArrayList<String> idSpecialist, String universityGraduate, String yearGraduate, String placeWorking) {
+        this.id = id;
         this.phoneNumber = phoneNumber;
         this.password = password;
-        this.lastName = lastName;
         this.firstName = firstName;
         this.middleName = middleName;
+        this.lastName = lastName;
+        this.avatar = avatar;
         this.birthday = birthday;
         this.address = address;
-        this.remain_money = remain_money;
+        this.status = status;
+        this.remainMoney = remainMoney;
         this.currentRating = currentRating;
+        this.certificates = certificates;
         this.idSpecialist = idSpecialist;
         this.universityGraduate = universityGraduate;
         this.yearGraduate = yearGraduate;
         this.placeWorking = placeWorking;
-    }
-
-    public Doctor() {
     }
 
     public String getId() {
@@ -65,14 +73,6 @@ public class Doctor {
         this.password = password;
     }
 
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
     public String getFirstName() {
         return firstName;
     }
@@ -89,11 +89,27 @@ public class Doctor {
         this.middleName = middleName;
     }
 
-    public Date getBirthday() {
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
 
@@ -113,20 +129,12 @@ public class Doctor {
         this.status = status;
     }
 
-    public String getAvatar() {
-        return avatar;
+    public long getRemainMoney() {
+        return remainMoney;
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public long getRemain_money() {
-        return remain_money;
-    }
-
-    public void setRemain_money(long remain_money) {
-        this.remain_money = remain_money;
+    public void setRemainMoney(long remainMoney) {
+        this.remainMoney = remainMoney;
     }
 
     public float getCurrentRating() {
@@ -161,11 +169,11 @@ public class Doctor {
         this.universityGraduate = universityGraduate;
     }
 
-    public int getYearGraduate() {
+    public String getYearGraduate() {
         return yearGraduate;
     }
 
-    public void setYearGraduate(int yearGraduate) {
+    public void setYearGraduate(String yearGraduate) {
         this.yearGraduate = yearGraduate;
     }
 

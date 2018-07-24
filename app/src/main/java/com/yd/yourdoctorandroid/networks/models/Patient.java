@@ -43,6 +43,9 @@ public class Patient {
                 '}';
     }
 
+    public Patient() {
+    }
+
     public Patient(String id, String fName, String mName, String lName, String phoneNumber, String password, String avatar, int gender, String birthday, String address, int role) {
         this.id = id;
         this.fName = fName;

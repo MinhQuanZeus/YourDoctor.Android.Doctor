@@ -79,40 +79,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        Log.d("MainActivity", "USER_INFO");
 //        Log.d("MainActivity", SharedPrefs.getInstance().get("USER_INFO", Patient.class).toString());
 //        Log.d("MainActivity", SharedPrefs.getInstance().get("JWT_TOKEN", String.class));
-        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                // Kiểm tra Intent Filter có khớp cái nào không.
-                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
-                    // GCM đã được đăng ký thành công.
-                    // Đăng ký vào topic có tên "Global".
-                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
-                    displayFirebaseRegId();
-
-                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
-                    // Khi có tin nhắn mới về.
-                    String message = intent.getStringExtra("message");
-                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-                   // txtMessage.setText(message);
-                }
-            }
-        };
+//        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//
+//                // Kiểm tra Intent Filter có khớp cái nào không.
+//                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
+//                    // GCM đã được đăng ký thành công.
+//                    // Đăng ký vào topic có tên "Global".
+//                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
+//                    displayFirebaseRegId();
+//
+//                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+//                    // Khi có tin nhắn mới về.
+//                    String message = intent.getStringExtra("message");
+//                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+//                   // txtMessage.setText(message);
+//                }
+//            }
+//        };
 
         displayFirebaseRegId();
     }
     private void displayFirebaseRegId() {
         SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
+
         String regId = pref.getString("regId", null);
+        SharedPrefs.getInstance().get("regId", String.class);
+        Log.e(TAG, "Firebase reg id: " + SharedPrefs.getInstance().get("regId", String.class));
 
-        Log.e(TAG, "Firebase reg id: " + regId);
-
-        if (!TextUtils.isEmpty(regId))
-            Toast.makeText(this, "Firebase Reg Id: " + regId, Toast.LENGTH_SHORT).show();
-
-        else
-            Toast.makeText(this, "Firebase Reg Id is not received yet", Toast.LENGTH_SHORT).show();
-           // txtRegId.setText("Firebase Reg Id is not received yet!");
+//        if (!TextUtils.isEmpty(regId))
+//            Toast.makeText(this, "Firebase Reg Id: " + regId, Toast.LENGTH_SHORT).show();
+//
+//        else
+//            Toast.makeText(this, "Firebase Reg Id is not received yet", Toast.LENGTH_SHORT).show();
+//           // txtRegId.setText("Firebase Reg Id is not received yet!");
     }
 
 
@@ -194,10 +195,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+//        Intent intent = new Intent(Intent.ACTION_MAIN);
+//        intent.addCategory(Intent.CATEGORY_HOME);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(intent);
     }
 
     @Override
@@ -253,22 +254,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
         fab_question.setVisibility(View.VISIBLE);
         // Đăng ký receiver vào LocalBroadcastManager.
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.REGISTRATION_COMPLETE));
+      //  LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+      //          new IntentFilter(Config.REGISTRATION_COMPLETE));
 
         // Đăng ký bộ nhận tin nhắn.
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.PUSH_NOTIFICATION));
+       // LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+              //  new IntentFilter(Config.PUSH_NOTIFICATION));
 
         // Xóa các notification khi app được bật.
-        NotificationUtils.clearNotifications(getApplicationContext());
+       // NotificationUtils.clearNotifications(getApplicationContext());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         fab_question.setVisibility(View.INVISIBLE);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+       // LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
     }
 }
 
