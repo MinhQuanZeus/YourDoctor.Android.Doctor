@@ -2,12 +2,9 @@ package com.yd.yourdoctorandroid.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -85,7 +82,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private List<Record> recordsChat;
     //private final String URL_SERVER = "https://your-doctor-test2.herokuapp.com";
-    private final String URL_SERVER = "http://192.168.124.103:3000";
+    private final String URL_SERVER = "http://192.168.124.100:3000";
 
     private Socket mSocket;
     private ChatAdpater chatApapter;
@@ -152,6 +149,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mSocket.on("errorUpdate", onErrorUpdate);
 
         mSocket.on("finishConversation",onFinishMessage);
+
+        mSocket.on("conversationDone", onConversationDone);
 
         loadPatientChoice(patientChoiceId);
 
@@ -232,6 +231,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    private Emitter.Listener onConversationDone = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String message = (String) args[0];
+                    Toast.makeText(getApplicationContext(), message,Toast.LENGTH_LONG).show();
+
+                }
+            });
+        }
+    };
+
     private Emitter.Listener onErrorUpdate = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -239,7 +252,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void run() {
                     String message = (String) args[0];
-                    Toast.makeText(getApplicationContext(), "Cuộc trò chuyện đã kết thúc vì vượt quá số tin nhắn lựa chọn của bệnh nhân",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), message,Toast.LENGTH_LONG).show();
 
                 }
             });

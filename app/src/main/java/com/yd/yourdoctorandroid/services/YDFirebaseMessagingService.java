@@ -94,8 +94,33 @@ public class YDFirebaseMessagingService extends FirebaseMessagingService {
                     break;
                 }
                 case 3: {
-                    title="Thông báo thanh toán";
-                    description = "";
+                    title=nameSender + " đã kết thúc cuộc tư vấn với bạn";
+                    //description = nameSender + " vừa nhắn tin cho bạn";
+
+                    Log.e("senderid",senderId );
+                    Log.e("storageId",storageId );
+                    Intent resultIntent = new Intent(getApplicationContext(), ChatActivity.class);
+                    resultIntent.putExtra("chatHistoryId",storageId);
+                    resultIntent.putExtra("patientChoiceId",senderId);
+                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+                    stackBuilder.addNextIntent(resultIntent);
+                    PendingIntent resultPendingIntent =
+                            stackBuilder.getPendingIntent(
+                                    0,
+                                    PendingIntent.FLAG_UPDATE_CURRENT
+                            );
+
+                    NotificationCompat.Builder mBuilder =
+                            (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                                    .setSmallIcon(R.drawable.your_doctor_logo)
+                                    .setContentTitle(title)
+                                    .setContentText(message)
+                                    .addAction(R.drawable.ic_done_black_24dp, "Đồng ý", resultPendingIntent);
+
+                    mBuilder.setContentIntent(resultPendingIntent);
+                    NotificationManager mNotificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotificationManager.notify(i, mBuilder.build());
                     break;
                 }
                 case 4: {
