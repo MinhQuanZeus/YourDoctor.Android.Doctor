@@ -2,13 +2,15 @@ package com.yd.yourdoctorandroid.utils;
 
 import android.util.Log;
 import android.widget.Toast;
+
+import com.yd.yourdoctorandroid.models.Specialist;
+import com.yd.yourdoctorandroid.models.TypeAdvisory;
 import com.yd.yourdoctorandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorandroid.networks.getAllTypesAdvisory.GetAllTypesAdvisoryService;
 import com.yd.yourdoctorandroid.networks.getAllTypesAdvisory.MainObjectTypeAdivosry;
 import com.yd.yourdoctorandroid.networks.getSpecialistService.GetSpecialistService;
 import com.yd.yourdoctorandroid.networks.getSpecialistService.MainObjectSpecialist;
-import com.yd.yourdoctorandroid.networks.models.Specialist;
-import com.yd.yourdoctorandroid.networks.models.TypeAdvisory;
+
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
@@ -64,7 +66,7 @@ public class LoadDefaultModel {
 
     public void loadTypeAdvisory() {
         GetAllTypesAdvisoryService getAllTypesAdvisoryService = RetrofitFactory.getInstance().createService(GetAllTypesAdvisoryService.class);
-        getAllTypesAdvisoryService.getMainObjectTypeAdvisories().enqueue(new Callback<MainObjectTypeAdivosry>() {
+        getAllTypesAdvisoryService.getMainObjectTypeAdvisories(SharedPrefs.getInstance().get("JWT_TOKEN", String.class)).enqueue(new Callback<MainObjectTypeAdivosry>() {
             @Override
             public void onResponse(Call<MainObjectTypeAdivosry> call, Response<MainObjectTypeAdivosry> response) {
                 Log.e("AnhLe", "success: " + response.body());

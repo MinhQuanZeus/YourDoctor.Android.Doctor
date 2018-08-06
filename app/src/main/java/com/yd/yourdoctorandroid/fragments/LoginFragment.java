@@ -21,6 +21,7 @@ import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.activities.ChatActivity;
 import com.yd.yourdoctorandroid.activities.MainActivity;
 import com.yd.yourdoctorandroid.managers.ScreenManager;
+import com.yd.yourdoctorandroid.models.Doctor;
 import com.yd.yourdoctorandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorandroid.networks.models.AuthResponse;
 import com.yd.yourdoctorandroid.networks.models.CommonErrorResponse;
@@ -28,6 +29,7 @@ import com.yd.yourdoctorandroid.networks.models.Login;
 import com.yd.yourdoctorandroid.networks.services.LoginService;
 import com.yd.yourdoctorandroid.utils.LoadDefaultModel;
 import com.yd.yourdoctorandroid.utils.SharedPrefs;
+import com.yd.yourdoctorandroid.utils.SocketUtils;
 import com.yd.yourdoctorandroid.utils.Utils;
 
 import java.io.IOException;
@@ -134,9 +136,16 @@ public class LoginFragment extends Fragment {
 
                 if (response.code() == 200 || response.code() == 201) {
                     SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
+                    if(SharedPrefs.getInstance().get(USER_INFO, Doctor.class) != null){
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get(USER_INFO, Doctor.class).getDoctorId());
+                    }
+
                     SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
                     //for test
-                    FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getId());
+                    Log.e("tokenDoctor", SharedPrefs.getInstance().get(JWT_TOKEN, String.class));
+                    Log.e("FireBase share ", response.body().getDoctor().getDoctorId());
+                    FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
+                    SocketUtils.getInstance().reConnect();
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

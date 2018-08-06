@@ -1,9 +1,9 @@
-package com.yd.yourdoctorandroid.networks.models;
+package com.yd.yourdoctorandroid.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Date;
+import java.util.List;
 
 public class Patient {
     private String id;
@@ -25,28 +25,13 @@ public class Patient {
     private String birthday;
     private String address;
     private int role;
-
-    @Override
-    public String toString() {
-        return "Patient{" +
-                "id='" + id + '\'' +
-                ", fName='" + fName + '\'' +
-                ", mName='" + mName + '\'' +
-                ", lName='" + lName + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", password='" + password + '\'' +
-                ", avatar='" + avatar + '\'' +
-                ", gender=" + gender +
-                ", birthday='" + birthday + '\'' +
-                ", address='" + address + '\'' +
-                ", role=" + role +
-                '}';
-    }
+    private long remainMoney;
+    private List<String> favoriteDoctors;
 
     public Patient() {
     }
 
-    public Patient(String id, String fName, String mName, String lName, String phoneNumber, String password, String avatar, int gender, String birthday, String address, int role) {
+    public Patient(String id, String fName, String mName, String lName, String phoneNumber, String password, String avatar, int gender, String birthday, String address, int role, long remainMoney, List<String> favoriteDoctors) {
         this.id = id;
         this.fName = fName;
         this.mName = mName;
@@ -58,10 +43,15 @@ public class Patient {
         this.birthday = birthday;
         this.address = address;
         this.role = role;
+        this.remainMoney = remainMoney;
+        this.favoriteDoctors = favoriteDoctors;
+    }
+
+    public String  getFullName(){
+        return fName + " "+ mName + " " + lName;
     }
 
     public String getId() {
-
         return id;
     }
 
@@ -147,5 +137,21 @@ public class Patient {
 
     public void setRole(int role) {
         this.role = role;
+    }
+
+    public long getRemainMoney() {
+        return remainMoney;
+    }
+
+    public void setRemainMoney(long remainMoney) {
+        this.remainMoney = remainMoney;
+    }
+
+    public List<String> getFavoriteDoctors() {
+        return favoriteDoctors;
+    }
+
+    public void setFavoriteDoctors(List<String> favoriteDoctors) {
+        this.favoriteDoctors = favoriteDoctors;
     }
 }

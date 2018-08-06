@@ -30,7 +30,7 @@ import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.adapters.DoctorChoiceAdapter;
 import com.yd.yourdoctorandroid.managers.ScreenManager;
-import com.yd.yourdoctorandroid.networks.models.Doctor;
+import com.yd.yourdoctorandroid.models.Doctor;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

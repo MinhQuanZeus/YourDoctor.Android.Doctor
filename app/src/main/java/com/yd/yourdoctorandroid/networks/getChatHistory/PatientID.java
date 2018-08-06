@@ -15,19 +15,6 @@ public class PatientID {
     public PatientID() {
     }
 
-    public PatientID(String _id, String firstName, String lastName, String middleName, String address, String birthday, String phoneNumber, long remainMoney, int gender, String avatar) {
-        this._id = _id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.middleName = middleName;
-        this.address = address;
-        this.birthday = birthday;
-        this.phoneNumber = phoneNumber;
-        this.remainMoney = remainMoney;
-        this.gender = gender;
-        this.avatar = avatar;
-    }
-
     public String get_id() {
         return _id;
     }

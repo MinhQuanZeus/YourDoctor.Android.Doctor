@@ -1,10 +1,6 @@
-package com.yd.yourdoctorandroid.networks.models;
-
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+package com.yd.yourdoctorandroid.models;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class Doctor {
     private String id;
@@ -26,11 +22,10 @@ public class Doctor {
     private String placeWorking;
 
     public Doctor() {
-
     }
 
-    public Doctor(String id, String phoneNumber, String password, String firstName, String middleName, String lastName, String avatar, String birthday, String address, int status, long remainMoney, float currentRating, ArrayList<Certification> certificates, ArrayList<String> idSpecialist, String universityGraduate, String yearGraduate, String placeWorking) {
-        this.id = id;
+    public Doctor(String doctorId, String phoneNumber, String password, String firstName, String middleName, String lastName, String avatar, String birthday, String address, int status, long remainMoney, float currentRating, ArrayList<Certification> certificates, ArrayList<String> idSpecialist, String universityGraduate, String yearGraduate, String placeWorking) {
+        this.id = doctorId;
         this.phoneNumber = phoneNumber;
         this.password = password;
         this.firstName = firstName;
@@ -49,12 +44,16 @@ public class Doctor {
         this.placeWorking = placeWorking;
     }
 
-    public String getId() {
+    public String  getFullName(){
+        return firstName + " "+ middleName + " " + lastName;
+    }
+
+    public String getDoctorId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setDoctorId(String doctorId) {
+        this.id = doctorId;
     }
 
     public String getPhoneNumber() {

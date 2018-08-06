@@ -18,11 +18,12 @@ import android.widget.ProgressBar;
 import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.adapters.DoctorRankingSpecialistAdapter;
 import com.yd.yourdoctorandroid.managers.PaginationScrollListener;
-import com.yd.yourdoctorandroid.networks.models.Doctor;
+import com.yd.yourdoctorandroid.models.Doctor;
 import com.yd.yourdoctorandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorandroid.networks.getDoctorRankingSpecialist.DoctorRanking;
 import com.yd.yourdoctorandroid.networks.getDoctorRankingSpecialist.GetDoctorRankingSpecialist;
 import com.yd.yourdoctorandroid.networks.getDoctorRankingSpecialist.MainObjectRanking;
+import com.yd.yourdoctorandroid.utils.SharedPrefs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,7 +136,7 @@ public class ListDoctorRankingSpecialistFragment extends Fragment {
 
     private void loadFirstPage() {
         GetDoctorRankingSpecialist getDoctorRankingSpecialist = RetrofitFactory.getInstance().createService(GetDoctorRankingSpecialist.class);
-        getDoctorRankingSpecialist.getMainObjectRanking(specialistId, "5", currentPage + "").enqueue(new Callback<MainObjectRanking>() {
+        getDoctorRankingSpecialist.getMainObjectRanking(SharedPrefs.getInstance().get("JWT_TOKEN", String.class),specialistId, "5", currentPage + "").enqueue(new Callback<MainObjectRanking>() {
             @Override
             public void onResponse(Call<MainObjectRanking> call, Response<MainObjectRanking> response) {
                 MainObjectRanking mainObject = response.body();
@@ -175,7 +176,7 @@ public class ListDoctorRankingSpecialistFragment extends Fragment {
     private void loadNextPage() {
 
         GetDoctorRankingSpecialist getDoctorRankingSpecialist = RetrofitFactory.getInstance().createService(GetDoctorRankingSpecialist.class);
-        getDoctorRankingSpecialist.getMainObjectRanking(specialistId, "5", currentPage + "").enqueue(new Callback<MainObjectRanking>() {
+        getDoctorRankingSpecialist.getMainObjectRanking(SharedPrefs.getInstance().get("JWT_TOKEN", String.class),specialistId, "5", currentPage + "").enqueue(new Callback<MainObjectRanking>() {
             @Override
             public void onResponse(Call<MainObjectRanking> call, Response<MainObjectRanking> response) {
                 MainObjectRanking mainObject = response.body();

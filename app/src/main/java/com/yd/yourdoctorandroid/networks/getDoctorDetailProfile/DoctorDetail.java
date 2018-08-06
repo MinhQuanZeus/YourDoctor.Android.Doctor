@@ -1,18 +1,18 @@
 package com.yd.yourdoctorandroid.networks.getDoctorDetailProfile;
 
-import com.yd.yourdoctorandroid.networks.models.Certification;
+import com.yd.yourdoctorandroid.models.Certification;
 
 import java.util.List;
 
 public class DoctorDetail {
 
-    DoctorID doctorId;
-    float currentRating;
-    List<Certification> certificates;
-    List<SpecialistDetail> idSpecialist;
-    String universityGraduate;
-    String yearGraduate;
-    String placeWorking;
+    private DoctorID doctorId;
+    private float currentRating;
+    private List<Certification> certificates;
+    private List<SpecialistDetail> idSpecialist;
+    private String universityGraduate;
+    private String yearGraduate;
+    private String placeWorking;
 
     public DoctorID getDoctorId() {
         return doctorId;

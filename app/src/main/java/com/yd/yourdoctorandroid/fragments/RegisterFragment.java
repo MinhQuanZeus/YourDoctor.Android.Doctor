@@ -37,7 +37,6 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -50,14 +49,14 @@ import com.yd.yourdoctorandroid.BuildConfig;
 import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.activities.MainActivity;
 import com.yd.yourdoctorandroid.managers.AzureImageManager;
+import com.yd.yourdoctorandroid.models.Doctor;
+import com.yd.yourdoctorandroid.models.Patient;
+import com.yd.yourdoctorandroid.models.Specialist;
 import com.yd.yourdoctorandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorandroid.networks.getSpecialistService.GetSpecialistService;
 import com.yd.yourdoctorandroid.networks.getSpecialistService.MainObjectSpecialist;
 import com.yd.yourdoctorandroid.networks.models.AuthResponse;
 import com.yd.yourdoctorandroid.networks.models.CommonErrorResponse;
-import com.yd.yourdoctorandroid.networks.models.Patient;
-import com.yd.yourdoctorandroid.networks.models.Specialist;
-import com.yd.yourdoctorandroid.networks.models.TypeAdvisory;
 import com.yd.yourdoctorandroid.networks.services.RegisterPatientService;
 import com.yd.yourdoctorandroid.utils.LoadDefaultModel;
 import com.yd.yourdoctorandroid.utils.SharedPrefs;
@@ -440,7 +439,8 @@ public class RegisterFragment extends Fragment {
         String birthday = edBirthday.getText().toString();
         String address = edAddress.getText().toString();
         int gender = getGender();
-        Patient patient = new Patient(null, fname, mname, lname, phoneNumber, password, avatar, gender, birthday, address, 1);
+        Patient patient = new Patient();
+        //= new Patient(null, fname, mname, lname, phoneNumber, password, avatar, gender, birthday, address, 1);
         MultipartBody.Part avatarUpload = null;
         // Map is used to multipart the file using okhttp3.RequestBody
         File file = null;
@@ -451,7 +451,7 @@ public class RegisterFragment extends Fragment {
         }
 
 
-        Log.d("CREATE USER", patient.toString());
+       // Log.d("CREATE USER", patient.toString());
         RegisterPatientService registerPatientService = RetrofitFactory.getInstance().createService(RegisterPatientService.class);
         final File finalFile = file;
         registerPatientService.register(avatarUpload, patient)
@@ -467,8 +467,13 @@ public class RegisterFragment extends Fragment {
                         }
                         if (response.code() == 200 || response.code() == 201) {
                             SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
+
+                            if(SharedPrefs.getInstance().get(USER_INFO, Doctor.class) != null){
+                                FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get(USER_INFO, Doctor.class).getDoctorId());
+                            }
+
                             SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
-                            FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getId());
+                            FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
                             Intent intent = new Intent(getActivity(), MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
