@@ -8,9 +8,9 @@ import com.yd.yourdoctorandroid.models.Patient;
 import java.net.URISyntaxException;
 
 public class SocketUtils {
-    //http://192.168.124.109:3000
+    //http://192.168.124.104:3000
     //https://your-doctor-test2.herokuapp.com
-    private final static String URL_SERVER = "http://192.168.124.104:3000";
+    private final static String URL_SERVER = "https://your-doctor-test2.herokuapp.com";
     private Socket mSocket;
     private static SocketUtils socketUtils;
 

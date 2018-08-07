@@ -71,19 +71,14 @@ public class Utils {
 
     public static void backToLogin(Context context){
         FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get("USER_INFO", Doctor.class).getDoctorId());
-        context.stopService(new Intent(context, YDFirebaseMessagingService.class));
-        context.stopService(new Intent(context, CheckNetWordChangeService.class));
+        //context.stopService(new Intent(context, YDFirebaseMessagingService.class));
+        //context.stopService(new Intent(context, CheckNetWordChangeService.class));
+        SocketUtils.getInstance().disconnectConnect();
         SharedPrefs.getInstance().clear();
         Intent intent = new Intent(context, AuthActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
-    }
-
-    public static void startServices(Context context){
-        //Intent intent = new Intent(context, YDFirebaseMessagingService.class);
-       // intent.
-       // context.startService()
     }
 
 }

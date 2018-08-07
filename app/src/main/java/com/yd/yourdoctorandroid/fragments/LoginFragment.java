@@ -136,6 +136,7 @@ public class LoginFragment extends Fragment {
 
                 if (response.code() == 200 || response.code() == 201) {
                     SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
+
                     if(SharedPrefs.getInstance().get(USER_INFO, Doctor.class) != null){
                         FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get(USER_INFO, Doctor.class).getDoctorId());
                     }

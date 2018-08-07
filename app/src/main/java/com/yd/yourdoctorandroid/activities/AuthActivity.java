@@ -27,8 +27,8 @@ public class AuthActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             Doctor doctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
             FirebaseMessaging.getInstance().subscribeToTopic(doctor.getDoctorId());
-            startActivity(intent);
             SocketUtils.getInstance().reConnect();
+            startActivity(intent);
         } else {
             ScreenManager.openFragment(getSupportFragmentManager(), new LoginFragment(), R.id.fl_auth, false, false);
         }

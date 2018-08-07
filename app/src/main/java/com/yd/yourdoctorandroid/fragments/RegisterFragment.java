@@ -60,6 +60,7 @@ import com.yd.yourdoctorandroid.networks.models.CommonErrorResponse;
 import com.yd.yourdoctorandroid.networks.services.RegisterPatientService;
 import com.yd.yourdoctorandroid.utils.LoadDefaultModel;
 import com.yd.yourdoctorandroid.utils.SharedPrefs;
+import com.yd.yourdoctorandroid.utils.SocketUtils;
 import com.yd.yourdoctorandroid.utils.Utils;
 
 import java.io.ByteArrayInputStream;
@@ -474,6 +475,7 @@ public class RegisterFragment extends Fragment {
 
                             SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
                             FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
+                            SocketUtils.getInstance().reConnect();
                             Intent intent = new Intent(getActivity(), MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
