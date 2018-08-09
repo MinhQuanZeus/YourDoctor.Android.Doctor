@@ -7,7 +7,7 @@ import retrofit2.http.POST;
 
 public interface CheckStatusChatService {
     //http://192.168.124.109:3000/api/
-    @POST("http://192.168.124.109:3000/api/chatshistorys/checkStatusChatsHistory")
+    @POST("chatshistorys/checkStatusChatsHistory")
     Call<ListNotDoneResponse> checkStatusChatService(@Header("Authorization") String jwt, @Body ListRequest listRequest);
 
 }

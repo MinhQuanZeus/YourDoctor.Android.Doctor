@@ -36,20 +36,14 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".activities.MainActivity">
-
-        </activity>
-        <activity android:name=".activities.ChatActivity">
-
-
-        </activity>
+        <activity android:name=".activities.MainActivity"></activity>
+        <activity android:name=".activities.ChatActivity"></activity>
         <activity android:name=".activities.AuthActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <service
@@ -59,7 +53,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
         <service
             android:name=".services.YDFirebaseInstanceIDService"
             android:exported="false">
@@ -73,7 +66,8 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-    </application>
 
+        <activity android:name=".activities.ReaderActivity"></activity>
+    </application>
 
 </manifest>

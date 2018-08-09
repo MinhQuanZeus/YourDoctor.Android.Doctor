@@ -3,20 +3,17 @@ package com.yd.yourdoctorandroid.networks.getListHistoryChat;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class DoctorIdHistory {
-    @SerializedName("id")
+public class PatientIdHistory {
+    @SerializedName("_id")
     @Expose
-    private String _id;
+    private String id;
     private String firstName;
     private String middleName;
     private String lastName;
+    private String avatar;
 
-    public String get_id() {
-        return _id;
-    }
-
-    public void set_id(String _id) {
-        this._id = _id;
+    public String getId() {
+        return id;
     }
 
     public String getFirstName() {
@@ -41,5 +38,17 @@ public class DoctorIdHistory {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getFullName(){
+        return firstName + " " + middleName +" " + lastName;
     }
 }
