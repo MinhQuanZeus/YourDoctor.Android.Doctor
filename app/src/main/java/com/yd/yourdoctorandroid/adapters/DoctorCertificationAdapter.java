@@ -45,7 +45,7 @@ public class DoctorCertificationAdapter extends RecyclerView.Adapter<DoctorCerti
     @Override
     public DoctorCertificationAdapter.DoctorCertificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        View view = layoutInflater.inflate(R.layout.item_certification, parent, false);
+        View view = layoutInflater.inflate(R.layout.item_certificates_in_profile, parent, false);
         view.setOnClickListener(onClickListener);
         return new DoctorCertificationAdapter.DoctorCertificationViewHolder(view);
     }
@@ -91,15 +91,12 @@ public class DoctorCertificationAdapter extends RecyclerView.Adapter<DoctorCerti
 
     public class DoctorCertificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         ImageView iv_certification_profile;
-        TextView tv_certification_profile;
         private ItemClickListener itemClickListener;
         private Certification certificationModel;
 
         public DoctorCertificationViewHolder(View itemView) {
             super(itemView);
             iv_certification_profile = itemView.findViewById(R.id.iv_certification_profile);
-            tv_certification_profile = itemView.findViewById(R.id.tv_certification_profile);
-
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
@@ -109,8 +106,6 @@ public class DoctorCertificationAdapter extends RecyclerView.Adapter<DoctorCerti
             this.certificationModel = certificationModel;
             if (certificationModel != null) {
                 Picasso.with(context).load(certificationModel.getPathImage()).into(iv_certification_profile);
-                tv_certification_profile.setText(certificationModel.getName());
-
             }
         }
 

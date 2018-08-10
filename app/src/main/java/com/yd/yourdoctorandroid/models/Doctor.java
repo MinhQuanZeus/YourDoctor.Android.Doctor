@@ -11,12 +11,13 @@ public class Doctor {
     private String lastName;
     private String avatar;
     private String birthday;
+    private int gender;
     private String address;
     private int status;
     private long remainMoney;
     private float currentRating;
     private ArrayList<Certification> certificates;
-    private ArrayList<String> idSpecialist;
+    private ArrayList<Specialist> idSpecialist;
     private String universityGraduate;
     private String yearGraduate;
     private String placeWorking;
@@ -24,7 +25,7 @@ public class Doctor {
     public Doctor() {
     }
 
-    public Doctor(String doctorId, String phoneNumber, String password, String firstName, String middleName, String lastName, String avatar, String birthday, String address, int status, long remainMoney, float currentRating, ArrayList<Certification> certificates, ArrayList<String> idSpecialist, String universityGraduate, String yearGraduate, String placeWorking) {
+    public Doctor(String doctorId, String phoneNumber, String password, String firstName, String middleName, String lastName, String avatar, String birthday,int gender, String address, int status, long remainMoney, float currentRating, ArrayList<Certification> certificates, ArrayList<Specialist> idSpecialist, String universityGraduate, String yearGraduate, String placeWorking) {
         this.id = doctorId;
         this.phoneNumber = phoneNumber;
         this.password = password;
@@ -33,6 +34,7 @@ public class Doctor {
         this.lastName = lastName;
         this.avatar = avatar;
         this.birthday = birthday;
+        this.gender = gender;
         this.address = address;
         this.status = status;
         this.remainMoney = remainMoney;
@@ -44,6 +46,13 @@ public class Doctor {
         this.placeWorking = placeWorking;
     }
 
+    public int getGender() {
+        return gender;
+    }
+
+    public void setGender(int gender) {
+        this.gender = gender;
+    }
     public String  getFullName(){
         return firstName + " "+ middleName + " " + lastName;
     }
@@ -152,11 +161,11 @@ public class Doctor {
         this.certificates = certificates;
     }
 
-    public ArrayList<String> getIdSpecialist() {
+    public ArrayList<Specialist> getIdSpecialist() {
         return idSpecialist;
     }
 
-    public void setIdSpecialist(ArrayList<String> idSpecialist) {
+    public void setIdSpecialist(ArrayList<Specialist> idSpecialist) {
         this.idSpecialist = idSpecialist;
     }
 

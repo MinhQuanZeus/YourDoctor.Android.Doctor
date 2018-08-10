@@ -1,203 +1,465 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".fragments.DoctorProfileFragment">
+    tools:context=".fragments.UserProfileFragment"
+    android:background="@color/white">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="match_parent">
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/tb_main"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/gradientbackground"
-            android:fitsSystemWindows="true"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:toolbarId="@+id/toolbar">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <android.support.v7.widget.Toolbar
-                    android:id="@+id/tb_back_from_profile_doctor"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/gradientbackground"
-                    app:layout_collapseMode="pin"
-                    app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-                <ImageView
-                    android:id="@+id/iv_ava_doctor"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_below="@id/tb_back_from_profile_doctor"
-                    android:layout_centerHorizontal="true" />
-
-
-                <TextView
-                    android:id="@+id/tv_name_doctor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="40dp"
-                    android:textColor="@color/colorText"
-                    android:textSize="21dp"
-                    android:textStyle="bold" />
-
-                <RatingBar
-                    android:id="@+id/rb_doctorranking"
-                    style="@style/customRatingBar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="10dp"
-                    android:isIndicator="true"
-                    android:progressTint="@color/duskYellow"
-
-                    />
-            </RelativeLayout>
-
-
-        </android.support.design.widget.CollapsingToolbarLayout>
-    </android.support.design.widget.AppBarLayout>
-
-    <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/primary_text"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary" />
 
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/tb_main"
+            android:padding="16dp">
 
-            <LinearLayout
-                android:id="@+id/menu_profile_doctor"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="15dp"
-                android:orientation="horizontal">
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/iv_avatar"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="24dp"
+                android:src="@drawable/patient_avatar"
+                app:civ_border_color="@color/colorPrimary"
+                app:civ_border_width="2dp" />
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/iv_chat_with_doctor"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_chat_black_24dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/chat" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/iv_videocall_with_doctor"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_video_call_black_24dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/videocall" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/iv_report_with_doctor"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_report_black_24dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/report" />
-                </LinearLayout>
-            </LinearLayout>
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/iv_upload_avatar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignBottom="@+id/iv_avatar"
+                android:layout_alignEnd="@+id/iv_avatar"
+                android:src="@drawable/camera"
+                app:civ_border_color="@color/colorPrimary"
+                app:civ_border_width="2dp" />
 
             <RelativeLayout
-                android:layout_width="match_parent"
+                android:id="@+id/rl_name"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/menu_profile_doctor">
+                android:layout_below="@+id/iv_avatar"
+                android:layout_centerHorizontal="true"
+                android:gravity="center_horizontal">
 
-                <TextView
-                    android:id="@+id/tv_info_logo"
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/til_fname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    android:text="@string/info_doctor"
-                    android:textAlignment="center"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:layout_alignParentStart="true"
+                    android:textColor="@color/colorText">
 
-                <TextView
-                    android:id="@+id/tv_introduce_doctor"
+                    <TextView
+                        android:id="@+id/tv_fname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="12dp"
+                        android:gravity="left"
+
+                        android:inputType="text"
+                        android:maxLength="12"
+                        android:padding="16dp"
+                        android:textColor="@color/colorText"
+                        android:textColorHint="@color/colorHint"
+                        android:textSize="16dp" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <!--android:hint="@string/first_name"-->
+                <!--mid name-->
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/til_mname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_info_logo"
-                    android:layout_centerHorizontal="true"
-                    android:layout_margin="@dimen/text_margin"
-                    android:text="@string/introduce_doctor_text"
-                    android:textAlignment="center"
-                    android:textColor="@color/colorText"
-                    android:textSize="15dp" />
+                    android:layout_toEndOf="@id/til_fname"
+                    android:textColor="@color/colorText">
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/rl_certification_doctor"
-                    android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tv_mname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="12dp"
+                        android:gravity="left"
+
+                        android:inputType="text"
+                        android:maxLength="12"
+                        android:padding="16dp"
+                        android:textColor="@color/colorText"
+                        android:textColorHint="@color/colorHint"
+                        android:textSize="16dp" />
+
+                </android.support.design.widget.TextInputLayout>
+
+
+                <!--last name-->
+                <!--android:hint="@string/mid_name"-->
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/til_lname"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_introduce_doctor"
-                    android:layout_margin="10dp" />
+                    android:layout_toEndOf="@id/til_mname"
+                    android:textColor="@color/colorText">
+
+                    <TextView
+                        android:id="@+id/tv_lname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="12dp"
+                        android:gravity="left"
+
+                        android:inputType="text"
+                        android:maxLength="12"
+                        android:padding="16dp"
+                        android:textColor="@color/colorText"
+                        android:textColorHint="@color/colorHint"
+                        android:textSize="16dp" />
+
+                </android.support.design.widget.TextInputLayout>
+
             </RelativeLayout>
 
+            <RatingBar
+                android:layout_below="@id/rl_name"
+                android:id="@+id/rb_doctorRanking"
+                style="@style/customRatingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10dp"
+                android:numStars="5"
+                android:isIndicator="true"
+                android:progressTint="@color/duskYellow"
+                />
+            <LinearLayout
+                android:id="@+id/ln_money"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_below="@id/rb_doctorRanking"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Số dư:"
+                    />
+                    <TextView
+                        android:id="@+id/tv_remainMoney"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="12dp"
+                        android:gravity="left"
+                        android:maxLength="12"
+                        android:padding="5dp"
+                        android:textColor="@color/colorText"
+                        android:textSize="16dp" />
+
+            </LinearLayout>
+            <!--phone-->
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ln_money"
+                android:textColor="@color/colorText">
+
+                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                    android:id="@+id/tv_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_phone_black_24dp"
+                    android:drawablePadding="12dp"
+                    android:gravity="left"
+                    android:hint="@string/phone"
+                    android:inputType="text"
+                    android:maxLength="12"
+                    android:padding="16dp"
+                    android:textColor="@color/colorText"
+                    android:textSize="16dp" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <ImageView
+                android:id="@+id/tv_gender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_phone"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/gender"
+                android:textSize="16dp"
+                app:srcCompat="@drawable/ic_gender_symbols" />
+
+            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/rg_gender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/til_phone"
+                android:layout_marginLeft="7dp"
+                android:layout_marginTop="16dp"
+                android:layout_toEndOf="@+id/tv_gender"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radio_male"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/male" />
+
+                <RadioButton
+                    android:id="@+id/radio_female"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/female" />
+
+                <RadioButton
+                    android:id="@+id/radio_other"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/other" />
+            </RadioGroup>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_marginTop="10dp"
+                android:id="@+id/til_birthday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rg_gender"
+                android:textColor="@color/colorText">
+
+                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                    android:id="@+id/ed_birthday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_birthday_calendar"
+                    android:drawablePadding="12dp"
+                    android:focusable="false"
+                    android:hint="@string/birthday"
+                    android:inputType="date"
+                    android:padding="16dp"
+                    android:textColor="@color/colorText"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <!--address-->
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_birthday"
+                android:textColor="@color/colorText">
+
+                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                    android:id="@+id/ed_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_direction_signs"
+                    android:drawablePadding="12dp"
+                    android:hint="@string/address"
+                    android:inputType="text"
+                    android:padding="16dp"
+                    android:textColor="@color/colorText"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <!--UniversityGraduate-->
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_universityGraduate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_address"
+                android:textColor="@color/colorText">
+
+                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                    android:id="@+id/tv_universityGraduate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_account_balance_black_24dp"
+                    android:drawablePadding="12dp"
+                    android:hint="@string/universityGraduate"
+                    android:inputType="text"
+                    android:padding="16dp"
+                    android:textColor="@color/colorText"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <!--yearGraduate-->
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_yearGraduate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_universityGraduate"
+                android:textColor="@color/colorText">
+
+                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                    android:id="@+id/tv_yearGraduate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_school_black_24dp"
+                    android:drawablePadding="12dp"
+                    android:hint="@string/yearGraduate"
+                    android:inputType="text"
+                    android:padding="16dp"
+                    android:textColor="@color/colorText"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <!--placeWorking-->
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_placeWorking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_yearGraduate"
+                android:textColor="@color/colorText">
+
+                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                    android:id="@+id/ed_placeWorking"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_work_black_24dp"
+                    android:drawablePadding="12dp"
+                    android:hint="@string/placeWorking"
+                    android:inputType="text"
+                    android:padding="16dp"
+                    android:textColor="@color/colorText"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <!--specialist-->
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_specialist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_placeWorking"
+                android:textColor="@color/colorText">
+
+                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                    android:id="@+id/tv_specialist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_local_hospital_black_24dp"
+                    android:drawablePadding="12dp"
+                    android:hint="@string/Specialist"
+                    android:inputType="text"
+                    android:padding="16dp"
+                    android:textColor="@color/colorText"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <!--certificates-->
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_certificates"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_specialist"
+                android:textColor="@color/colorText">
+
+                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                    android:id="@+id/tv_certificates"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_import_contacts_black_24dp"
+                    android:drawablePadding="12dp"
+                    android:hint="@string/Certificates"
+                    android:text="Ảnh chứng chỉ"
+                    android:padding="16dp"
+                    android:textColor="@color/colorText"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <!--certificates-->
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_certificatesImage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_certificates"
+                android:textColor="@color/colorText">
+
+                <android.support.v7.widget.RecyclerView
+                    android:padding="16dp"
+                    android:id="@+id/rv_image_certificates"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/til_certificates"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </android.support.v7.widget.RecyclerView>
+            </android.support.design.widget.TextInputLayout>
+
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_certificatesImage"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_change_password"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/buttonborder"
+                    android:text="@string/change_password"
+                    android:textColor="@color/redButton"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/btn_edit_profile"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_toEndOf="@id/btn_change_password"
+                    android:background="@drawable/buttonborder"
+                    android:text="@string/edit"
+                    android:textColor="@color/redButton"
+                    android:textSize="15sp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/rl_YesNoButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/til_address"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/btn_no"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/buttonborder"
+                    android:text="@string/btn_cancel"
+                    android:textColor="@color/white"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/btn_yes"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_toEndOf="@id/btn_no"
+                    android:background="@drawable/buttonborder"
+                    android:text="@string/btn_ok"
+                    android:textColor="@color/white"
+                    android:textSize="15sp" />
+            </RelativeLayout>
         </RelativeLayout>
-    </android.support.v4.widget.NestedScrollView>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:tint="@color/pink"
-        app:backgroundTint="@color/white"
-        app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
-
-</android.support.design.widget.CoordinatorLayout>
+        <ProgressBar
+            android:id="@+id/pbProfileDoctor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true" />
+    </RelativeLayout>
+</ScrollView>

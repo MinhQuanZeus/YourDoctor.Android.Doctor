@@ -21,8 +21,12 @@ import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.activities.ChatActivity;
 import com.yd.yourdoctorandroid.activities.MainActivity;
 import com.yd.yourdoctorandroid.managers.ScreenManager;
+import com.yd.yourdoctorandroid.models.Certification;
 import com.yd.yourdoctorandroid.models.Doctor;
+import com.yd.yourdoctorandroid.models.Specialist;
 import com.yd.yourdoctorandroid.networks.RetrofitFactory;
+import com.yd.yourdoctorandroid.networks.getDetailDoctor.GetDetailDoctorService;
+import com.yd.yourdoctorandroid.networks.getDetailDoctor.MainDetailDoctor;
 import com.yd.yourdoctorandroid.networks.models.AuthResponse;
 import com.yd.yourdoctorandroid.networks.models.CommonErrorResponse;
 import com.yd.yourdoctorandroid.networks.models.Login;
@@ -34,6 +38,7 @@ import com.yd.yourdoctorandroid.utils.Utils;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 
 import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton;
 import butterknife.BindView;
@@ -136,23 +141,14 @@ public class LoginFragment extends Fragment {
 
                 if (response.code() == 200 || response.code() == 201) {
                     SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
-
-                    if(SharedPrefs.getInstance().get(USER_INFO, Doctor.class) != null){
-                        FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get(USER_INFO, Doctor.class).getDoctorId());
-                    }
-
                     SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
-                    //for test
-                    Log.e("tokenDoctor", SharedPrefs.getInstance().get(JWT_TOKEN, String.class));
-                    Log.e("FireBase share ", response.body().getDoctor().getDoctorId());
-                    FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
-                    SocketUtils.getInstance().reConnect();
-                    Intent intent = new Intent(getActivity(), MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    getActivity().startActivity(intent);
-                    btnLogin.revertAnimation();
 
+//                    if(SharedPrefs.getInstance().get(USER_INFO, Doctor.class) != null){
+//                        //FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get(USER_INFO, Doctor.class).getDoctorId());
+//                    }
+
+
+                    getDetailDoctor();
                 }else {
                     enableAll();
                     CommonErrorResponse commonErrorResponse = parseToCommonError(response);
@@ -173,6 +169,45 @@ public class LoginFragment extends Fragment {
                 if (t instanceof SocketTimeoutException) {
                     Toast.makeText(getActivity(), getResources().getText(R.string.error_timeout), Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+    }
+
+    private void getDetailDoctor(){
+        GetDetailDoctorService getDetailDoctorService = RetrofitFactory.getInstance().createService(GetDetailDoctorService.class);
+        Log.e("token", SharedPrefs.getInstance().get(JWT_TOKEN,String.class));
+        Log.e("idDoctor",SharedPrefs.getInstance().get(USER_INFO,Doctor.class).getDoctorId() );
+        getDetailDoctorService.getDetailDoctor(SharedPrefs.getInstance().get(JWT_TOKEN,String.class),SharedPrefs.getInstance().get(USER_INFO,Doctor.class).getDoctorId()).enqueue(new Callback<MainDetailDoctor>() {
+            @Override
+            public void onResponse(Call<MainDetailDoctor> call, Response<MainDetailDoctor> response) {
+
+                if (response.code() == 200) {
+                    Doctor doctor;
+                    doctor = SharedPrefs.getInstance().get(USER_INFO,Doctor.class);
+
+                    doctor.setCertificates((ArrayList<Certification>) response.body().getDetailDoctor().getCertificates());
+                    doctor.setIdSpecialist((ArrayList<Specialist>)response.body().getDetailDoctor().getIdSpecialist());
+                    doctor.setUniversityGraduate(response.body().getDetailDoctor().getUniversityGraduate());
+                    doctor.setYearGraduate(response.body().getDetailDoctor().getYearGraduate());
+                    doctor.setPlaceWorking(response.body().getDetailDoctor().getPlaceWorking());
+                    doctor.setCurrentRating(response.body().getDetailDoctor().getCurrentRating());
+                    SharedPrefs.getInstance().put(USER_INFO,doctor);
+                    FirebaseMessaging.getInstance().subscribeToTopic(doctor.getDoctorId());
+                    SocketUtils.getInstance().reConnect();
+
+
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    getActivity().startActivity(intent);
+                    btnLogin.revertAnimation();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MainDetailDoctor> call, Throwable t) {
+                Toast.makeText(getContext(),"Đăng nhập không thành công",Toast.LENGTH_LONG).show();
+                btnLogin.revertAnimation();
             }
         });
     }

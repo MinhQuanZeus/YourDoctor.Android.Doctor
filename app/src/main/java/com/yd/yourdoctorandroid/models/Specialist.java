@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Specialist {
 
-    @SerializedName("_id")
+    @SerializedName("specialistId")
     @Expose
     String id;
     String name;

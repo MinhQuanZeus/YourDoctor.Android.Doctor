@@ -55,6 +55,12 @@
     <string name="fname_required">Vui lòng nhập họ</string>
     <string name="lname_required">Vui lòng nhập tên</string>
     <string name="confirm_password_error">Mật khẩu không khớp</string>
+    <string name="universityGraduate">Trường tốt nghiệp</string>
+    <string name="yearGraduate">Năm tốt nghiệp</string>
+    <string name="placeWorking">Nơi làm việc</string>
+    <string name="Specialist">Chuyên khoa</string>
+    <string name="Gender">Giới tính</string>
+    <string name="Certificates">Chứng chỉ</string>
 
 
     <!--Error mesage-->
