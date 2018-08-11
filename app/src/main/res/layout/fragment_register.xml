@@ -76,7 +76,7 @@
                 android:textColor="@color/colorText"
                 android:textColorHint="@color/colorHint">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_mname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -102,7 +102,7 @@
                 android:textColor="@color/colorText"
                 android:textColorHint="@color/colorHint">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_lname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -128,7 +128,7 @@
                 android:textColor="@color/colorText"
                 android:textColorHint="@color/colorHint">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -202,7 +202,7 @@
                 android:textColor="@color/colorText"
                 android:textColorHint="@color/colorHint">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -225,7 +225,7 @@
                 android:textColor="@color/colorText"
                 android:textColorHint="@color/colorHint">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_confirm_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -248,7 +248,7 @@
                 android:textColor="@color/colorText"
                 android:textColorHint="@color/colorHint">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_birthday"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -272,7 +272,7 @@
                 android:textColor="@color/colorText"
                 android:textColorHint="@color/colorHint">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -295,7 +295,7 @@
                 android:textColor="@color/colorText"
                 android:textColorHint="@color/colorHint">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_place_graduate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -318,7 +318,7 @@
                 android:textColor="@color/colorText"
                 android:textColorHint="@color/colorHint">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_year_graduate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -341,7 +341,7 @@
                 android:textColor="@color/colorText"
                 android:textColorHint="@color/colorHint">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_place_working"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

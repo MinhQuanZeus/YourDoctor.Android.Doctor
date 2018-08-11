@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.yd.yourdoctorandroid"
+        applicationId "com.yd.yourdoctorpartnerandroid"
         minSdkVersion 19
         targetSdkVersion 27
         versionCode 1
@@ -16,6 +16,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    useLibrary 'org.apache.http.legacy'
+
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -40,6 +48,14 @@ dependencies {
     implementation 'com.github.nkzawa:socket.io-client:0.3.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     implementation 'com.microsoft.azure.android:azure-storage-android:2.0.0@aar'
+
+    implementation 'com.github.nkzawa:socket.io-client:0.4.2'
+    implementation 'com.github.nhancv:nc-android-webrtcpeer:2.1.2'
+    implementation 'com.github.nhancv:nc-android-npermission:1.4'
+    //Async
+    implementation 'io.reactivex:rxandroid:1.2.0'
+    implementation 'io.reactivex:rxjava:1.3.0'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

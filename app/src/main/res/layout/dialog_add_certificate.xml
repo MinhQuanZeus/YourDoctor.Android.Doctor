@@ -14,7 +14,7 @@
         android:textColor="@color/colorText"
         android:textColorHint="@color/colorHint">
 
-        <com.yd.yourdoctorandroid.custormviews.MyEditText
+        <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
             android:id="@+id/ed_name_certificate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

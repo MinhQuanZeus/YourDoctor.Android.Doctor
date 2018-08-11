@@ -1,0 +1,10 @@
+package com.yd.yourdoctorpartnerandroid.networks.getSpecialistService;
+
+import retrofit2.Call;
+import retrofit2.http.GET;
+
+public interface GetSpecialistService {
+
+    @GET("specialists")
+    Call<MainObjectSpecialist> getMainObjectSpecialist();
+}

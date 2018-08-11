@@ -40,7 +40,7 @@
         android:layout_centerInParent="true"
         android:layout_marginTop="45dp">
 
-        <com.yd.yourdoctorandroid.custormviews.MyTextView
+        <com.yd.yourdoctorpartnerandroid.custormviews.MyTextView
             android:id="@+id/btn_patient"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
             android:textColor="#fff"
             android:textSize="16dp" />
 
-        <com.yd.yourdoctorandroid.custormviews.MyTextView
+        <com.yd.yourdoctorpartnerandroid.custormviews.MyTextView
             android:id="@+id/btn_doctor"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
