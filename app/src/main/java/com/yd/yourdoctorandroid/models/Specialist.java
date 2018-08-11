@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Specialist {
 
-    @SerializedName("_id")
+    @SerializedName("specialistId")
     @Expose
     String id;
     String name;
