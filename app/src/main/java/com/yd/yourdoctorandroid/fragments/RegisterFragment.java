@@ -37,29 +37,30 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.yd.yourdoctorandroid.BuildConfig;
 import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.activities.MainActivity;
 import com.yd.yourdoctorandroid.managers.AzureImageManager;
+import com.yd.yourdoctorandroid.models.Doctor;
+import com.yd.yourdoctorandroid.models.Patient;
+import com.yd.yourdoctorandroid.models.Specialist;
 import com.yd.yourdoctorandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorandroid.networks.getSpecialistService.GetSpecialistService;
 import com.yd.yourdoctorandroid.networks.getSpecialistService.MainObjectSpecialist;
 import com.yd.yourdoctorandroid.networks.models.AuthResponse;
 import com.yd.yourdoctorandroid.networks.models.CommonErrorResponse;
-import com.yd.yourdoctorandroid.networks.models.Patient;
-import com.yd.yourdoctorandroid.networks.models.Specialist;
-import com.yd.yourdoctorandroid.networks.models.TypeAdvisory;
 import com.yd.yourdoctorandroid.networks.services.RegisterPatientService;
 import com.yd.yourdoctorandroid.utils.LoadDefaultModel;
 import com.yd.yourdoctorandroid.utils.SharedPrefs;
+import com.yd.yourdoctorandroid.utils.SocketUtils;
 import com.yd.yourdoctorandroid.utils.Utils;
 
 import java.io.ByteArrayInputStream;
@@ -333,7 +334,7 @@ public class RegisterFragment extends Fragment {
             public void onResponse(Call<MainObjectSpecialist> call, Response<MainObjectSpecialist> response) {
                 Log.e("AnhLe", "success: " + response.body());
                 MainObjectSpecialist mainObjectSpecialist = response.body();
-                ArrayList<Specialist> specialists = (ArrayList<Specialist>) mainObjectSpecialist.getSpecialist();
+                ArrayList<Specialist> specialists = (ArrayList<Specialist>) mainObjectSpecialist.getListSpecialist();
                 if(specialists != null){
                     ArrayAdapter<Specialist> arrayAdapter
                             = new ArrayAdapter<Specialist>(getContext(), android.R.layout.simple_list_item_checked , specialists);
@@ -439,7 +440,8 @@ public class RegisterFragment extends Fragment {
         String birthday = edBirthday.getText().toString();
         String address = edAddress.getText().toString();
         int gender = getGender();
-        Patient patient = new Patient(null, fname, mname, lname, phoneNumber, password, avatar, gender, birthday, address, 1);
+        Patient patient = new Patient();
+        //= new Patient(null, fname, mname, lname, phoneNumber, password, avatar, gender, birthday, address, 1);
         MultipartBody.Part avatarUpload = null;
         // Map is used to multipart the file using okhttp3.RequestBody
         File file = null;
@@ -450,14 +452,14 @@ public class RegisterFragment extends Fragment {
         }
 
 
-        Log.d("CREATE USER", patient.toString());
+       // Log.d("CREATE USER", patient.toString());
         RegisterPatientService registerPatientService = RetrofitFactory.getInstance().createService(RegisterPatientService.class);
         final File finalFile = file;
         registerPatientService.register(avatarUpload, patient)
                 .enqueue(new Callback<AuthResponse>() {
                     @Override
                     public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                        btnSignUp.revertAnimation();
+
                         if (finalFile != null) {
                             try {
                                 finalFile.delete();
@@ -466,11 +468,20 @@ public class RegisterFragment extends Fragment {
                         }
                         if (response.code() == 200 || response.code() == 201) {
                             SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
+
+                            if(SharedPrefs.getInstance().get(USER_INFO, Doctor.class) != null){
+                                FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get(USER_INFO, Doctor.class).getDoctorId());
+                            }
+
                             SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
+                            FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
+                            SocketUtils.getInstance().reConnect();
                             Intent intent = new Intent(getActivity(), MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             getActivity().startActivity(intent);
+
+                            btnSignUp.revertAnimation();
                         } else {
                             CommonErrorResponse commonErrorResponse = parseToCommonError(response);
                             if (commonErrorResponse.getError() != null) {
@@ -478,6 +489,7 @@ public class RegisterFragment extends Fragment {
                                 Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
                                 Log.d("RESPONSE", error);
                             }
+                            btnSignUp.revertAnimation();
                         }
                     }
 

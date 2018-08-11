@@ -1,44 +1,39 @@
 package com.yd.yourdoctorandroid.activities;
 
 import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.adapters.PagerAdapter;
+import com.yd.yourdoctorandroid.fragments.AboutUsFragment;
 import com.yd.yourdoctorandroid.fragments.AdvisoryMenuFragment;
 import com.yd.yourdoctorandroid.fragments.DoctorProfileFragment;
 import com.yd.yourdoctorandroid.fragments.DoctorRankFragment;
 import com.yd.yourdoctorandroid.fragments.UserProfileFragment;
 import com.yd.yourdoctorandroid.managers.ScreenManager;
-import com.yd.yourdoctorandroid.networks.models.Patient;
 import com.yd.yourdoctorandroid.utils.Config;
-import com.yd.yourdoctorandroid.utils.NotificationUtils;
 import com.yd.yourdoctorandroid.utils.SharedPrefs;
+import com.yd.yourdoctorandroid.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -79,40 +74,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        Log.d("MainActivity", "USER_INFO");
 //        Log.d("MainActivity", SharedPrefs.getInstance().get("USER_INFO", Patient.class).toString());
 //        Log.d("MainActivity", SharedPrefs.getInstance().get("JWT_TOKEN", String.class));
-        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                // Kiểm tra Intent Filter có khớp cái nào không.
-                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
-                    // GCM đã được đăng ký thành công.
-                    // Đăng ký vào topic có tên "Global".
-                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
-                    displayFirebaseRegId();
-
-                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
-                    // Khi có tin nhắn mới về.
-                    String message = intent.getStringExtra("message");
-                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-                   // txtMessage.setText(message);
-                }
-            }
-        };
+//        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//
+//                // Kiểm tra Intent Filter có khớp cái nào không.
+//                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
+//                    // GCM đã được đăng ký thành công.
+//                    // Đăng ký vào topic có tên "Global".
+//                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
+//                    displayFirebaseRegId();
+//
+//                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+//                    // Khi có tin nhắn mới về.
+//                    String message = intent.getStringExtra("message");
+//                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+//                   // txtMessage.setText(message);
+//                }
+//            }
+//        };
 
         displayFirebaseRegId();
     }
     private void displayFirebaseRegId() {
         SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
+
         String regId = pref.getString("regId", null);
+        SharedPrefs.getInstance().get("regId", String.class);
+        Log.e(TAG, "Firebase reg id: " + SharedPrefs.getInstance().get("regId", String.class));
 
-        Log.e(TAG, "Firebase reg id: " + regId);
-
-        if (!TextUtils.isEmpty(regId))
-            Toast.makeText(this, "Firebase Reg Id: " + regId, Toast.LENGTH_SHORT).show();
-
-        else
-            Toast.makeText(this, "Firebase Reg Id is not received yet", Toast.LENGTH_SHORT).show();
-           // txtRegId.setText("Firebase Reg Id is not received yet!");
+//        if (!TextUtils.isEmpty(regId))
+//            Toast.makeText(this, "Firebase Reg Id: " + regId, Toast.LENGTH_SHORT).show();
+//
+//        else
+//            Toast.makeText(this, "Firebase Reg Id is not received yet", Toast.LENGTH_SHORT).show();
+//           // txtRegId.setText("Firebase Reg Id is not received yet!");
     }
 
 
@@ -157,20 +153,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_notifications_none_black_24dp));
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_home_black_24dp));
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_book_black_24dp));
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_history_black_24dp));
 
-        tabLayout.getTabAt(0).getIcon().setColorFilter(getResources().getColor(R.color.icon_selected), PorterDuff.Mode.SRC_IN);
-        tabLayout.getTabAt(1).getIcon().setColorFilter(getResources().getColor(R.color.icon_unselected), PorterDuff.Mode.SRC_IN);
+        tabLayout.getTabAt(0).getIcon().setColorFilter(getResources().getColor(R.color.icon_unselected), PorterDuff.Mode.SRC_IN);
+        tabLayout.getTabAt(1).getIcon().setColorFilter(getResources().getColor(R.color.icon_selected), PorterDuff.Mode.SRC_IN);
         tabLayout.getTabAt(2).getIcon().setColorFilter(getResources().getColor(R.color.icon_unselected), PorterDuff.Mode.SRC_IN);
+        tabLayout.getTabAt(3).getIcon().setColorFilter(getResources().getColor(R.color.icon_unselected), PorterDuff.Mode.SRC_IN);
 
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(), 4);
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setCurrentItem(1);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
+                tabLayout.getTabAt(1).getIcon().setColorFilter(getResources().getColor(R.color.icon_unselected), PorterDuff.Mode.SRC_IN);
                 tabLayout.getTabAt(tab.getPosition()).getIcon().setColorFilter(getResources().getColor(R.color.icon_selected), PorterDuff.Mode.SRC_IN);
+
+
             }
 
             @Override
@@ -194,10 +196,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+//        Intent intent = new Intent(Intent.ACTION_MAIN);
+//        intent.addCategory(Intent.CATEGORY_HOME);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(intent);
     }
 
     @Override
@@ -229,16 +231,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             }
             case R.id.nav_profile_main: {
-                ScreenManager.openFragment(getSupportFragmentManager(), new UserProfileFragment(), R.id.rl_container, true, true);
+                ScreenManager.openFragment(getSupportFragmentManager(), new DoctorProfileFragment(), R.id.rl_container, true, true);
                 break;
             }
             case R.id.nav_ranking_docto_main: {
                 ScreenManager.openFragment(getSupportFragmentManager(), new DoctorRankFragment(), R.id.rl_container, true, true);
                 break;
             }
+            case R.id.navAboutUs:{
+                ScreenManager.openFragment(getSupportFragmentManager(), new AboutUsFragment(), R.id.rl_container, true, true);
+
+                break;
+            }
             case R.id.nav_logout_main: {
                 //Test
-                ScreenManager.openFragment(getSupportFragmentManager(), new DoctorProfileFragment(), R.id.rl_container, true, true);
+                handleLogOut();
+                //ScreenManager.openFragment(getSupportFragmentManager(), new DoctorProfileFragment(), R.id.rl_container, true, true);
                 break;
 
             }
@@ -253,22 +261,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
         fab_question.setVisibility(View.VISIBLE);
         // Đăng ký receiver vào LocalBroadcastManager.
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.REGISTRATION_COMPLETE));
+      //  LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+      //          new IntentFilter(Config.REGISTRATION_COMPLETE));
 
         // Đăng ký bộ nhận tin nhắn.
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.PUSH_NOTIFICATION));
+       // LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+              //  new IntentFilter(Config.PUSH_NOTIFICATION));
 
         // Xóa các notification khi app được bật.
-        NotificationUtils.clearNotifications(getApplicationContext());
+       // NotificationUtils.clearNotifications(getApplicationContext());
+    }
+
+    private void handleLogOut(){
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Đăng Xuất")
+                .setMessage("Bạn có chắc muốn thoát khỏi hệ thống không?")
+                .setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Utils.backToLogin(getApplicationContext());
+                    }
+
+                })
+                .setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                }).show();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         fab_question.setVisibility(View.INVISIBLE);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+       // LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
     }
 }
 

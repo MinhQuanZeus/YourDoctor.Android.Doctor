@@ -16,7 +16,7 @@ import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.events.ItemClickListener;
-import com.yd.yourdoctorandroid.networks.models.Certification;
+import com.yd.yourdoctorandroid.models.Certification;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class DoctorCertificationAdapter extends RecyclerView.Adapter<DoctorCerti
     @Override
     public DoctorCertificationAdapter.DoctorCertificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        View view = layoutInflater.inflate(R.layout.item_certification, parent, false);
+        View view = layoutInflater.inflate(R.layout.item_certificates_in_profile, parent, false);
         view.setOnClickListener(onClickListener);
         return new DoctorCertificationAdapter.DoctorCertificationViewHolder(view);
     }
@@ -68,7 +68,7 @@ public class DoctorCertificationAdapter extends RecyclerView.Adapter<DoctorCerti
                 PhotoView certification_photo_view = dialog.findViewById(R.id.certification_photo_view);
                 Button btn_cancel_from_photo_view = dialog.findViewById(R.id.btn_cancel_from_photo_view);
 
-                Picasso.with(context).load(certificationChoice.getPath_image()).into(certification_photo_view);
+                Picasso.with(context).load(certificationChoice.getPathImage()).into(certification_photo_view);
 
                 btn_cancel_from_photo_view.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -91,15 +91,12 @@ public class DoctorCertificationAdapter extends RecyclerView.Adapter<DoctorCerti
 
     public class DoctorCertificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         ImageView iv_certification_profile;
-        TextView tv_certification_profile;
         private ItemClickListener itemClickListener;
         private Certification certificationModel;
 
         public DoctorCertificationViewHolder(View itemView) {
             super(itemView);
             iv_certification_profile = itemView.findViewById(R.id.iv_certification_profile);
-            tv_certification_profile = itemView.findViewById(R.id.tv_certification_profile);
-
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
@@ -108,9 +105,7 @@ public class DoctorCertificationAdapter extends RecyclerView.Adapter<DoctorCerti
 
             this.certificationModel = certificationModel;
             if (certificationModel != null) {
-                Picasso.with(context).load(certificationModel.getPath_image()).into(iv_certification_profile);
-                tv_certification_profile.setText(certificationModel.getName());
-
+                Picasso.with(context).load(certificationModel.getPathImage()).into(iv_certification_profile);
             }
         }
 

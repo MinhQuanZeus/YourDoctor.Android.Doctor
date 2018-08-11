@@ -2,10 +2,11 @@ package com.yd.yourdoctorandroid.networks.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.yd.yourdoctorandroid.models.Doctor;
 
 public class AuthResponse {
     private String message;
-    @SerializedName("jwt_token")
+    @SerializedName("token")
     @Expose
     private String jwtToken;
     @SerializedName("user")

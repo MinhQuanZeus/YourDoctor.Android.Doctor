@@ -1,24 +1,45 @@
 package com.yd.yourdoctorandroid.services;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
-import android.util.Log;
 
+import android.os.Build;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.yd.yourdoctorandroid.activities.MainActivity;
-import com.yd.yourdoctorandroid.utils.Config;
+import com.yd.yourdoctorandroid.R;
+import com.yd.yourdoctorandroid.activities.ChatActivity;
+import com.yd.yourdoctorandroid.models.Doctor;
 import com.yd.yourdoctorandroid.utils.NotificationUtils;
+import com.yd.yourdoctorandroid.utils.SharedPrefs;
+import com.yd.yourdoctorandroid.utils.SocketUtils;
 
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class YDFirebaseMessagingService extends FirebaseMessagingService {
     public static final String TAG = YDFirebaseMessagingService.class.getSimpleName();
-    private NotificationUtils notificationUtils;
+    private String senderId;
+    private String nameSender;
+    private String receiveId;
+    private int type;
+    private String storageId;
+    private String message;
+    private String createTime;
+
+    private String title;
+    private String description;
+
+    static int id = 1;
+
+    private Intent intent;
+    private PendingIntent pendingIntent;
+    private NotificationCompat.Builder builder;
+    private NotificationManager notifManager;
 
     public YDFirebaseMessagingService() {
         super();
@@ -26,105 +47,133 @@ public class YDFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        Log.e(TAG, "From: " + remoteMessage.getFrom());
-
         if (remoteMessage == null) {
+            Log.e(TAG, "Notify is null");
             return;
-        }
-
-        // Kiểm tra xem message có chứa notification payload không.
-        if (remoteMessage.getNotification() != null) {
-            Log.e(TAG, "Notification Body: " + remoteMessage.getNotification().getBody());
-            handleNotification(remoteMessage.getNotification().getBody());
-        }
-
-        // Kiểm tra xem message có chứa data payload không.
-        if (remoteMessage.getData().size() > 0) {
-            Log.e(TAG, "Data Payload: " + remoteMessage.getData().toString());
-
-            try {
-                JSONObject json = new JSONObject(remoteMessage.getData().toString());
-                handleDataMessage(json);
-            } catch (Exception e) {
-                Log.e(TAG, "Exception: " + e.getMessage());
-            }
-        }
-
-
-    }
-
-    private void handleNotification(String message) {
-        if (!NotificationUtils.isAppInBackground(getApplicationContext())) {
-            // Nếu app đang chạy hiện, broadcast cả push message.
-            Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
-            pushNotification.putExtra("message", message);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
         } else {
-            // Nếu app đang chạy ngầm, Firebase sẽ tự xử lý notification.
+            senderId = remoteMessage.getData().get("senderId");
+            nameSender = remoteMessage.getData().get("nameSender");
+            receiveId = remoteMessage.getData().get("receiveId");
+            type = Integer.parseInt(remoteMessage.getData().get("type"));
+            storageId = remoteMessage.getData().get("storageId");
+            message = remoteMessage.getData().get("message");
+            createTime = remoteMessage.getData().get("createTime");
+            if(SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null){
+                showNotification();
+            }
+
         }
     }
 
-    private void handleDataMessage(JSONObject json) {
-        Log.e(TAG, "push json: " + json.toString());
+    private void showNotification() {
+        if (notifManager == null) {
+            notifManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        }
 
-        try {
-            JSONObject data = json.getJSONObject("data");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel mChannel = notifManager.getNotificationChannel(id + "");
+            if (mChannel == null) {
+                mChannel = new NotificationChannel(id + "", "YourDoctor", importance);
+                mChannel.setDescription(description);
+                mChannel.enableVibration(true);
+                mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+                notifManager.createNotificationChannel(mChannel);
+            }
+            builder = new NotificationCompat.Builder(this, id + "");
 
-            String title = data.getString("title");
-            String message = data.getString("message");
-            boolean isBackground = data.getBoolean("is_background");
-            String imageUrl = data.getString("image");
-            String timestamp = data.getString("timestamp");
-            JSONObject payload = data.getJSONObject("payload");
+            switch (type) {
+                case 1: {
+                    intent = new Intent(getApplicationContext(), ChatActivity.class);
+                    Log.e("Notify is here", "Notify is here");
+                    Log.e("sender id " , senderId);
+                    Log.e("storageId" , storageId);
+                    intent.putExtra("chatHistoryId", storageId);
+                    intent.putExtra("patientChoiceId", senderId);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+                    stackBuilder.addNextIntent(intent);
+                    PendingIntent pendingIntent =
+                            stackBuilder.getPendingIntent(
+                                    0,
+                                    PendingIntent.FLAG_UPDATE_CURRENT
+                            );
+                   //pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
 
-            Log.e(TAG, "title: " + title);
-            Log.e(TAG, "message: " + message);
-            Log.e(TAG, "isBackground: " + isBackground);
-            Log.e(TAG, "payload: " + payload.toString());
-            Log.e(TAG, "imageUrl: " + imageUrl);
-            Log.e(TAG, "timestamp: " + timestamp);
+                    builder.setContentTitle("Thông báo chat")  // required
+                            .setSmallIcon(R.drawable.your_doctor_logo) // required
+                            .setContentText(message)  // required
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setAutoCancel(true)
+                            .setContentIntent(pendingIntent)
+                            .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+                    break;
+                }
+                case 3: {
 
-
-            if (!NotificationUtils.isAppInBackground(getApplicationContext())) {
-                // Nếu app đang chạy hiện, broadcast cả push message.
-                Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
-                pushNotification.putExtra("message", message);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
-            } else {
-                // Nếu app đang chạy ngầm, Firebase sẽ tự xử lý notification.
-                Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
-                resultIntent.putExtra("message", message);
-
-                // Kiểm tra xem có ảnh không.
-                if (TextUtils.isEmpty(imageUrl)) {
-                    showNotificationMessage(getApplicationContext(), title, message, timestamp, resultIntent);
-                } else {
-                    // image is present, show notification with image
-                    showNotificationMessageWithBigImage(getApplicationContext(), title, message, timestamp, resultIntent, imageUrl);
+                    builder.setContentTitle("Thông báo Thanh Toán")  // required
+                            .setSmallIcon(R.drawable.your_doctor_logo) // required
+                            .setContentText(message)  // required
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setAutoCancel(true)
+                            .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+                    break;
                 }
             }
-        } catch (JSONException e) {
-            Log.e(TAG, "Json Exception: " + e.getMessage());
-        } catch (Exception e) {
-            Log.e(TAG, "Exception: " + e.getMessage());
+
+        } else {
+
+
+            builder = new NotificationCompat.Builder(this);
+
+            switch (type) {
+                case 1: {
+                    intent = new Intent(getApplicationContext(), ChatActivity.class);
+                    intent.putExtra("chatHistoryId", storageId);
+                    intent.putExtra("patientChoiceId", senderId);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+                    stackBuilder.addNextIntent(intent);
+                    PendingIntent pendingIntent =
+                            stackBuilder.getPendingIntent(
+                                    0,
+                                    PendingIntent.FLAG_UPDATE_CURRENT
+                            );
+
+                    builder.setContentTitle("Thông báo chat")                           // required
+                            .setSmallIcon(R.drawable.your_doctor_logo) // required
+                            .setContentText(message)  // required
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setAutoCancel(true)
+                            .setContentIntent(pendingIntent)
+                            .setTicker(message)
+                            .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
+                            .setPriority(Notification.PRIORITY_HIGH);
+                    break;
+                }
+                case 3: {
+
+                    builder.setContentTitle("Thông báo thanh toán")                           // required
+                            .setSmallIcon(R.drawable.your_doctor_logo) // required
+                            .setContentText(message)  // required
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setAutoCancel(true)
+                            .setContentIntent(pendingIntent)
+                            .setTicker(message)
+                            .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
+                            .setPriority(Notification.PRIORITY_HIGH);
+                    break;
+                }
+
+            }
         }
-    }
 
-    /**
-     * Hiển thị notification chỉ có text.
-     */
-    private void showNotificationMessage(Context context, String title, String message, String timeStamp, Intent intent) {
-        notificationUtils = new NotificationUtils(context);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils.showNotificationMessage(title, message, timeStamp, intent);
-    }
-
-    /**
-     * Hiển thị notification có cả text và hình.
-     */
-    private void showNotificationMessageWithBigImage(Context context, String title, String message, String timeStamp, Intent intent, String imageUrl) {
-        notificationUtils = new NotificationUtils(context);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils.showNotificationMessage(title, message, timeStamp, intent, imageUrl);
+        Notification notification = builder.build();
+        notifManager.notify(id, notification);
+        id++;
     }
 }
+

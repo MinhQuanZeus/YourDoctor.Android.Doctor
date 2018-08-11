@@ -17,10 +17,10 @@ import android.view.ViewGroup;
 
 import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.managers.ScreenManager;
+import com.yd.yourdoctorandroid.models.Specialist;
 import com.yd.yourdoctorandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorandroid.networks.getSpecialistService.GetSpecialistService;
 import com.yd.yourdoctorandroid.networks.getSpecialistService.MainObjectSpecialist;
-import com.yd.yourdoctorandroid.networks.models.Specialist;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +110,7 @@ public class DoctorRankFragment extends Fragment {
             public synchronized void onResponse(Call<MainObjectSpecialist> call, Response<MainObjectSpecialist> response) {
                 Log.e("AnhLe", "success: " + response.body());
                 MainObjectSpecialist mainObjectSpecialist = response.body();
-                List<Specialist> specialist = mainObjectSpecialist.getSpecialist();
+                List<Specialist> specialist = mainObjectSpecialist.getListSpecialist();
 
                 specialists = specialist;
                 setupViewPager(vp_doctorRanking);
@@ -159,7 +159,7 @@ public class DoctorRankFragment extends Fragment {
 
         @Override
         public Fragment getItem(int position) {
-            return new ListDoctorRankingSpecialistFragment().setSpecialistId(((Specialist) specialists.get(position)).get_id(), getContext());
+            return new ListDoctorRankingSpecialistFragment().setSpecialistId(((Specialist) specialists.get(position)).getId(), getContext());
 
         }
 

@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import com.yd.yourdoctorandroid.fragments.HistoryTransactionFragment;
 import com.yd.yourdoctorandroid.fragments.HomeFragment;
 import com.yd.yourdoctorandroid.fragments.NotifyFragment;
+import com.yd.yourdoctorandroid.fragments.SpecialistInfoFragment;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
 
@@ -26,7 +27,10 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
             case 1:
                 return new HomeFragment();
             case 2:
+                return new SpecialistInfoFragment();
+            case 3:{
                 return new HistoryTransactionFragment();
+            }
             default:
                 return new HomeFragment();
         }

@@ -1,17 +1,17 @@
 package com.yd.yourdoctorandroid.networks.getSpecialistService;
 
-import com.yd.yourdoctorandroid.networks.models.Specialist;
+import com.yd.yourdoctorandroid.models.Specialist;
 
 import java.util.List;
 
 public class MainObjectSpecialist {
-    List<Specialist> specialist;
+    private List<Specialist> listSpecialist;
 
-    public List<Specialist> getSpecialist() {
-        return specialist;
+    public List<Specialist> getListSpecialist() {
+        return listSpecialist;
     }
 
-    public void setSpecialist(List<Specialist> specialist) {
-        this.specialist = specialist;
+    public void setListSpecialist(List<Specialist> listSpecialist) {
+        this.listSpecialist = listSpecialist;
     }
 }
