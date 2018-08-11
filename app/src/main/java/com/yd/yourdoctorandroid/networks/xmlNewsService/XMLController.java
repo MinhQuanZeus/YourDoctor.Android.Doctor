@@ -50,7 +50,9 @@ public class XMLController extends AsyncTask<String, Void, ArrayList<New>> {
         progressDialog = new ProgressDialog(context);
         progressDialog.setTitle("Báo sức khỏe VNPress");
         progressDialog.setMessage("Đang xử lý...");
-        progressDialog.show();
+        if(progressDialog != null){
+            progressDialog.show();
+        }
     }
 
     @Override
@@ -90,8 +92,9 @@ public class XMLController extends AsyncTask<String, Void, ArrayList<New>> {
     protected void onPostExecute(ArrayList<New> listItem) {
         super.onPostExecute(listItem);
         // Hủy dialog đi.
-
-        progressDialog.dismiss();
+        if(progressDialog != null){
+            progressDialog.dismiss();
+        }
 
         if (listItem != null) {
 
