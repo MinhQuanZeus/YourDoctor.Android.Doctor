@@ -1,5 +1,7 @@
 package com.yd.yourdoctorandroid.networks;
 
+import com.yd.yourdoctorandroid.utils.Config;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -23,10 +25,8 @@ public class RetrofitFactory {
                 .writeTimeout(2000, TimeUnit.SECONDS)
                 .readTimeout(3000, TimeUnit.SECONDS)
                 .build();
-        //192.168.124.104
-        //https://your-doctor-test2.herokuapp.com/api/
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://103.221.220.186:3000/api/")
+                .baseUrl(Config.URL_SERVER)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();

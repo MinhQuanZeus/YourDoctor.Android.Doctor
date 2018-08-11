@@ -15,4 +15,10 @@ public class Config {
 
     // Key cho SharedPreferences.
     public static final String SHARED_PREF = "pref_firebase";
+
+    //192.168.124.113
+    //http://103.221.220.186:3000/api/
+    public static final String URL_SERVER = "http://103.221.220.186:3000/api/";
+    //http://103.221.220.186:3000
+    public static final String URL_SOCKET = "http://103.221.220.186:3000";
 }
