@@ -31,7 +31,7 @@
             android:textColor="@color/colorText"
             android:textColorHint="@color/colorHint">
 
-            <com.yd.yourdoctorandroid.custormviews.MyEditText
+            <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                 android:id="@+id/ed_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
             android:textColor="@color/colorText"
             android:textColorHint="@color/colorHint">
 
-            <com.yd.yourdoctorandroid.custormviews.MyEditText
+            <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                 android:id="@+id/ed_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
                 android:textColor="@color/colorHint"
                 android:textSize="11dp"/>
 
-            <com.yd.yourdoctorandroid.custormviews.MyTextView
+            <com.yd.yourdoctorpartnerandroid.custormviews.MyTextView
                 android:id="@+id/forgotpass"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -145,7 +145,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <com.yd.yourdoctorandroid.custormviews.MyTextView
+            <com.yd.yourdoctorpartnerandroid.custormviews.MyTextView
                 android:id="@+id/or"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

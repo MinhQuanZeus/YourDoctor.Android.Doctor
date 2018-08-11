@@ -172,7 +172,7 @@
                 android:layout_below="@id/ln_money"
                 android:textColor="@color/colorText">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/tv_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -237,7 +237,7 @@
                 android:layout_below="@id/rg_gender"
                 android:textColor="@color/colorText">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_birthday"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -259,7 +259,7 @@
                 android:layout_below="@id/til_birthday"
                 android:textColor="@color/colorText">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -280,7 +280,7 @@
                 android:layout_below="@id/til_address"
                 android:textColor="@color/colorText">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/tv_universityGraduate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -301,7 +301,7 @@
                 android:layout_below="@id/til_universityGraduate"
                 android:textColor="@color/colorText">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/tv_yearGraduate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -322,7 +322,7 @@
                 android:layout_below="@id/til_yearGraduate"
                 android:textColor="@color/colorText">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/ed_placeWorking"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -343,7 +343,7 @@
                 android:layout_below="@id/til_placeWorking"
                 android:textColor="@color/colorText">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/tv_specialist"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -364,7 +364,7 @@
                 android:layout_below="@id/til_specialist"
                 android:textColor="@color/colorText">
 
-                <com.yd.yourdoctorandroid.custormviews.MyEditText
+                <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
                     android:id="@+id/tv_certificates"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
