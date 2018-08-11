@@ -334,7 +334,7 @@ public class RegisterFragment extends Fragment {
             public void onResponse(Call<MainObjectSpecialist> call, Response<MainObjectSpecialist> response) {
                 Log.e("AnhLe", "success: " + response.body());
                 MainObjectSpecialist mainObjectSpecialist = response.body();
-                ArrayList<Specialist> specialists = (ArrayList<Specialist>) mainObjectSpecialist.getSpecialist();
+                ArrayList<Specialist> specialists = (ArrayList<Specialist>) mainObjectSpecialist.getListSpecialist();
                 if(specialists != null){
                     ArrayAdapter<Specialist> arrayAdapter
                             = new ArrayAdapter<Specialist>(getContext(), android.R.layout.simple_list_item_checked , specialists);

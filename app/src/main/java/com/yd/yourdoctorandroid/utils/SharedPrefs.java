@@ -77,6 +77,12 @@ public class SharedPrefs {
         editor.apply();
     }
 
+    public void remove(String key){
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.remove(key);
+        editor.apply();
+    }
+
     public void clear() {
         mSharedPreferences.edit().clear().apply();
     }

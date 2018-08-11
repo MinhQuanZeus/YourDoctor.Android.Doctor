@@ -110,7 +110,7 @@ public class DoctorRankFragment extends Fragment {
             public synchronized void onResponse(Call<MainObjectSpecialist> call, Response<MainObjectSpecialist> response) {
                 Log.e("AnhLe", "success: " + response.body());
                 MainObjectSpecialist mainObjectSpecialist = response.body();
-                List<Specialist> specialist = mainObjectSpecialist.getSpecialist();
+                List<Specialist> specialist = mainObjectSpecialist.getListSpecialist();
 
                 specialists = specialist;
                 setupViewPager(vp_doctorRanking);

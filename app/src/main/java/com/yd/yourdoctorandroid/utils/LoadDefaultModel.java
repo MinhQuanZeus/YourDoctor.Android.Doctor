@@ -54,7 +54,7 @@ public class LoadDefaultModel {
             public  void onResponse(Call<MainObjectSpecialist> call, Response<MainObjectSpecialist> response) {
                 Log.e("AnhLe", "success: " + response.body());
                 MainObjectSpecialist mainObjectSpecialist = response.body();
-                specialists = (ArrayList<Specialist>) mainObjectSpecialist.getSpecialist();
+                specialists = (ArrayList<Specialist>) mainObjectSpecialist.getListSpecialist();
             }
 
             @Override

@@ -10,7 +10,8 @@ import java.net.URISyntaxException;
 public class SocketUtils {
     //http://192.168.124.104:3000
     //https://your-doctor-test2.herokuapp.com
-    private final static String URL_SERVER = "https://your-doctor-test2.herokuapp.com";
+    //http://103.221.220.186:3000
+    private final static String URL_SERVER = "http://103.221.220.186:3000";
     private Socket mSocket;
     private static SocketUtils socketUtils;
 

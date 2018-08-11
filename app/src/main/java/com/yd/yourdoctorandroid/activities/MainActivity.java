@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorandroid.R;
 import com.yd.yourdoctorandroid.adapters.PagerAdapter;
+import com.yd.yourdoctorandroid.fragments.AboutUsFragment;
 import com.yd.yourdoctorandroid.fragments.AdvisoryMenuFragment;
 import com.yd.yourdoctorandroid.fragments.DoctorProfileFragment;
 import com.yd.yourdoctorandroid.fragments.DoctorRankFragment;
@@ -235,6 +236,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             case R.id.nav_ranking_docto_main: {
                 ScreenManager.openFragment(getSupportFragmentManager(), new DoctorRankFragment(), R.id.rl_container, true, true);
+                break;
+            }
+            case R.id.navAboutUs:{
+                ScreenManager.openFragment(getSupportFragmentManager(), new AboutUsFragment(), R.id.rl_container, true, true);
+
                 break;
             }
             case R.id.nav_logout_main: {

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,7 +51,6 @@ public class LoginFragment extends Fragment {
 
     public static final String JWT_TOKEN = "JWT_TOKEN";
     public static final String USER_INFO = "USER_INFO";
-    TextView tvSignUp;
     @BindView(R.id.ed_phone)
     EditText edPhone;
     @BindView(R.id.ed_password)
@@ -61,7 +61,12 @@ public class LoginFragment extends Fragment {
     TextInputLayout tilPassword;
     @BindView(R.id.btn_sign_in)
     CircularProgressButton btnLogin;
+    @BindView(R.id.checkBoxRemember)
+    CheckBox checkBoxRemember;
+    @BindView(R.id.tv_signup)
+    TextView tvSignUp;
     private Unbinder unbinder;
+
     public LoginFragment() {
         // Required empty public constructor
     }
@@ -78,7 +83,13 @@ public class LoginFragment extends Fragment {
 
     private void setUp(View view) {
         unbinder = ButterKnife.bind(this, view);
-        tvSignUp = (TextView) view.findViewById(R.id.tv_signup);
+        String phone = SharedPrefs.getInstance().get("phone",String.class);
+        String password = SharedPrefs.getInstance().get("password",String.class);
+        if(phone != null && phone!= "" && password != null && password != null){
+            checkBoxRemember.setChecked(true);
+            edPhone.setText(phone);
+            edPassword.setText(password);
+        }
         tvSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,6 +158,13 @@ public class LoginFragment extends Fragment {
                     Log.e("FireBase share ", response.body().getDoctor().getDoctorId());
                     FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
                     SocketUtils.getInstance().reConnect();
+                    if(checkBoxRemember.isChecked()){
+                        SharedPrefs.getInstance().put("phone",edPhone.getText().toString());
+                        SharedPrefs.getInstance().put("password",edPassword.getText().toString());
+                    }else {
+                        SharedPrefs.getInstance().put("phone","");
+                        SharedPrefs.getInstance().put("password","");
+                    }
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
