@@ -28,6 +28,7 @@ import com.yd.yourdoctorpartnerandroid.networks.getDetailDoctor.MainDetailDoctor
 import com.yd.yourdoctorpartnerandroid.networks.models.AuthResponse;
 import com.yd.yourdoctorpartnerandroid.networks.models.CommonErrorResponse;
 import com.yd.yourdoctorpartnerandroid.networks.models.Login;
+import com.yd.yourdoctorpartnerandroid.models.SpecialistDoctor;
 import com.yd.yourdoctorpartnerandroid.networks.services.LoginService;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.SocketUtils;
@@ -87,11 +88,13 @@ public class LoginFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         String phone = SharedPrefs.getInstance().get("phone",String.class);
         String password = SharedPrefs.getInstance().get("password",String.class);
+
         if(phone != null && phone!= "" && password != null && password != null){
             checkBoxRemember.setChecked(true);
             edPhone.setText(phone);
             edPassword.setText(password);
         }
+
         tvSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -158,37 +161,46 @@ public class LoginFragment extends Fragment {
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
 
                 if (response.code() == 200 || response.code() == 201) {
-                    SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
+                    if(response.body().getDoctor().getStatus() != 1){
+                        Toast.makeText(getContext() , "Tài khoản đang bị khóa!", Toast.LENGTH_LONG).show();
+                        btnLogin.revertAnimation();
+                    }else if(response.body().getDoctor().getRole() != 2){
+                        Toast.makeText(getContext() , "Tài khoản này không phải tài khoản bác sĩ!", Toast.LENGTH_LONG).show();
+                        btnLogin.revertAnimation();
+                    }
+                    else{
+                        SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
+                        if(SharedPrefs.getInstance().get(USER_INFO, Doctor.class) != null){
+                            FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get(USER_INFO, Doctor.class).getDoctorId());
+                        }
+                        SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
+                        FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
+                        SocketUtils.getInstance().reConnect();
 
-                    if(SharedPrefs.getInstance().get(USER_INFO, Doctor.class) != null){
-                        FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get(USER_INFO, Doctor.class).getDoctorId());
+                        if(checkBoxRemember.isChecked()){
+                            SharedPrefs.getInstance().put("phone",edPhone.getText().toString());
+                            SharedPrefs.getInstance().put("password",edPassword.getText().toString());
+                        }else {
+                            SharedPrefs.getInstance().put("phone","");
+                            SharedPrefs.getInstance().put("password","");
+                        }
+                        getDetailDoctor();
+
                     }
 
-                    SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
-                    //for test
-                    Log.e("tokenDoctor", SharedPrefs.getInstance().get(JWT_TOKEN, String.class));
-                    Log.e("FireBase share ", response.body().getDoctor().getDoctorId());
-//                    FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
-//                    SocketUtils.getInstance().reConnect();
-                    if(checkBoxRemember.isChecked()){
-                        SharedPrefs.getInstance().put("phone",edPhone.getText().toString());
-                        SharedPrefs.getInstance().put("password",edPassword.getText().toString());
-                    }else {
-                        SharedPrefs.getInstance().put("phone","");
-                        SharedPrefs.getInstance().put("password","");
-                    }
-
-
-
-                    getDetailDoctor();
                 }else {
                     enableAll();
-                    CommonErrorResponse commonErrorResponse = parseToCommonError(response);
-                    if (commonErrorResponse.getError() != null) {
-                        String error = Utils.getStringResourceByString(getContext(), commonErrorResponse.getError());
-                        Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
-                        Log.d("RESPONSE", error);
+                    try{
+                        CommonErrorResponse commonErrorResponse = parseToCommonError(response);
+                        if (commonErrorResponse.getError() != null) {
+                            String error = Utils.getStringResourceByString(getContext(), commonErrorResponse.getError());
+                            Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
+                            Log.d("RESPONSE", error);
+                        }
+                    }catch (Exception e){
+                        Toast.makeText(getActivity(), "Có lỗi không thể đăng nhập", Toast.LENGTH_SHORT).show();
                     }
+
                     btnLogin.revertAnimation();
                 }
             }
@@ -207,8 +219,6 @@ public class LoginFragment extends Fragment {
 
     private void getDetailDoctor(){
         GetDetailDoctorService getDetailDoctorService = RetrofitFactory.getInstance().createService(GetDetailDoctorService.class);
-        Log.e("token", SharedPrefs.getInstance().get(JWT_TOKEN,String.class));
-        Log.e("idDoctor",SharedPrefs.getInstance().get(USER_INFO,Doctor.class).getDoctorId() );
         getDetailDoctorService.getDetailDoctor(SharedPrefs.getInstance().get(JWT_TOKEN,String.class),SharedPrefs.getInstance().get(USER_INFO,Doctor.class).getDoctorId()).enqueue(new Callback<MainDetailDoctor>() {
             @Override
             public void onResponse(Call<MainDetailDoctor> call, Response<MainDetailDoctor> response) {
@@ -216,24 +226,21 @@ public class LoginFragment extends Fragment {
                 if (response.code() == 200) {
                     Doctor doctor;
                     doctor = SharedPrefs.getInstance().get(USER_INFO,Doctor.class);
-
                     doctor.setCertificates((ArrayList<Certification>) response.body().getDetailDoctor().getCertificates());
-                    //doctor.setIdSpecialist((ArrayList<SpecialistDoctor>)response.body().getDetailDoctor().getIdSpecialist());
+                    doctor.setIdSpecialist((ArrayList<SpecialistDoctor>)response.body().getDetailDoctor().getIdSpecialist());
                     doctor.setUniversityGraduate(response.body().getDetailDoctor().getUniversityGraduate());
                     doctor.setYearGraduate(response.body().getDetailDoctor().getYearGraduate());
                     doctor.setPlaceWorking(response.body().getDetailDoctor().getPlaceWorking());
                     doctor.setCurrentRating(response.body().getDetailDoctor().getCurrentRating());
                     SharedPrefs.getInstance().put(USER_INFO,doctor);
-                    FirebaseMessaging.getInstance().subscribeToTopic(doctor.getDoctorId());
-                    SocketUtils.getInstance().reConnect();
-
-
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     getActivity().startActivity(intent);
-                    btnLogin.revertAnimation();
+                }else {
+                    Toast.makeText(getContext(),"Đăng nhập không thành công",Toast.LENGTH_LONG).show();
                 }
+                btnLogin.revertAnimation();
             }
 
             @Override

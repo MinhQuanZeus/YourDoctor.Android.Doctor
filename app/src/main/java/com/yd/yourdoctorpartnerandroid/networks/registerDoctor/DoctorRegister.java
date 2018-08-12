@@ -1,7 +1,6 @@
 package com.yd.yourdoctorpartnerandroid.networks.registerDoctor;
 
-import com.yd.yourdoctorpartnerandroid.models.Certification;
-import com.yd.yourdoctorpartnerandroid.models.Specialist;
+import com.yd.yourdoctorpartnerandroid.models.SpecialistDoctor;
 
 import java.util.ArrayList;
 

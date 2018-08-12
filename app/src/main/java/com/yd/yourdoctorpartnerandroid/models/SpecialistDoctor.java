@@ -1,4 +1,4 @@
-package com.yd.yourdoctorpartnerandroid.networks.registerDoctor;
+package com.yd.yourdoctorpartnerandroid.models;
 
 public class SpecialistDoctor {
     private String specialistId;

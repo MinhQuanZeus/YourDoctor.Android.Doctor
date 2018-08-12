@@ -44,24 +44,18 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.yd.yourdoctorpartnerandroid.BuildConfig;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.adapters.CertificateRegisterAdapter;
-import com.yd.yourdoctorpartnerandroid.models.Certification;
-import com.yd.yourdoctorpartnerandroid.models.Doctor;
 import com.yd.yourdoctorpartnerandroid.models.Specialist;
 import com.yd.yourdoctorpartnerandroid.networks.registerDoctor.CertificateRequest;
 import com.yd.yourdoctorpartnerandroid.networks.registerDoctor.DoctorRegister;
-import com.yd.yourdoctorpartnerandroid.networks.registerDoctor.SpecialistDoctor;
+import com.yd.yourdoctorpartnerandroid.models.SpecialistDoctor;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorpartnerandroid.networks.getLinkImageService.GetLinkImageService;
 import com.yd.yourdoctorpartnerandroid.networks.getLinkImageService.MainGetLink;
 import com.yd.yourdoctorpartnerandroid.networks.getSpecialistService.GetSpecialistService;
 import com.yd.yourdoctorpartnerandroid.networks.getSpecialistService.MainObjectSpecialist;
-import com.yd.yourdoctorpartnerandroid.networks.models.AuthResponse;
-import com.yd.yourdoctorpartnerandroid.networks.models.CommonErrorResponse;
 import com.yd.yourdoctorpartnerandroid.networks.registerDoctor.RegisterDoctorService;
 import com.yd.yourdoctorpartnerandroid.networks.registerDoctor.RegisterResponse;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
@@ -260,8 +254,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         isInProcessAddingCertificate = false;
         certificateImageArrayList = new ArrayList<>();
         specialistsChoice = new ArrayList<>();
-
         edPhone.setText(phoneNumber);
+        edPhone.setEnabled(false);
         edPhone.setEnabled(false);
 
         btnCancelCertificate.setOnClickListener(this);
@@ -534,6 +528,9 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         doctorRegister.setPassword(edPassword.getText().toString());
         doctorRegister.setAddress(edAddress.getText().toString());
         doctorRegister.setBirthday(edBirthday.getText().toString());
+        doctorRegister.setPlaceWorking(ed_place_working.getText().toString());
+        doctorRegister.setYearGraduate(ed_year_graduate.getText().toString());
+        doctorRegister.setUniversityGraduate(ed_place_graduate.getText().toString());
         doctorRegister.setRemainMoney(0);
         doctorRegister.setGender(getGender());
         RegisterDoctorService registerDoctorService = RetrofitFactory.getInstance().createService(RegisterDoctorService.class);

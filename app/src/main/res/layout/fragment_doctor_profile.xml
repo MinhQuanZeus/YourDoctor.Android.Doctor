@@ -316,7 +316,7 @@
 
             <!--placeWorking-->
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/til_placeWorking"
+                android:id="@+id/til_place_working"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/til_yearGraduate"
@@ -340,7 +340,7 @@
                 android:id="@+id/til_specialist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/til_placeWorking"
+                android:layout_below="@id/til_place_working"
                 android:textColor="@color/colorText">
 
                 <com.yd.yourdoctorpartnerandroid.custormviews.MyEditText
@@ -397,6 +397,7 @@
 
 
             <RelativeLayout
+                android:id="@+id/rl_mainButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/til_certificatesImage"
@@ -408,9 +409,9 @@
                     android:id="@+id/btn_change_password"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/buttonborder"
+                    android:background="@drawable/buttonstyleithgradient"
                     android:text="@string/change_password"
-                    android:textColor="@color/redButton"
+                    android:textColor="@color/white"
                     android:textSize="15sp" />
 
                 <Button
@@ -419,16 +420,17 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
                     android:layout_toEndOf="@id/btn_change_password"
-                    android:background="@drawable/buttonborder"
+                    android:background="@drawable/buttonstyleithgradient"
                     android:text="@string/edit"
-                    android:textColor="@color/redButton"
+                    android:textColor="@color/white"
                     android:textSize="15sp" />
             </RelativeLayout>
+
             <RelativeLayout
                 android:id="@+id/rl_YesNoButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/til_address"
+                android:layout_below="@id/til_certificatesImage"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal"
@@ -438,7 +440,7 @@
                     android:id="@+id/btn_no"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/buttonborder"
+                    android:background="@drawable/buttonstyleithgradient"
                     android:text="@string/btn_cancel"
                     android:textColor="@color/white"
                     android:textSize="15sp" />
@@ -449,17 +451,20 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
                     android:layout_toEndOf="@id/btn_no"
-                    android:background="@drawable/buttonborder"
+                    android:background="@drawable/buttonstyleithgradient"
                     android:text="@string/btn_ok"
                     android:textColor="@color/white"
                     android:textSize="15sp" />
             </RelativeLayout>
+
         </RelativeLayout>
+
         <ProgressBar
             android:id="@+id/pbProfileDoctor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true" />
-    </RelativeLayout>
+        </RelativeLayout>
+
 </ScrollView>
