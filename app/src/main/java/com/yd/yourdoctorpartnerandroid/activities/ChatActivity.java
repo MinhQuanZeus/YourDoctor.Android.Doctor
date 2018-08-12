@@ -34,6 +34,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.Socket;
+import com.yd.yourdoctorpartnerandroid.DoctorApplication;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.adapters.ChatAdapter;
 import com.yd.yourdoctorpartnerandroid.fragments.DoctorProfileFragment;
@@ -135,7 +137,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_chat);
 
         ButterKnife.bind(this);
-
+        Socket socket = DoctorApplication.self().getSocket();
+        socket.connect();
         ivInfo.setOnClickListener(this);
         btnImage.setOnClickListener(this);
         btnChat.setOnClickListener(this);

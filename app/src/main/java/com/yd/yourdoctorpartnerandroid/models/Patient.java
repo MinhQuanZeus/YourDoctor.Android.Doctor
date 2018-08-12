@@ -26,13 +26,13 @@ public class Patient {
     private String birthday;
     private String address;
     private int role;
-    private long remainMoney;
+    private float remainMoney;
     private List<String> favoriteDoctors;
 
     public Patient() {
     }
 
-    public Patient(String id, String fName, String mName, String lName, String phoneNumber, String password, String avatar,int status, int gender, String birthday, String address, int role, long remainMoney, List<String> favoriteDoctors) {
+    public Patient(String id, String fName, String mName, String lName, String phoneNumber, String password, String avatar,int status, int gender, String birthday, String address, int role, float remainMoney, List<String> favoriteDoctors) {
         this.id = id;
         this.fName = fName;
         this.mName = mName;
@@ -149,11 +149,11 @@ public class Patient {
         this.role = role;
     }
 
-    public long getRemainMoney() {
+    public float getRemainMoney() {
         return remainMoney;
     }
 
-    public void setRemainMoney(long remainMoney) {
+    public void setRemainMoney(float remainMoney) {
         this.remainMoney = remainMoney;
     }
 

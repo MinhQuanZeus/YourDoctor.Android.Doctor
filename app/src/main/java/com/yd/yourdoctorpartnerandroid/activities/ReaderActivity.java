@@ -16,7 +16,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.github.nkzawa.socketio.client.Socket;
 import com.squareup.picasso.Picasso;
+import com.yd.yourdoctorpartnerandroid.DoctorApplication;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.models.New;
 import com.yd.yourdoctorpartnerandroid.utils.SocketUtils;
@@ -45,6 +47,8 @@ public class ReaderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reader);
         ButterKnife.bind(this);
+        Socket socket = DoctorApplication.self().getSocket();
+        socket.connect();
         progress.setMax(100);
         progress.getProgressDrawable().setColorFilter(
                 Color.RED, android.graphics.PorterDuff.Mode.SRC_IN);

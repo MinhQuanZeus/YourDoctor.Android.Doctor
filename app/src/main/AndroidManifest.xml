@@ -19,7 +19,7 @@
         android:required="false" />
 
     <application
-        android:name=".Application"
+        android:name=".DoctorApplication"
         android:allowBackup="true"
         android:icon="@drawable/your_doctor_logo"
         android:label="@string/app_name"
@@ -36,8 +36,8 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".activities.MainActivity"></activity>
-        <activity android:name=".activities.ChatActivity"></activity>
+        <activity android:name=".activities.MainActivity" />
+        <activity android:name=".activities.ChatActivity" />
         <activity android:name=".activities.AuthActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -67,7 +67,8 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".activities.ReaderActivity"></activity>
+        <activity android:name=".activities.ReaderActivity" />
+        <activity android:name=".activities.VideoCallActivity"></activity>
     </application>
 
 </manifest>

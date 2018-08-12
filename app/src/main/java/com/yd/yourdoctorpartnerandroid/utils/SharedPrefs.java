@@ -3,7 +3,7 @@ package com.yd.yourdoctorpartnerandroid.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.yd.yourdoctorpartnerandroid.Application;
+import com.yd.yourdoctorpartnerandroid.DoctorApplication;
 
 public class SharedPrefs {
     private static final String PREFS_NAME = "share_prefs";
@@ -11,7 +11,7 @@ public class SharedPrefs {
     private SharedPreferences mSharedPreferences;
 
     private SharedPrefs() {
-        mSharedPreferences = Application.self().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        mSharedPreferences = DoctorApplication.self().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
     public static SharedPrefs getInstance() {
@@ -34,7 +34,7 @@ public class SharedPrefs {
         } else if (anonymousClass == Long.class) {
             return (T) Long.valueOf(mSharedPreferences.getLong(key, 0));
         } else {
-            return (T) Application.self()
+            return (T) DoctorApplication.self()
                     .getGSon()
                     .fromJson(mSharedPreferences.getString(key, ""), anonymousClass);
         }
@@ -53,7 +53,7 @@ public class SharedPrefs {
         } else if (anonymousClass == Long.class) {
             return (T) Long.valueOf(mSharedPreferences.getLong(key, (Long) defaultValue));
         } else {
-            return (T) Application.self()
+            return (T) DoctorApplication.self()
                     .getGSon()
                     .fromJson(mSharedPreferences.getString(key, ""), anonymousClass);
         }
@@ -72,7 +72,7 @@ public class SharedPrefs {
         } else if (data instanceof Long) {
             editor.putLong(key, (Long) data);
         } else {
-            editor.putString(key, Application.self().getGSon().toJson(data));
+            editor.putString(key, DoctorApplication.self().getGSon().toJson(data));
         }
         editor.apply();
     }

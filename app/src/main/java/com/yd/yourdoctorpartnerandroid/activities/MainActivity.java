@@ -1,7 +1,10 @@
 package com.yd.yourdoctorpartnerandroid.activities;
 
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -22,7 +25,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.Socket;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
+import com.yd.yourdoctorpartnerandroid.DoctorApplication;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.adapters.PagerAdapter;
 import com.yd.yourdoctorpartnerandroid.fragments.AboutUsFragment;
@@ -31,9 +38,15 @@ import com.yd.yourdoctorpartnerandroid.fragments.DoctorProfileFragment;
 import com.yd.yourdoctorpartnerandroid.fragments.DoctorRankFragment;
 import com.yd.yourdoctorpartnerandroid.fragments.UserProfileFragment;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
+import com.yd.yourdoctorpartnerandroid.models.Doctor;
+import com.yd.yourdoctorpartnerandroid.models.TypeCall;
+import com.yd.yourdoctorpartnerandroid.models.VideoCallSession;
 import com.yd.yourdoctorpartnerandroid.utils.Config;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -66,11 +79,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String TAG = MainActivity.class.getSimpleName();
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
+    private Socket socket;
+    private Doctor userInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupUI();
+        setupSocket();
 //        Log.d("MainActivity", "USER_INFO");
 //        Log.d("MainActivity", SharedPrefs.getInstance().get("USER_INFO", Patient.class).toString());
 //        Log.d("MainActivity", SharedPrefs.getInstance().get("JWT_TOKEN", String.class));
@@ -93,8 +110,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //                }
 //            }
 //        };
-
+//
         displayFirebaseRegId();
+    }
+
+
+    private void setupSocket() {
+        socket = DoctorApplication.self().getSocket();
+        socket.connect();
     }
     private void displayFirebaseRegId() {
         SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
@@ -115,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void setupUI() {
         ButterKnife.bind(this);
-
+        userInfo = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
         setSupportActionBar(tb_main);
         View headerView = navigationView_main.inflateHeaderView(R.layout.nav_header_main);
         iv_ava_user = headerView.findViewById(R.id.iv_ava_user);
