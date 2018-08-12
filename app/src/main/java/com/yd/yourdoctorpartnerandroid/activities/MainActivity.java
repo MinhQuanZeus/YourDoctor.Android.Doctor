@@ -1,5 +1,6 @@
 package com.yd.yourdoctorpartnerandroid.activities;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,6 +29,7 @@ import android.widget.TextView;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.nhancv.npermission.NPermission;
 import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorpartnerandroid.DoctorApplication;
 import com.yd.yourdoctorpartnerandroid.R;
@@ -52,7 +54,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NPermission.OnPermissionResult {
 
     @BindView(R.id.tab_layout)
     TabLayout tabLayout;
@@ -81,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private Socket socket;
     private Doctor userInfo;
+    private NPermission nPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            }
 //        };
 //
+        nPermission = new NPermission(true);
+        nPermission.requestPermission(this, Manifest.permission.CAMERA);
         displayFirebaseRegId();
     }
 
@@ -320,6 +325,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onPause();
         fab_question.setVisibility(View.INVISIBLE);
        // LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    }
+
+    @Override
+    public void onPermissionResult(String s, boolean b) {
+        switch (s) {
+            case Manifest.permission.CAMERA:
+                if (!b) {
+                    nPermission.requestPermission(this, Manifest.permission.CAMERA);
+                }
+                break;
+            default:
+                break;
+        }
     }
 }
 

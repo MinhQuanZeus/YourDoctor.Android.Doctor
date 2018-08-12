@@ -4,6 +4,7 @@ package com.yd.yourdoctorpartnerandroid.fragments;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,6 +71,9 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
+
+import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.RECORD_AUDIO;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -503,7 +508,7 @@ public class CallingFragment extends Fragment implements IKurentoFragment, NPerm
     }
 
     public void startCall() {
-        if (!(Build.VERSION.SDK_INT < 23 || isGranted)) {
+        if (!(Build.VERSION.SDK_INT < 23 || !checkPermission())) {
             nPermission.requestPermission(getActivity(), Manifest.permission.CAMERA);
             return;
         }
@@ -733,6 +738,15 @@ public class CallingFragment extends Fragment implements IKurentoFragment, NPerm
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null;
+    }
+
+    public boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
+                RECORD_AUDIO);
+        int result1 = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
+                CAMERA);
+        return result == PackageManager.PERMISSION_GRANTED &&
+                result1 == PackageManager.PERMISSION_GRANTED;
     }
 
 }
