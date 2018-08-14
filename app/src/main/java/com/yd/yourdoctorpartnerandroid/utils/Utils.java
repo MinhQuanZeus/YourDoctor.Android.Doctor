@@ -48,17 +48,17 @@ public class Utils {
         return imageFile;
     }
 
-    public static String convertTime(long time){
+    public static String convertTime(long time) {
         Date date = new Date(time);
         //yyyy MM dd HH:mm:ss
         Format format = new SimpleDateFormat("HH:mm, dd/MM ");
         return format.format(date);
     }
 
-    public static String convertTimeFromMonggo(String timeString){
+    public static String convertTimeFromMonggo(String timeString) {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH);
         Date date = null;
-        Format  format2;
+        Format format2;
         try {
             date = format.parse(timeString);
         } catch (Exception e) {
@@ -69,7 +69,7 @@ public class Utils {
 
     }
 
-    public static void backToLogin(Context context){
+    public static void backToLogin(Context context) {
 
         FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get("USER_INFO", Doctor.class).getDoctorId());
         //context.stopService(new Intent(context, YDFirebaseMessagingService.class));
@@ -77,14 +77,14 @@ public class Utils {
         SocketUtils.getInstance().disconnectConnect();
         SharedPrefs.getInstance().remove("JWT_TOKEN");
         SharedPrefs.getInstance().remove("USER_INFO");
-//        Intent intent = new Intent(context, AuthActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        context.startActivity(intent);
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Intent intent = new Intent(context, AuthActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+//        Intent intent = new Intent(Intent.ACTION_MAIN);
+//        intent.addCategory(Intent.CATEGORY_HOME);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        context.startActivity(intent);
     }
 
 }

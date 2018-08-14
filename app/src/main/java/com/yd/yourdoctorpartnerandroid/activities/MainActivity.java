@@ -47,7 +47,9 @@ import com.yd.yourdoctorpartnerandroid.models.VideoCallSession;
 import com.yd.yourdoctorpartnerandroid.utils.Config;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
+import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     private Socket socket;
-    private Doctor userInfo;
+    private Doctor currentDoctor;
     private NPermission nPermission;
 
     @Override
@@ -126,12 +128,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(EventSend eventSend) {
         if(eventSend.getType() == 1){
-//            currentPatient = SharedPrefs.getInstance().get("USER_INFO", Patient.class);
-//            if(currentPatient != null){
-//                tvNameUser.setText(currentPatient.getFullName());
-//                Picasso.with(this).load(currentPatient.getAvatar().toString()).into(ivAvaUser);
-//                tvMoneyUser.setText(currentPatient.getRemainMoney() + "" );
-//            }
+            currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+            if(currentDoctor != null){
+                tv_name_user.setText(currentDoctor.getFullName());
+                ZoomImageViewUtils.loadImageManual(getApplicationContext(),currentDoctor.getAvatar(),iv_ava_user);
+                tv_money_user.setText(currentDoctor.getRemainMoney() + "" );
+            }
         }
     }
 
@@ -159,19 +161,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void setupUI() {
         ButterKnife.bind(this);
-        userInfo = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
         setSupportActionBar(tb_main);
         View headerView = navigationView_main.inflateHeaderView(R.layout.nav_header_main);
         iv_ava_user = headerView.findViewById(R.id.iv_ava_user);
         tv_name_user = headerView.findViewById(R.id.tv_name_user);
         tv_money_user = headerView.findViewById(R.id.tv_money_user);
+        currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+        if(currentDoctor != null){
+            tv_name_user.setText(currentDoctor.getFullName());
+            ZoomImageViewUtils.loadImageManual(getApplicationContext(),currentDoctor.getAvatar(),iv_ava_user);
+            tv_money_user.setText(currentDoctor.getRemainMoney() + "" );
+        }
+
 
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-
-        Picasso.with(this).load("https://kenh14cdn.com/2016/160722-star-tzuyu-1469163381381-1473652430446.jpg").transform(new CropCircleTransformation()).into(iv_ava_user);
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, draw_layout_main, tb_main, R.string.app_name, R.string.app_name);
         draw_layout_main.setDrawerListener(toggle);
@@ -321,8 +326,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Utils.backToLogin(getApplicationContext());
                         DoctorApplication.self().getSocket().close();
+                        Utils.backToLogin(getApplicationContext());
                     }
 
                 })
@@ -339,6 +344,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onPause();
         fab_question.setVisibility(View.INVISIBLE);
        // LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    }
+
+    @Override
+    protected void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
     @Override
