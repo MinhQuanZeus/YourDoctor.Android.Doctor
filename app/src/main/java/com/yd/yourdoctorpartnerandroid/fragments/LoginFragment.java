@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +18,10 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.yd.yourdoctorpartnerandroid.R;
-import com.yd.yourdoctorpartnerandroid.activities.ChatActivity;
 import com.yd.yourdoctorpartnerandroid.activities.MainActivity;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.models.Certification;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
-import com.yd.yourdoctorpartnerandroid.models.Specialist;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorpartnerandroid.networks.getDetailDoctor.GetDetailDoctorService;
 import com.yd.yourdoctorpartnerandroid.networks.getDetailDoctor.MainDetailDoctor;
@@ -32,7 +29,6 @@ import com.yd.yourdoctorpartnerandroid.networks.models.AuthResponse;
 import com.yd.yourdoctorpartnerandroid.networks.models.CommonErrorResponse;
 import com.yd.yourdoctorpartnerandroid.networks.models.Login;
 import com.yd.yourdoctorpartnerandroid.networks.services.LoginService;
-import com.yd.yourdoctorpartnerandroid.utils.LoadDefaultModel;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.SocketUtils;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
@@ -68,6 +64,8 @@ public class LoginFragment extends Fragment {
     CircularProgressButton btnLogin;
     @BindView(R.id.checkBoxRemember)
     CheckBox checkBoxRemember;
+    @BindView(R.id.forgotpass)
+    com.yd.yourdoctorpartnerandroid.custormviews.MyTextView forgotPass;
     @BindView(R.id.tv_signup)
     TextView tvSignUp;
     private Unbinder unbinder;
@@ -98,6 +96,16 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ScreenManager.openFragment(getActivity().getSupportFragmentManager(), new InputPhoneNumberFragment(), R.id.fl_auth, true, true);
+            }
+        });
+
+        forgotPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                InputPhoneNumberFragment inputPhoneNumberFragment = new InputPhoneNumberFragment();
+                inputPhoneNumberFragment.setIsForgetPassword(true);
+                ScreenManager.openFragment(getActivity().getSupportFragmentManager(), inputPhoneNumberFragment, R.id.fl_auth, true, true);
+
             }
         });
 
@@ -160,8 +168,8 @@ public class LoginFragment extends Fragment {
                     //for test
                     Log.e("tokenDoctor", SharedPrefs.getInstance().get(JWT_TOKEN, String.class));
                     Log.e("FireBase share ", response.body().getDoctor().getDoctorId());
-                    FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
-                    SocketUtils.getInstance().reConnect();
+//                    FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
+//                    SocketUtils.getInstance().reConnect();
                     if(checkBoxRemember.isChecked()){
                         SharedPrefs.getInstance().put("phone",edPhone.getText().toString());
                         SharedPrefs.getInstance().put("password",edPassword.getText().toString());
@@ -210,7 +218,7 @@ public class LoginFragment extends Fragment {
                     doctor = SharedPrefs.getInstance().get(USER_INFO,Doctor.class);
 
                     doctor.setCertificates((ArrayList<Certification>) response.body().getDetailDoctor().getCertificates());
-                    doctor.setIdSpecialist((ArrayList<Specialist>)response.body().getDetailDoctor().getIdSpecialist());
+                    //doctor.setIdSpecialist((ArrayList<SpecialistDoctor>)response.body().getDetailDoctor().getIdSpecialist());
                     doctor.setUniversityGraduate(response.body().getDetailDoctor().getUniversityGraduate());
                     doctor.setYearGraduate(response.body().getDetailDoctor().getYearGraduate());
                     doctor.setPlaceWorking(response.body().getDetailDoctor().getPlaceWorking());

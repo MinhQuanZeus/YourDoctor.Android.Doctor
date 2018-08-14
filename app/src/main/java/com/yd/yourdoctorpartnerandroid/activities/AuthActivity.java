@@ -32,7 +32,8 @@ public class AuthActivity extends AppCompatActivity {
 //        } else {
 //            ScreenManager.openFragment(getSupportFragmentManager(), new LoginFragment(), R.id.fl_auth, false, false);
 //        }
-
         ScreenManager.openFragment(getSupportFragmentManager(), new LoginFragment(), R.id.fl_auth, false, false);
+
+        //ScreenManager.openFragment(getSupportFragmentManager(), new LoginFragment(), R.id.fl_auth, false, false);
     }
 }

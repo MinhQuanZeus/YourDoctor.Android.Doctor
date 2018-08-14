@@ -165,10 +165,6 @@ public class Doctor {
         return idSpecialist;
     }
 
-    public void setIdSpecialist(ArrayList<Specialist> idSpecialist) {
-        this.idSpecialist = idSpecialist;
-    }
-
     public String getUniversityGraduate() {
         return universityGraduate;
     }

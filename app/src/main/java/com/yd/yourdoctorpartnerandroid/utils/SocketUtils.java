@@ -2,13 +2,14 @@ package com.yd.yourdoctorpartnerandroid.utils;
 
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
+import com.yd.yourdoctorpartnerandroid.Constants;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
 import com.yd.yourdoctorpartnerandroid.models.Patient;
 
 import java.net.URISyntaxException;
 
 public class SocketUtils {
-    private final static String URL_SERVER = Config.URL_SOCKET;
+    private final static String URL_SERVER = Constants.SOCKET_URL;
     private Socket mSocket;
     private static SocketUtils socketUtils;
 

@@ -14,6 +14,8 @@ import android.widget.Toast;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
+import com.yd.yourdoctorpartnerandroid.networks.forgetPasswordService.ForgetPasswordService;
+import com.yd.yourdoctorpartnerandroid.networks.forgetPasswordService.MainForgetResponse;
 import com.yd.yourdoctorpartnerandroid.networks.models.PhoneVerification;
 import com.yd.yourdoctorpartnerandroid.networks.models.CommonSuccessResponse;
 import com.yd.yourdoctorpartnerandroid.networks.services.PhoneVerificationService;
@@ -41,8 +43,14 @@ public class InputPhoneNumberFragment extends Fragment {
     EditText etPhone;
     private Unbinder unbinder;
 
+    boolean isForgetPassword = false;
+
     public InputPhoneNumberFragment() {
         // Required empty public constructor
+    }
+
+    public void setIsForgetPassword(boolean isForgetPassword) {
+        this.isForgetPassword = isForgetPassword;
     }
 
 
@@ -100,27 +108,54 @@ public class InputPhoneNumberFragment extends Fragment {
         etPhone.setEnabled(false);
         final String phone = etPhone.getText().toString();
         btnNext.startAnimation();
-        PhoneVerification phoneVerification = new PhoneVerification(phone, null);
-        PhoneVerificationService phoneVerificationService = RetrofitFactory.getInstance().createService(PhoneVerificationService.class);
-        phoneVerificationService.register(phoneVerification)
-                .enqueue(new Callback<CommonSuccessResponse>() {
-                    @Override
-                    public void onResponse(Call<CommonSuccessResponse> call, Response<CommonSuccessResponse> response) {
-                        btnNext.revertAnimation();
-                        if (response.code() == 200 || response.code() == 201){
-                            ScreenManager.openFragment(getActivity().getSupportFragmentManager(), new VerifyCodePhoneNumberFragment().setPhoneNumber(phone), R.id.fl_auth, true, true);
+        if (!isForgetPassword) {
+            PhoneVerification phoneVerification = new PhoneVerification(phone, null);
+            PhoneVerificationService phoneVerificationService = RetrofitFactory.getInstance().createService(PhoneVerificationService.class);
+            phoneVerificationService.register(phoneVerification)
+                    .enqueue(new Callback<CommonSuccessResponse>() {
+                        @Override
+                        public void onResponse(Call<CommonSuccessResponse> call, Response<CommonSuccessResponse> response) {
+                            btnNext.revertAnimation();
+                            if (response.code() == 200 || response.code() == 201) {
+                                ScreenManager.openFragment(getActivity().getSupportFragmentManager(), new VerifyCodePhoneNumberFragment().setPhoneNumber(phone), R.id.fl_auth, true, true);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<CommonSuccessResponse> call, Throwable t) {
-                        btnNext.revertAnimation();
-                        etPhone.setEnabled(true);
-                        if (t instanceof SocketTimeoutException) {
-                            Toast.makeText(getActivity(), getResources().getText(R.string.error_timeout), Toast.LENGTH_SHORT).show();
+                        @Override
+                        public void onFailure(Call<CommonSuccessResponse> call, Throwable t) {
+                            btnNext.revertAnimation();
+                            etPhone.setEnabled(true);
+                            if (t instanceof SocketTimeoutException) {
+                                Toast.makeText(getActivity(), getResources().getText(R.string.error_timeout), Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                });
+                    });
+        } else {
+            ForgetPasswordService forgetPasswordService = RetrofitFactory.getInstance().createService(ForgetPasswordService.class);
+            forgetPasswordService.forgetPasswordService(phone)
+                    .enqueue(new Callback<MainForgetResponse>() {
+                        @Override
+                        public void onResponse(Call<MainForgetResponse> call, Response<MainForgetResponse> response) {
+                            btnNext.revertAnimation();
+                            if (response.code() == 200 && response.body().isStatus()) {
+                                Toast.makeText(getContext(), "Mật khẩu mới vừa được gửi đến bạn", Toast.LENGTH_LONG).show();
+                            }else {
+                                etPhone.setEnabled(true);
+                                Toast.makeText(getContext(), "Số Điện thoại không hợp lệ", Toast.LENGTH_LONG).show();
+
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<MainForgetResponse> call, Throwable t) {
+                            btnNext.revertAnimation();
+                            etPhone.setEnabled(true);
+                            Toast.makeText(getContext(), "Lỗi kết nối máy chủ", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+        }
+
     }
 
     @Override

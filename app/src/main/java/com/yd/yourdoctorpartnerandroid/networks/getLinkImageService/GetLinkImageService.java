@@ -10,5 +10,5 @@ import retrofit2.http.Part;
 public interface GetLinkImageService {
     @POST("uploadImageChat")
     @Multipart
-    Call<MainGetLink> uploadImageToGetLink(@Header("Authorization") String jwt, @Part MultipartBody.Part imageFile);
+    Call<MainGetLink> uploadImageToGetLink(@Part MultipartBody.Part imageFile);
 }

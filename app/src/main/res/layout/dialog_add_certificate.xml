@@ -30,13 +30,14 @@
 
 
     </android.support.design.widget.TextInputLayout>
+
     <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_below="@id/til_name_certificate"
         android:id="@+id/iv_Certificate"
         android:layout_width="150dp"
         android:layout_height="150dp"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp"
+        android:layout_marginBottom="56dp"
         android:src="@drawable/patient_avatar" />
 
     <de.hdodenhof.circleimageview.CircleImageView

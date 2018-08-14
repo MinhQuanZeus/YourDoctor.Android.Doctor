@@ -335,7 +335,7 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
         pbProfileDoctor.setVisibility(View.VISIBLE);
         if (mImageToBeAttached != null) {
             GetLinkImageService getLinkeImageService = RetrofitFactory.getInstance().createService(GetLinkImageService.class);
-            getLinkeImageService.uploadImageToGetLink(SharedPrefs.getInstance().get("JWT_TOKEN", String.class),getImageUpload()).enqueue(new Callback<MainGetLink>() {
+            getLinkeImageService.uploadImageToGetLink(getImageUpload()).enqueue(new Callback<MainGetLink>() {
                 @Override
                 public void onResponse(Call<MainGetLink> call, Response<MainGetLink> response) {
 

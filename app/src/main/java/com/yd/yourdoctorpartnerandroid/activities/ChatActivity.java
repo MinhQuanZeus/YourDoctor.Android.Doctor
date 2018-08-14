@@ -38,6 +38,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.yd.yourdoctorpartnerandroid.DoctorApplication;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.adapters.ChatAdapter;
+import com.yd.yourdoctorpartnerandroid.fragments.ConfirmEndChatFragment;
 import com.yd.yourdoctorpartnerandroid.fragments.DoctorProfileFragment;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
@@ -295,6 +296,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private Emitter.Listener onErrorUpdate = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -302,7 +308,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     progressBar.setVisibility(View.GONE);
                     String message = (String) args[0];
                     //showMessageConfirm(message);
-                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                    try{
+                        ConfirmEndChatFragment confirmEndChatFragment = new ConfirmEndChatFragment();
+                        confirmEndChatFragment.setData(currentDoctor,patientChoice,message);
+                        ScreenManager.openFragment(getSupportFragmentManager(), confirmEndChatFragment, R.id.rl_chat, true, true);
+                    }catch (Exception e){
+                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                    }
+
+
 
                 }
             });
@@ -312,7 +326,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private Emitter.Listener onFinishMessage = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -320,7 +338,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     String message = (String) args[0];
                     //showMessageConfirm(message);
                     Log.e("emitt anh le", message);
-                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+
+                    try{
+                        ConfirmEndChatFragment confirmEndChatFragment = new ConfirmEndChatFragment();
+                        confirmEndChatFragment.setData(currentDoctor,patientChoice,message);
+                        ScreenManager.openFragment(getSupportFragmentManager(), confirmEndChatFragment, R.id.rl_chat, true, true);
+                    }catch (Exception e){
+                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                    }
+
                 }
             });
         }
@@ -568,7 +594,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             GetLinkImageService getLinkeImageService = RetrofitFactory.getInstance().createService(GetLinkImageService.class);
-            getLinkeImageService.uploadImageToGetLink(SharedPrefs.getInstance().get("JWT_TOKEN", String.class), imageUtils.getImageUpload()).enqueue(new Callback<MainGetLink>() {
+            getLinkeImageService.uploadImageToGetLink(imageUtils.getImageUpload()).enqueue(new Callback<MainGetLink>() {
                 @Override
                 public void onResponse(Call<MainGetLink> call, Response<MainGetLink> response) {
                     Log.e("linkImage", response.body().getFilePath());
