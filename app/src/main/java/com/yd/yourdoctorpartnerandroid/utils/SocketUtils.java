@@ -9,7 +9,7 @@ import com.yd.yourdoctorpartnerandroid.models.Patient;
 import java.net.URISyntaxException;
 
 public class SocketUtils {
-    private final static String URL_SERVER = Constants.SOCKET_URL;
+    private final static String URL_SERVER = Constants.URL_SOCKET;
     private Socket mSocket;
     private static SocketUtils socketUtils;
 
