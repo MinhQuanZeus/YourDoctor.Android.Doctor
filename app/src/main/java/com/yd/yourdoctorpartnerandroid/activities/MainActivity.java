@@ -34,6 +34,7 @@ import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorpartnerandroid.DoctorApplication;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.adapters.PagerAdapter;
+import com.yd.yourdoctorpartnerandroid.events.EventSend;
 import com.yd.yourdoctorpartnerandroid.fragments.AboutUsFragment;
 import com.yd.yourdoctorpartnerandroid.fragments.AdvisoryMenuFragment;
 import com.yd.yourdoctorpartnerandroid.fragments.DoctorProfileFragment;
@@ -47,6 +48,8 @@ import com.yd.yourdoctorpartnerandroid.utils.Config;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -89,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //EventBus.getDefault().register(this);
         setupUI();
         setupSocket();
 //        Log.d("MainActivity", "USER_INFO");
@@ -117,6 +121,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nPermission = new NPermission(true);
         nPermission.requestPermission(this, Manifest.permission.CAMERA);
         displayFirebaseRegId();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(EventSend eventSend) {
+        if(eventSend.getType() == 1){
+//            currentPatient = SharedPrefs.getInstance().get("USER_INFO", Patient.class);
+//            if(currentPatient != null){
+//                tvNameUser.setText(currentPatient.getFullName());
+//                Picasso.with(this).load(currentPatient.getAvatar().toString()).into(ivAvaUser);
+//                tvMoneyUser.setText(currentPatient.getRemainMoney() + "" );
+//            }
+        }
     }
 
 
@@ -222,13 +238,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (draw_layout_main.isDrawerOpen(GravityCompat.START)) {
             draw_layout_main.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            handleLogOut();
         }
-        handleLogOut();
-//        Intent intent = new Intent(Intent.ACTION_MAIN);
-//        intent.addCategory(Intent.CATEGORY_HOME);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startActivity(intent);
+
     }
 
     @Override
@@ -310,6 +322,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Utils.backToLogin(getApplicationContext());
+                        DoctorApplication.self().getSocket().close();
                     }
 
                 })
