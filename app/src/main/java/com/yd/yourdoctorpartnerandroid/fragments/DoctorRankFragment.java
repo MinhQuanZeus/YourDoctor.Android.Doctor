@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
@@ -21,6 +23,8 @@ import com.yd.yourdoctorpartnerandroid.models.Specialist;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorpartnerandroid.networks.getSpecialistService.GetSpecialistService;
 import com.yd.yourdoctorpartnerandroid.networks.getSpecialistService.MainObjectSpecialist;
+import com.yd.yourdoctorpartnerandroid.utils.LoadDefaultModel;
+import com.yd.yourdoctorpartnerandroid.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,17 +41,23 @@ import retrofit2.Response;
  */
 public class DoctorRankFragment extends Fragment {
 
-    @BindView(R.id.tab_specialists)
-    TabLayout tab_specialists;
+    @BindView(R.id.tabSpecialists)
+    TabLayout tabSpecialists;
 
-    @BindView(R.id.vp_doctorRanking)
-    ViewPager vp_doctorRanking;
+    @BindView(R.id.vpDoctorRanking)
+    ViewPager vpDoctorRanking;
 
-    @BindView(R.id.tb_logo_specialist)
-    Toolbar tb_logo_specialist;
+    @BindView(R.id.tbLogoSpecialist)
+    Toolbar tbLogoSpecialist;
+
+    @BindView(R.id.progessBar)
+    ProgressBar progessBar;
+
 
     Unbinder butterKnife;
     private List<Specialist> specialists = new ArrayList<>();
+
+    private ViewPagerAdapter adapter;
 
     public DoctorRankFragment() {
         // Required empty public constructor
@@ -59,38 +69,83 @@ public class DoctorRankFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_doctor_rank, container, false);
-
+        butterKnife = ButterKnife.bind(this, view);
         setUpSpecialists();
 
-        butterKnife = ButterKnife.bind(this, view);
 
-        ((AppCompatActivity) getActivity()).setSupportActionBar(tb_logo_specialist);
-        final ActionBar actionbar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
-        actionbar.setTitle(R.string.ranking_doctor);
-
-        tb_logo_specialist.setNavigationOnClickListener(new View.OnClickListener() {
+        tbLogoSpecialist.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        tbLogoSpecialist.setTitle(getResources().getString(R.string.ranking_doctor));
+        tbLogoSpecialist.setTitleTextColor(getResources().getColor(R.color.primary_text));
+        tbLogoSpecialist.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 ScreenManager.backFragment(getFragmentManager());
-
             }
         });
 
-        tab_specialists.setupWithViewPager(vp_doctorRanking);
-        tab_specialists.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+
+        return view;
+    }
+
+    private void setUpSpecialists() {
+        specialists = LoadDefaultModel.getInstance().getSpecialists();
+
+        if (specialists == null) {
+            GetSpecialistService getSpecialistService = RetrofitFactory.getInstance().createService(GetSpecialistService.class);
+            getSpecialistService.getMainObjectSpecialist().enqueue(new Callback<MainObjectSpecialist>() {
+                @Override
+                public void onResponse(Call<MainObjectSpecialist> call, Response<MainObjectSpecialist> response) {
+
+                    if (response.code() == 200) {
+                        MainObjectSpecialist mainObjectSpecialist = response.body();
+                        specialists = mainObjectSpecialist.getListSpecialist();
+                        LoadDefaultModel.getInstance().setSpecialists(specialists);
+                        progessBar.setVisibility(View.GONE);
+                        setupViewPager();
+                    } else if (response.code() == 401) {
+                        Utils.backToLogin(getContext());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<MainObjectSpecialist> call, Throwable t) {
+                    Log.e("loi mang", t.toString());
+                    Toast.makeText(getContext(), "Kết nối mạng có vấn đề , không thể tải dữ liệu", Toast.LENGTH_LONG).show();
+                    progessBar.setVisibility(View.GONE);
+                }
+            });
+
+        } else {
+            progessBar.setVisibility(View.GONE);
+            setupViewPager();
+
+        }
+
+    }
+
+
+    private void setupViewPager() {
+        for (Specialist specialist : specialists) {
+            tabSpecialists.addTab(tabSpecialists.newTab().setText(specialist.getName()));
+        }
+
+        adapter = new ViewPagerAdapter(getFragmentManager(), specialists);
+        vpDoctorRanking.setAdapter(adapter);
+        vpDoctorRanking.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabSpecialists));
+
+        tabSpecialists.getTabAt(0).select();
+        vpDoctorRanking.setCurrentItem(0);
+
+        tabSpecialists.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-
-                vp_doctorRanking.setCurrentItem(tab.getPosition());
-
+                vpDoctorRanking.setCurrentItem(tab.getPosition());
+                adapter.notifyDataSetChanged();
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-
             }
 
             @Override
@@ -98,39 +153,6 @@ public class DoctorRankFragment extends Fragment {
 
             }
         });
-        return view;
-    }
-
-
-    private void setUpSpecialists() {
-
-        GetSpecialistService getSpecialistService = RetrofitFactory.getInstance().createService(GetSpecialistService.class);
-        getSpecialistService.getMainObjectSpecialist().enqueue(new Callback<MainObjectSpecialist>() {
-            @Override
-            public synchronized void onResponse(Call<MainObjectSpecialist> call, Response<MainObjectSpecialist> response) {
-                Log.e("AnhLe", "success: " + response.body());
-                MainObjectSpecialist mainObjectSpecialist = response.body();
-                List<Specialist> specialist = mainObjectSpecialist.getListSpecialist();
-
-                specialists = specialist;
-                setupViewPager(vp_doctorRanking);
-                vp_doctorRanking.setCurrentItem(0);
-
-            }
-
-            @Override
-            public synchronized void onFailure(Call<MainObjectSpecialist> call, Throwable t) {
-                Log.e("AnhLe", "Fail: " + t.getMessage());
-            }
-        });
-
-    }
-
-
-    private void setupViewPager(ViewPager viewPager) {
-
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager(), specialists);
-        viewPager.setAdapter(adapter);
     }
 
     @Override
@@ -141,14 +163,11 @@ public class DoctorRankFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        butterKnife.unbind();
+        //butterKnife.unbind();
     }
 
 
-    class ViewPagerAdapter extends FragmentStatePagerAdapter
-
-    {
-
+    class ViewPagerAdapter extends FragmentStatePagerAdapter {
         private List specialists;
 
         public ViewPagerAdapter(FragmentManager fm, List<Specialist> specialists) {
@@ -176,4 +195,5 @@ public class DoctorRankFragment extends Fragment {
     }
 
 }
+
 

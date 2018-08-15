@@ -35,9 +35,11 @@ import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
+import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorpartnerandroid.DoctorApplication;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.adapters.ChatAdapter;
+import com.yd.yourdoctorpartnerandroid.events.EventSend;
 import com.yd.yourdoctorpartnerandroid.fragments.ConfirmEndChatFragment;
 import com.yd.yourdoctorpartnerandroid.fragments.DoctorProfileFragment;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
@@ -64,6 +66,8 @@ import com.yd.yourdoctorpartnerandroid.utils.SocketUtils;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
 import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -257,7 +261,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     patientChoice.setAvatar(mainObject.getInformationPatient().getPatientId().getAvatar());
                     patientChoice.setBirthday(mainObject.getInformationPatient().getPatientId().getBirthday());
                     patientChoice.setPhoneNumber(mainObject.getInformationPatient().getPatientId().getPhoneNumber());
-
+                    tbMainChat.setTitle("Bs." + patientChoice.getFullName());
                     Log.e("patient is ", patientChoice.getlName());
 
                     loadChatDisplay();
@@ -352,27 +356,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    private void showMessageConfirm(String message) {
-        new AlertDialog.Builder(getApplicationContext())
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Thông báo kết thúc")
-                .setMessage(message)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-                    }
-                })
-                .setNegativeButton("Báo cáo Bệnh nhân", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        //TODO
-                        reportPatient();
-                    }
-                }).show();
-    }
-
 
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
         @Override
@@ -415,8 +398,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     };
 
     private void backToMainActivity() {
-        // mSocket.emit("disconnect");
-        //mSocket.disconnect();
         SocketUtils.getInstance().getSocket().emit("leaveRoom", chatHistoryID);
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -581,9 +562,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 progressBar.setVisibility(View.GONE);
             } else {
                 //SocketUtils.getInstance().getSocket().emit("sendMessage", currentDoctor.getDoctorId(), patientChoiceId, chatHistoryID, 1, mEditText.getText().toString());
-                SocketUtils.getInstance().getSocket().emit("sendMessage", currentDoctor.getDoctorId(), patientChoiceId, chatHistoryID, 1, mEditText.getText().toString());
-
-
+                SocketUtils.getInstance().getSocket().emit("sendMessage", currentDoctor.getDoctorId(), patientChoiceId, chatHistoryID, 1, mEditText.getText().toString().trim());
                 mEditText.setText("");
             }
 

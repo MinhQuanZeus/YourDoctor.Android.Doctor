@@ -2,10 +2,7 @@ package com.yd.yourdoctorpartnerandroid.activities;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -26,9 +23,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.nhancv.npermission.NPermission;
 import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorpartnerandroid.DoctorApplication;
@@ -36,14 +31,11 @@ import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.adapters.PagerAdapter;
 import com.yd.yourdoctorpartnerandroid.events.EventSend;
 import com.yd.yourdoctorpartnerandroid.fragments.AboutUsFragment;
-import com.yd.yourdoctorpartnerandroid.fragments.AdvisoryMenuFragment;
+import com.yd.yourdoctorpartnerandroid.fragments.BankingFragment;
 import com.yd.yourdoctorpartnerandroid.fragments.DoctorProfileFragment;
 import com.yd.yourdoctorpartnerandroid.fragments.DoctorRankFragment;
-import com.yd.yourdoctorpartnerandroid.fragments.UserProfileFragment;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
-import com.yd.yourdoctorpartnerandroid.models.TypeCall;
-import com.yd.yourdoctorpartnerandroid.models.VideoCallSession;
 import com.yd.yourdoctorpartnerandroid.utils.Config;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
@@ -52,12 +44,9 @@ import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NPermission.OnPermissionResult {
 
@@ -66,9 +55,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @BindView(R.id.view_pager)
     ViewPager viewPager;
-
-    @BindView(R.id.fab_question)
-    FloatingActionButton fab_question;
 
     @BindView(R.id.draw_layout_main)
     DrawerLayout draw_layout_main;
@@ -94,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //EventBus.getDefault().register(this);
+        EventBus.getDefault().register(this);
         setupUI();
         setupSocket();
 //        Log.d("MainActivity", "USER_INFO");
@@ -125,18 +111,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         displayFirebaseRegId();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(EventSend eventSend) {
-        if(eventSend.getType() == 1){
-            currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
-            if(currentDoctor != null){
-                tv_name_user.setText(currentDoctor.getFullName());
-                ZoomImageViewUtils.loadImageManual(getApplicationContext(),currentDoctor.getAvatar(),iv_ava_user);
-                tv_money_user.setText(currentDoctor.getRemainMoney() + "" );
-            }
-        }
-    }
-
 
     private void setupSocket() {
         socket = DoctorApplication.self().getSocket();
@@ -155,6 +129,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        else
 //            Toast.makeText(this, "Firebase Reg Id is not received yet", Toast.LENGTH_SHORT).show();
 //           // txtRegId.setText("Firebase Reg Id is not received yet!");
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(EventSend eventSend) {
+        if(eventSend.getType() == 1){
+            currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+            if(currentDoctor != null){
+                tv_name_user.setText(currentDoctor.getFullName());
+                ZoomImageViewUtils.loadImageManual(getApplicationContext(),currentDoctor.getAvatar(), iv_ava_user);
+                tv_money_user.setText(currentDoctor.getRemainMoney() + "" );
+            }
+        }
     }
 
 
@@ -184,13 +170,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView_main.setNavigationItemSelectedListener(this);
 
-        fab_question.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                ScreenManager.openFragment(getSupportFragmentManager(), new AdvisoryMenuFragment(), R.id.rl_container, true, true);
-            }
-        });
 
         tb_main.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -212,8 +191,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(), 4);
         viewPager.setAdapter(pagerAdapter);
-        viewPager.setCurrentItem(1);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+        tabLayout.getTabAt(1).select();
+        viewPager.setCurrentItem(1);
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -266,14 +248,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         if (item == null) return false;
         switch (item.getItemId()) {
-            case R.id.nav_create_advisory_main: {
-                ScreenManager.openFragment(getSupportFragmentManager(), new AdvisoryMenuFragment(), R.id.rl_container, true, true);
-                break;
-            }
-            case R.id.nav_favorite_doctor_main: {
-                break;
-            }
             case R.id.nav_exchange_money_main: {
+                ScreenManager.openFragment(getSupportFragmentManager(), new BankingFragment(), R.id.rl_container, true, true);
                 break;
             }
             case R.id.nav_profile_main: {
@@ -286,13 +262,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             case R.id.navAboutUs:{
                 ScreenManager.openFragment(getSupportFragmentManager(), new AboutUsFragment(), R.id.rl_container, true, true);
-
                 break;
             }
             case R.id.nav_logout_main: {
-                //Test
                 handleLogOut();
-                //ScreenManager.openFragment(getSupportFragmentManager(), new DoctorProfileFragment(), R.id.rl_container, true, true);
                 break;
 
             }
@@ -305,17 +278,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        fab_question.setVisibility(View.VISIBLE);
-        // Đăng ký receiver vào LocalBroadcastManager.
-      //  LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-      //          new IntentFilter(Config.REGISTRATION_COMPLETE));
-
-        // Đăng ký bộ nhận tin nhắn.
-       // LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-              //  new IntentFilter(Config.PUSH_NOTIFICATION));
-
-        // Xóa các notification khi app được bật.
-       // NotificationUtils.clearNotifications(getApplicationContext());
     }
 
     private void handleLogOut(){
@@ -342,8 +304,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onPause() {
         super.onPause();
-        fab_question.setVisibility(View.INVISIBLE);
-       // LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
     }
 
     @Override

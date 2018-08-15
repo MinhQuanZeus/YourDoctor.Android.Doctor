@@ -84,13 +84,13 @@ public class HistoryTransactionFragment extends Fragment {
                     return new ListChatHistoryFragment();
                 }
                 case 1:{
-                    return new NotifyFragment();
+                    return new VideoCallHistoryFragment();
                 }
                 case 2:{
                     return new ListPaymentHistoryFragment();
                 }
                 case 3:{
-                    return new NotifyFragment();
+                    return new BankingHistoryFragment();
                 }
             }
             return null;

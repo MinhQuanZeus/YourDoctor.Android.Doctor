@@ -14,13 +14,20 @@ import android.widget.Toast;
 import com.chaos.view.PinView;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
+import com.yd.yourdoctorpartnerandroid.models.Doctor;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
+import com.yd.yourdoctorpartnerandroid.networks.banking.RequestVerifyExchange;
+import com.yd.yourdoctorpartnerandroid.networks.banking.ResponseVerifyExchange;
+import com.yd.yourdoctorpartnerandroid.networks.banking.VerifyCodeExchange;
 import com.yd.yourdoctorpartnerandroid.networks.models.CommonErrorResponse;
 import com.yd.yourdoctorpartnerandroid.networks.models.PhoneVerification;
 import com.yd.yourdoctorpartnerandroid.networks.models.CommonSuccessResponse;
 import com.yd.yourdoctorpartnerandroid.networks.services.PhoneVerificationCodeService;
 import com.yd.yourdoctorpartnerandroid.utils.NetworkUtils;
+import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -55,6 +62,12 @@ public class VerifyCodePhoneNumberFragment extends Fragment {
         // Required empty public constructor
     }
 
+    private String idExchangeRequest;
+
+    public void  setData(String idExchangeRequest){
+        this.idExchangeRequest = idExchangeRequest;
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,7 +86,12 @@ public class VerifyCodePhoneNumberFragment extends Fragment {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().onBackPressed();
+                if(idExchangeRequest != null && !idExchangeRequest.equals("")){
+                    ScreenManager.backFragment(getFragmentManager());
+                }else {
+                    getActivity().onBackPressed();
+                }
+
             }
         });
         unbinder = ButterKnife.bind(this, view);
@@ -81,7 +99,13 @@ public class VerifyCodePhoneNumberFragment extends Fragment {
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onSubmit();
+
+                if(idExchangeRequest != null && !idExchangeRequest.equals("")){
+                    onVerifyExchangeBank();
+                }else {
+                    onSubmit();
+                }
+
             }
         });
         pvCode.setAnimationEnable(true);
@@ -108,6 +132,51 @@ public class VerifyCodePhoneNumberFragment extends Fragment {
         return isValid;
     }
 
+    private void onVerifyExchangeBank(){
+        if (!onValidate()) {
+            return;
+        }
+        btnNext.startAnimation();
+        pvCode.setEnabled(false);
+        String code = pvCode.getText().toString();
+        RequestVerifyExchange requestVerifyExchange = new RequestVerifyExchange(idExchangeRequest,code);
+
+        VerifyCodeExchange verifyCodeExchange = RetrofitFactory.getInstance().createService(VerifyCodeExchange.class);
+        verifyCodeExchange.verifyCodeExchange(SharedPrefs.getInstance().get("JWT_TOKEN", String.class) , requestVerifyExchange).enqueue(new Callback<ResponseVerifyExchange>() {
+            @Override
+            public void onResponse(Call<ResponseVerifyExchange> call, Response<ResponseVerifyExchange> response) {
+                btnNext.revertAnimation();
+                if (response.code() == 200) {
+                    if(!response.body().isStatus()){
+                        Doctor currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+                        currentDoctor.setRemainMoney(response.body().getOldRemainMoney());
+                        SharedPrefs.getInstance().put("USER_INFO", currentDoctor);
+                        EventBus.getDefault().post(1);
+                        Toast.makeText(getContext(), response.body().getMessage(),Toast.LENGTH_LONG).show();
+                        pvCode.setText("");
+
+                    }else {
+                        Toast.makeText(getContext(), response.body().getMessage(),Toast.LENGTH_LONG).show();
+                        pvCode.setText("");
+                    }
+
+                } else {
+                    pvCode.setText("");
+                    Toast.makeText(getContext(), "Code bạn vừa nhập không hợp lệ, hoặc yêu cầu đã bị từ chối!",Toast.LENGTH_LONG).show();
+
+                }
+                pvCode.setEnabled(true);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseVerifyExchange> call, Throwable t) {
+                pvCode.setEnabled(true);
+                btnNext.revertAnimation();
+                Toast.makeText(getContext(),"Không thể gửi trên server", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     private void onSubmit() {
         if (!onValidate()) {
             return;
@@ -123,7 +192,7 @@ public class VerifyCodePhoneNumberFragment extends Fragment {
             public void onResponse(Call<CommonSuccessResponse> call, Response<CommonSuccessResponse> response) {
                 btnNext.revertAnimation();
                 if (response.code() == 200) {
-                    ScreenManager.openFragment(getActivity().getSupportFragmentManager(), new RegisterFragment().setPhoneNumber(phoneNumber), R.id.fl_auth, true, true);
+                    ScreenManager.openFragment(getActivity().getSupportFragmentManager(), new RegisterFragment().setPhoneNumber(phoneNumber), R.id.rl_container, true, true);
                 } else {
                     pvCode.setEnabled(true);
                     CommonErrorResponse commonErrorResponse = NetworkUtils.parseToCommonError(response);
