@@ -281,6 +281,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     if(progressBar != null)progressBar.setVisibility(View.GONE);
                     Toast.makeText(getApplicationContext(), "loi khi tai patient", Toast.LENGTH_LONG).show();
+
                 }
 
             }
@@ -301,6 +302,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void run() {
                     // chi hien thong bao
+                    isDone = true;
                     String message = (String) args[0];
                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                     if(progressBar != null) progressBar.setVisibility(View.GONE);
@@ -321,6 +323,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    isDone = true;
 
                     if(progressBar != null) progressBar.setVisibility(View.GONE);
                     String message = (String) args[0];
@@ -351,6 +354,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    isDone = true;
                     if(progressBar != null) progressBar.setVisibility(View.GONE);
                     String message = (String) args[0];
                     //showMessageConfirm(message);
@@ -373,6 +377,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -621,6 +630,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void handleSendMessageChat() {
+        if(isDone){
+            Toast.makeText(getApplicationContext(),"Cuộc tư vấn đã kết thúc", Toast.LENGTH_LONG).show();
+            return;
+        }
         if(progressBar != null) progressBar.setVisibility(View.VISIBLE);
         if (typeChatCurrent == 1) {
             if (mEditText.getText().equals("")) {

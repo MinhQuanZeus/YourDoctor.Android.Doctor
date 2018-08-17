@@ -4,11 +4,15 @@ import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -22,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.nkzawa.socketio.client.Socket;
 import com.nhancv.npermission.NPermission;
@@ -48,8 +53,12 @@ import org.greenrobot.eventbus.ThreadMode;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NPermission.OnPermissionResult {
+import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.RECORD_AUDIO;
 
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    public static final int REQUEST_PERMISSION_CODE = 1;
     @BindView(R.id.tab_layout)
     TabLayout tabLayout;
 
@@ -74,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private Socket socket;
     private Doctor currentDoctor;
-    private NPermission nPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,53 +91,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         EventBus.getDefault().register(this);
         setupUI();
         setupSocket();
-//        Log.d("MainActivity", "USER_INFO");
-//        Log.d("MainActivity", SharedPrefs.getInstance().get("USER_INFO", Patient.class).toString());
-//        Log.d("MainActivity", SharedPrefs.getInstance().get("JWT_TOKEN", String.class));
-//        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//
-//                // Kiểm tra Intent Filter có khớp cái nào không.
-//                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
-//                    // GCM đã được đăng ký thành công.
-//                    // Đăng ký vào topic có tên "Global".
-//                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
-//                    displayFirebaseRegId();
-//
-//                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
-//                    // Khi có tin nhắn mới về.
-//                    String message = intent.getStringExtra("message");
-//                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-//                   // txtMessage.setText(message);
-//                }
-//            }
-//        };
-//
-        nPermission = new NPermission(true);
-        nPermission.requestPermission(this, Manifest.permission.CAMERA);
-        nPermission.requestPermission(this, Manifest.permission.RECORD_AUDIO);
-        displayFirebaseRegId();
     }
 
 
     private void setupSocket() {
         socket = DoctorApplication.self().getSocket();
         socket.connect();
-    }
-    private void displayFirebaseRegId() {
-        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
-
-        String regId = pref.getString("regId", null);
-        SharedPrefs.getInstance().get("regId", String.class);
-        Log.e(TAG, "Firebase reg id: " + SharedPrefs.getInstance().get("regId", String.class));
-
-//        if (!TextUtils.isEmpty(regId))
-//            Toast.makeText(this, "Firebase Reg Id: " + regId, Toast.LENGTH_SHORT).show();
-//
-//        else
-//            Toast.makeText(this, "Firebase Reg Id is not received yet", Toast.LENGTH_SHORT).show();
-//           // txtRegId.setText("Firebase Reg Id is not received yet!");
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -148,6 +115,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void setupUI() {
         ButterKnife.bind(this);
+        if (!checkPermission()) {
+            requestPermission();
+        }
         setSupportActionBar(tb_main);
         View headerView = navigationView_main.inflateHeaderView(R.layout.nav_header_main);
         iv_ava_user = headerView.findViewById(R.id.iv_ava_user);
@@ -307,24 +277,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onPause();
     }
 
+    public boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(getApplicationContext(),
+                RECORD_AUDIO);
+        int result1 = ContextCompat.checkSelfPermission(getApplicationContext(),
+                CAMERA);
+        return result == PackageManager.PERMISSION_GRANTED &&
+                result1 == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_PERMISSION_CODE:
+                if (grantResults.length > 0) {
+                    boolean StoragePermission = grantResults[0] ==
+                            PackageManager.PERMISSION_GRANTED;
+                    boolean RecordPermission = grantResults[1] ==
+                            PackageManager.PERMISSION_GRANTED;
+
+                    if (StoragePermission && RecordPermission) {
+                        Toast.makeText(this, "Permission Granted",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        requestPermission();
+                    }
+                }
+                break;
+        }
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this, new
+                String[]{RECORD_AUDIO, CAMERA}, REQUEST_PERMISSION_CODE);
+    }
+
     @Override
     protected void onStop() {
         EventBus.getDefault().unregister(this);
         super.onStop();
     }
 
-    @Override
-    public void onPermissionResult(String s, boolean b) {
-        switch (s) {
-            case Manifest.permission.CAMERA:
-                if (!b) {
-                    nPermission.requestPermission(this, Manifest.permission.CAMERA);
-                }
-                break;
-            default:
-                break;
-        }
-    }
 }
 
 
