@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //
         nPermission = new NPermission(true);
         nPermission.requestPermission(this, Manifest.permission.CAMERA);
+        nPermission.requestPermission(this, Manifest.permission.RECORD_AUDIO);
         displayFirebaseRegId();
     }
 
