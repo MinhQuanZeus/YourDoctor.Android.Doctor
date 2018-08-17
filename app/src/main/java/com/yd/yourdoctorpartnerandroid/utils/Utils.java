@@ -70,10 +70,16 @@ public class Utils {
     }
 
     public static void backToLogin(Context context) {
+
         FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get("USER_INFO", Doctor.class).getDoctorId());
-        SocketUtils.getInstance().disconnectConnect();
+        SocketUtils.getInstance().closeConnect();
         SharedPrefs.getInstance().remove("JWT_TOKEN");
         SharedPrefs.getInstance().remove("USER_INFO");
+        try{
+            LoadDefaultModel.getInstance().unregisterServiceCheckNetwork(context);
+        }catch (Exception e){
+        }
+
         Intent intent = new Intent(context, AuthActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

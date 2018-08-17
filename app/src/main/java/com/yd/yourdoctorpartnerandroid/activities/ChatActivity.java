@@ -44,6 +44,8 @@ import com.yd.yourdoctorpartnerandroid.fragments.ConfirmEndChatFragment;
 import com.yd.yourdoctorpartnerandroid.fragments.DoctorProfileFragment;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
+import com.yd.yourdoctorpartnerandroid.networks.cancelChatService.CancelChatService;
+import com.yd.yourdoctorpartnerandroid.networks.cancelChatService.MainResponseCancelChat;
 import com.yd.yourdoctorpartnerandroid.networks.changePassword.ChangePasswordService;
 import com.yd.yourdoctorpartnerandroid.networks.changePassword.PasswordRequest;
 import com.yd.yourdoctorpartnerandroid.networks.changePassword.PasswordResponse;
@@ -115,6 +117,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.ivCancel)
     ImageView ivCancel;
 
+    @BindView(R.id.ivCancelChat)
+    ImageView ivCancelChat;
+
+    private boolean isDone;
+
     private EditText etReasonReport;
     private AlertDialog dialogReport;
 
@@ -148,7 +155,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         btnImage.setOnClickListener(this);
         btnChat.setOnClickListener(this);
         ivCancel.setOnClickListener(this);
-
+        ivCancelChat.setOnClickListener(this);
+        isDone = false;
         imageUtils = new ImageUtils(this);
 
         typeChatCurrent = 1;
@@ -174,12 +182,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         tbMainChat.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 backToMainActivity();
             }
         });
-
+        if(!SocketUtils.getInstance().checkIsConnected()){
+            Toast.makeText(getApplicationContext(),"Không kết nối được máy chủ",Toast.LENGTH_LONG);
+            return;
+        }
         SocketUtils.getInstance().getSocket().emit("joinRoom", chatHistoryID);
+        SocketUtils.getInstance().setRoomId(chatHistoryID);
 
         SocketUtils.getInstance().getSocket().on("newMessage", onNewMessage);
 
@@ -206,7 +217,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 mainObject = response.body();
                 if (response.code() == 200 && mainObject != null) {
                     List<MainRecord> mainRecords = mainObject.getObjConversation().getRecords();
-
+                    if(mainObject.getObjConversation().getStatus() == 2){
+                        isDone = true;
+                    }
                     for (MainRecord mainRecord : mainRecords) {
                         Record record = new Record();
                         record.setRecorderID(mainRecord.getRecorderID());
@@ -233,13 +246,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     Utils.backToLogin(getApplicationContext());
                 }
 
-                progressBar.setVisibility(View.GONE);
+                if(progressBar != null) progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onFailure(Call<MainObjectChatHistory> call, Throwable t) {
                 Toast.makeText(getApplicationContext(), "Không thể tải được cuộc trò chuyện", Toast.LENGTH_LONG).show();
-                progressBar.setVisibility(View.GONE);
+                if(progressBar != null) progressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -266,7 +279,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                     loadChatDisplay();
                 } else {
-                    progressBar.setVisibility(View.GONE);
+                    if(progressBar != null)progressBar.setVisibility(View.GONE);
                     Toast.makeText(getApplicationContext(), "loi khi tai patient", Toast.LENGTH_LONG).show();
                 }
 
@@ -275,7 +288,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFailure(Call<MainObjectDetailPatient> call, Throwable t) {
                 Log.e("Anhle P error ", t.toString());
-                progressBar.setVisibility(View.GONE);
+                if(progressBar != null) progressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -290,7 +303,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     // chi hien thong bao
                     String message = (String) args[0];
                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                    progressBar.setVisibility(View.GONE);
+                    if(progressBar != null) progressBar.setVisibility(View.GONE);
 
                 }
             });
@@ -309,7 +322,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void run() {
 
-                    progressBar.setVisibility(View.GONE);
+                    if(progressBar != null) progressBar.setVisibility(View.GONE);
                     String message = (String) args[0];
                     //showMessageConfirm(message);
                     try{
@@ -338,7 +351,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    progressBar.setVisibility(View.GONE);
+                    if(progressBar != null) progressBar.setVisibility(View.GONE);
                     String message = (String) args[0];
                     //showMessageConfirm(message);
                     Log.e("emitt anh le", message);
@@ -386,10 +399,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                             recyclerView.smoothScrollToPosition(recordsChat.size() - 1);
                         }
                         chatApapter.notifyDataSetChanged();
-                        progressBar.setVisibility(View.GONE);
+                        if(progressBar != null) progressBar.setVisibility(View.GONE);
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        progressBar.setVisibility(View.GONE);
+                        if(progressBar != null) progressBar.setVisibility(View.GONE);
                     }
 
                 }
@@ -398,6 +411,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     };
 
     private void backToMainActivity() {
+        SocketUtils.getInstance().setRoomId(null);
         SocketUtils.getInstance().getSocket().emit("leaveRoom", chatHistoryID);
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -425,6 +439,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 setTypeChat(1);
                 break;
             }
+            case R.id.ivCancelChat:{
+                handleCancelChat();
+                break;
+            }
         }
     }
 
@@ -443,12 +461,60 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button btnOkInfoPatient;
 
+
+    private void handleCancelChat(){
+        new AlertDialog.Builder(ChatActivity.this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Xác nhận việc hủy cuộc tư vấn với BN.")
+                .setMessage("Bạn sẽ không nhận được tiền công nếu hủy, bạn có chắc chắn muốn hủy bỏ cuộc tư vấn không? ")
+                .setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(!isDone){
+                            //TODO API
+                            if(progressBar != null) progressBar.setVisibility(View.VISIBLE);
+
+                            CancelChatService cancelChatService = RetrofitFactory.getInstance().createService(CancelChatService.class);
+                            cancelChatService.cancelChatService(SharedPrefs.getInstance().get("JWT_TOKEN", String.class), chatHistoryID).enqueue(new Callback<MainResponseCancelChat>() {
+                                @Override
+                                public void onResponse(Call<MainResponseCancelChat> call, Response<MainResponseCancelChat> response) {
+                                    if (response.code() == 200 && response.body().isSuccess()) {
+                                        isDone = true;
+                                        Toast.makeText(getApplicationContext(), "Hủy cuộc chat thành công", Toast.LENGTH_LONG).show();
+                                    } else if (response.code() == 401) {
+                                        Utils.backToLogin(getApplicationContext());
+                                    }
+                                    if(progressBar != null) progressBar.setVisibility(View.GONE);
+                                }
+
+                                @Override
+                                public void onFailure(Call<MainResponseCancelChat> call, Throwable t) {
+                                    Toast.makeText(getApplicationContext(), "Lỗi kết máy chủ, không thể thực hiện yêu cầu", Toast.LENGTH_LONG).show();
+                                    if(progressBar != null) progressBar.setVisibility(View.GONE);
+                                }
+                            });
+
+                        }else {
+                            Toast.makeText(getApplicationContext(),"Cuộc tư vấn đã kết thúc trước đó", Toast.LENGTH_LONG).show();
+                        }
+
+                        dialog.dismiss();
+                    }
+
+                })
+                .setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                }).show();
+    }
+
     private void showDialogInfo() {
         final Dialog dialog = new Dialog(ChatActivity.this);
         dialog.setContentView(R.layout.info_chat_dialog);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
-        // set the custom dialog components - text, image and button
         ivPatientChat = dialog.findViewById(R.id.ivPatientChat);
         tvNamePatientChat = dialog.findViewById(R.id.tvNamePatientChat);
         tvBirthDayChat = dialog.findViewById(R.id.tvBirthDayChat);
@@ -494,7 +560,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         View view = inflater.inflate(R.layout.report_user_dialog, null);
         etReasonReport = view.findViewById(R.id.et_reason_report);
         pbInforChat = view.findViewById(R.id.pb_infor_chat);
-        pbInforChat.setVisibility(View.GONE);
+        if(pbInforChat != null) pbInforChat.setVisibility(View.GONE);
         builder.setView(view);
         if (patientChoice != null) {
             builder.setTitle("Báo cáo BN." + patientChoice.getFullName());
@@ -517,10 +583,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         dialogReport.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pbInforChat.setVisibility(View.VISIBLE);
+                if(pbInforChat != null) pbInforChat.setVisibility(View.VISIBLE);
                 if (etReasonReport.getText().toString().equals("")) {
                     Toast.makeText(getApplicationContext(), "Bạn phải nhập lý do", Toast.LENGTH_LONG).show();
-                    pbInforChat.setVisibility(View.GONE);
+                    if(pbInforChat != null) pbInforChat.setVisibility(View.GONE);
                 } else {
                     ReportRequest reportRequest = new ReportRequest();
                     reportRequest.setIdPersonBeingReported(patientChoiceId);
@@ -538,13 +604,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                             } else if (response.code() == 401) {
                                 Utils.backToLogin(getApplicationContext());
                             }
-                            pbInforChat.setVisibility(View.GONE);
+                            if(pbInforChat != null) pbInforChat.setVisibility(View.GONE);
                         }
 
                         @Override
                         public void onFailure(Call<MainResponReport> call, Throwable t) {
                             Toast.makeText(getApplicationContext(), "Lỗi kết máy chủ", Toast.LENGTH_LONG).show();
-                            pbInforChat.setVisibility(View.GONE);
+                            if(pbInforChat != null) pbInforChat.setVisibility(View.GONE);
                         }
                     });
 
@@ -555,20 +621,26 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void handleSendMessageChat() {
-        progressBar.setVisibility(View.VISIBLE);
+        if(progressBar != null) progressBar.setVisibility(View.VISIBLE);
         if (typeChatCurrent == 1) {
             if (mEditText.getText().equals("")) {
                 Toast.makeText(this, "Bạn nên nhập tin nhắn trước", Toast.LENGTH_LONG).show();
-                progressBar.setVisibility(View.GONE);
+                if(progressBar != null) progressBar.setVisibility(View.GONE);
             } else {
+                if(!SocketUtils.getInstance().checkIsConnected()){
+                    if(progressBar != null) progressBar.setVisibility(View.GONE);
+                    Toast.makeText(getApplicationContext(),"Không có kết nối",Toast.LENGTH_LONG).show();
+                }else {
+                    SocketUtils.getInstance().getSocket().emit("sendMessage", currentDoctor.getDoctorId(), patientChoiceId, chatHistoryID, 1, mEditText.getText().toString().trim());
+                    mEditText.setText("");
+
+                }
                 //SocketUtils.getInstance().getSocket().emit("sendMessage", currentDoctor.getDoctorId(), patientChoiceId, chatHistoryID, 1, mEditText.getText().toString());
-                SocketUtils.getInstance().getSocket().emit("sendMessage", currentDoctor.getDoctorId(), patientChoiceId, chatHistoryID, 1, mEditText.getText().toString().trim());
-                mEditText.setText("");
             }
 
         } else {
             if (imageUtils.getImageUpload() == null) {
-                progressBar.setVisibility(View.GONE);
+                if(progressBar != null) progressBar.setVisibility(View.GONE);
                 return;
             }
 
@@ -581,20 +653,25 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     if (response.code() == 200) {
                         Log.e("linkSuccess", response.body().getFilePath());
                         MainGetLink mainObject = response.body();
-                        SocketUtils.getInstance().getSocket().emit("sendMessage", currentDoctor.getDoctorId(), patientChoiceId, chatHistoryID, 2, mainObject.getFilePath());
-                        setTypeChat(1);
+                        if(!SocketUtils.getInstance().checkIsConnected()){
+                            if(progressBar != null) progressBar.setVisibility(View.GONE);
+                            Toast.makeText(getApplicationContext(),"Không có kết nối",Toast.LENGTH_LONG).show();
+                        }else {
+                            SocketUtils.getInstance().getSocket().emit("sendMessage", currentDoctor.getDoctorId(), patientChoiceId, chatHistoryID, 2, mainObject.getFilePath());
+                            setTypeChat(1);
+                        }
                     } else if (response.code() == 401) {
                         Utils.backToLogin(getApplicationContext());
                     } else {
                         Log.e("not200", "anhle");
-                        progressBar.setVisibility(View.GONE);
+                        if(progressBar != null) progressBar.setVisibility(View.GONE);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<MainGetLink> call, Throwable t) {
                     Log.e("Anhlelink", t.toString());
-                    progressBar.setVisibility(View.GONE);
+                    if(progressBar != null) progressBar.setVisibility(View.GONE);
                 }
             });
         }

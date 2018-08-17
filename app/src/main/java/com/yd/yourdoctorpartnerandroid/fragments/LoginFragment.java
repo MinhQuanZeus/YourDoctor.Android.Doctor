@@ -30,6 +30,7 @@ import com.yd.yourdoctorpartnerandroid.networks.models.CommonErrorResponse;
 import com.yd.yourdoctorpartnerandroid.networks.models.Login;
 import com.yd.yourdoctorpartnerandroid.models.SpecialistDoctor;
 import com.yd.yourdoctorpartnerandroid.networks.services.LoginService;
+import com.yd.yourdoctorpartnerandroid.utils.LoadDefaultModel;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.SocketUtils;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
@@ -98,7 +99,7 @@ public class LoginFragment extends Fragment {
         tvSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ScreenManager.openFragment(getActivity().getSupportFragmentManager(), new InputPhoneNumberFragment(), R.id.fl_auth, true, true);
+                ScreenManager.openFragment(getActivity().getSupportFragmentManager(), new RulesRegisterFragment(), R.id.fl_auth, true, true);
             }
         });
 
@@ -175,7 +176,7 @@ public class LoginFragment extends Fragment {
                         }
                         SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
                         FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
-                        SocketUtils.getInstance().reConnect();
+                        LoadDefaultModel.getInstance().registerServiceCheckNetwork(getActivity().getApplicationContext());
 
                         if(checkBoxRemember.isChecked()){
                             SharedPrefs.getInstance().put("phone",edPhone.getText().toString());

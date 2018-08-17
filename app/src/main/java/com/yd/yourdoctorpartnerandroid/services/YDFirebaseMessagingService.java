@@ -15,10 +15,13 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.activities.ChatActivity;
+import com.yd.yourdoctorpartnerandroid.events.EventSend;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
 import com.yd.yourdoctorpartnerandroid.utils.NotificationUtils;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.SocketUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 
 public class YDFirebaseMessagingService extends FirebaseMessagingService {
@@ -30,6 +33,7 @@ public class YDFirebaseMessagingService extends FirebaseMessagingService {
     private String storageId;
     private String message;
     private String createTime;
+    private String remainMoney;
 
     private String title;
     private String description;
@@ -40,6 +44,7 @@ public class YDFirebaseMessagingService extends FirebaseMessagingService {
     private PendingIntent pendingIntent;
     private NotificationCompat.Builder builder;
     private NotificationManager notifManager;
+    private Doctor doctor;
 
     public YDFirebaseMessagingService() {
         super();
@@ -58,6 +63,7 @@ public class YDFirebaseMessagingService extends FirebaseMessagingService {
             storageId = remoteMessage.getData().get("storageId");
             message = remoteMessage.getData().get("message");
             createTime = remoteMessage.getData().get("createTime");
+            remainMoney = remoteMessage.getData().get("remainMoney");
             if(SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null){
                 showNotification();
             }
@@ -112,8 +118,27 @@ public class YDFirebaseMessagingService extends FirebaseMessagingService {
                     break;
                 }
                 case 3: {
+                    if(remainMoney != null && !remainMoney.equals("") && SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null){
+                        doctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+                        try{
+                            doctor.setRemainMoney(Float.parseFloat(remainMoney));
+                            SharedPrefs.getInstance().put("USER_INFO", doctor);
+                            EventBus.getDefault().post(new EventSend(1));
+                        }catch (Exception e){
+                            Log.e("LoiMessageFirebase :", "remainMoney");
+                        }
+
+                    }
 
                     builder.setContentTitle("Thông báo Thanh Toán")  // required
+                            .setSmallIcon(R.drawable.your_doctor_logo) // required
+                            .setContentText(message)  // required
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setAutoCancel(true)
+                            .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+                    break;
+                }case 4:{
+                    builder.setContentTitle("Thông báo Thanh Toán rút tiền")  // required
                             .setSmallIcon(R.drawable.your_doctor_logo) // required
                             .setContentText(message)  // required
                             .setDefaults(Notification.DEFAULT_ALL)
@@ -155,6 +180,17 @@ public class YDFirebaseMessagingService extends FirebaseMessagingService {
                     break;
                 }
                 case 3: {
+                    if(remainMoney != null && !remainMoney.equals("") && SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null){
+                        doctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+                        try{
+                            doctor.setRemainMoney(Float.parseFloat(remainMoney));
+                            SharedPrefs.getInstance().put("USER_INFO", doctor);
+                            EventBus.getDefault().post(new EventSend(1));
+                        }catch (Exception e){
+                            Log.e("LoiMessageFirebase :", "remainMoney");
+                        }
+
+                    }
 
                     builder.setContentTitle("Thông báo thanh toán")                           // required
                             .setSmallIcon(R.drawable.your_doctor_logo) // required
@@ -166,6 +202,17 @@ public class YDFirebaseMessagingService extends FirebaseMessagingService {
                             .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
                             .setPriority(Notification.PRIORITY_HIGH);
                     break;
+                }
+                case 4:{
+                    builder.setContentTitle("Thông báo Rút tiền")                           // required
+                            .setSmallIcon(R.drawable.your_doctor_logo) // required
+                            .setContentText(message)  // required
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setAutoCancel(true)
+                            .setContentIntent(pendingIntent)
+                            .setTicker(message)
+                            .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
+                            .setPriority(Notification.PRIORITY_HIGH);
                 }
 
             }

@@ -390,7 +390,7 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
                                 Toast.makeText(getContext(),"Thay đổi mật khẩu thành công!", Toast.LENGTH_LONG).show();
                                 dialogChangePassword.dismiss();
                             } else if(response.code() == 401) {
-                                Utils.backToLogin(getContext());
+                                Utils.backToLogin(getActivity().getApplicationContext());
 
                             }else {
                                 tv_message_change_password.setTextColor(getResources().getColor(R.color.red));

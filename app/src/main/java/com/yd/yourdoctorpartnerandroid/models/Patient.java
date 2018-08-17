@@ -57,8 +57,12 @@ public class Patient {
         this.status = status;
     }
 
-    public String  getFullName(){
-        return fName + " "+ mName + " " + lName;
+    public String getFullName() {
+        if(!this.mName.isEmpty()) {
+            return this.fName + " " + this.mName + " " + this.lName;
+        }else {
+            return this.fName + " " + this.lName;
+        }
     }
 
     public String getId() {

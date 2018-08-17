@@ -94,4 +94,13 @@ public class PatientID {
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
+
+    public String getFullName() {
+        if(!this.middleName.isEmpty()) {
+            return this.firstName + " " + this.middleName + " " + this.lastName;
+        }else {
+            return this.firstName + " " + this.lastName;
+        }
+    }
+
 }

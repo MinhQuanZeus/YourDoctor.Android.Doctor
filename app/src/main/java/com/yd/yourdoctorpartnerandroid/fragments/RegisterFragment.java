@@ -58,6 +58,7 @@ import com.yd.yourdoctorpartnerandroid.networks.getSpecialistService.GetSpeciali
 import com.yd.yourdoctorpartnerandroid.networks.getSpecialistService.MainObjectSpecialist;
 import com.yd.yourdoctorpartnerandroid.networks.registerDoctor.RegisterDoctorService;
 import com.yd.yourdoctorpartnerandroid.networks.registerDoctor.RegisterResponse;
+import com.yd.yourdoctorpartnerandroid.utils.LoadDefaultModel;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
 
 import java.io.File;
@@ -364,6 +365,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                 MainObjectSpecialist mainObjectSpecialist = response.body();
                 specialists = (ArrayList<Specialist>) mainObjectSpecialist.getListSpecialist();
                 if (specialists != null) {
+                    LoadDefaultModel.getInstance().setSpecialists(specialists);
                     ArrayAdapter<Specialist> arrayAdapter
                             = new ArrayAdapter<Specialist>(getContext(), android.R.layout.simple_list_item_checked, specialists);
                     cb_list_specialist.setAdapter(arrayAdapter);

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yd.yourdoctorpartnerandroid.R;
+import com.yd.yourdoctorpartnerandroid.events.EventSend;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
@@ -138,14 +139,14 @@ public class BankingFragment extends Fragment {
                         tvMessageBanking.setTextColor(getResources().getColor(R.color.green));
                         currentDoctor.setRemainMoney(currentDoctor.getRemainMoney()-amountChoice);
                         SharedPrefs.getInstance().put("USER_INFO", currentDoctor);
-                        EventBus.getDefault().post(1);
+                        EventBus.getDefault().post(new EventSend(1));
 
                         VerifyCodePhoneNumberFragment verifyCodePhoneNumberFragment = new VerifyCodePhoneNumberFragment();
                         verifyCodePhoneNumberFragment.setData(response.body().getBankingId());
                         ScreenManager.openFragment(getActivity().getSupportFragmentManager(), verifyCodePhoneNumberFragment, R.id.rl_container, true, true);
                     }
                 } else if (response.code() == 401) {
-                    Utils.backToLogin(getContext());
+                    Utils.backToLogin(getActivity().getApplicationContext());
                 }
 
                 pvBanking.setVisibility(View.GONE);
@@ -230,7 +231,7 @@ public class BankingFragment extends Fragment {
                         Toast.makeText(getContext(), "Không tải được ngân hàng!", Toast.LENGTH_LONG).show();
                     }
                 } else if (response.code() == 401) {
-                    Utils.backToLogin(getContext());
+                    Utils.backToLogin(getActivity().getApplicationContext());
                 }
 
                 pvBanking.setVisibility(View.GONE);

@@ -169,7 +169,7 @@ public class ConfirmEndChatFragment extends Fragment {
                                 etReasonReport.setText("");
                                 dialogReport.dismiss();
                             }else if(response.code() == 401){
-                                Utils.backToLogin(getContext());
+                                Utils.backToLogin(getActivity().getApplicationContext());
                             }
                             pbReport.setVisibility(View.GONE);
                         }

@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.chaos.view.PinView;
 import com.yd.yourdoctorpartnerandroid.R;
+import com.yd.yourdoctorpartnerandroid.events.EventSend;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
@@ -151,7 +152,7 @@ public class VerifyCodePhoneNumberFragment extends Fragment {
                         Doctor currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
                         currentDoctor.setRemainMoney(response.body().getOldRemainMoney());
                         SharedPrefs.getInstance().put("USER_INFO", currentDoctor);
-                        EventBus.getDefault().post(1);
+                        EventBus.getDefault().post(new EventSend(1));
                         Toast.makeText(getContext(), response.body().getMessage(),Toast.LENGTH_LONG).show();
                         pvCode.setText("");
 

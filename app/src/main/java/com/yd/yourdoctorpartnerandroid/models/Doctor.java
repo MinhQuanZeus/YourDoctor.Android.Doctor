@@ -62,8 +62,13 @@ public class Doctor {
     public void setGender(int gender) {
         this.gender = gender;
     }
-    public String  getFullName(){
-        return firstName + " "+ middleName + " " + lastName;
+
+    public String getFullName() {
+        if(!this.middleName.isEmpty()) {
+            return this.firstName + " " + this.middleName + " " + this.lastName;
+        }else {
+            return this.firstName + " " + this.lastName;
+        }
     }
 
     public String getDoctorId() {

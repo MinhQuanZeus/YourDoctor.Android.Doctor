@@ -12,6 +12,15 @@ public class SocketUtils {
     private final static String URL_SERVER = Constants.URL_SOCKET;
     private Socket mSocket;
     private static SocketUtils socketUtils;
+    private String roomId;
+
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
 
     public SocketUtils() {
         try {
@@ -38,12 +47,22 @@ public class SocketUtils {
         if(SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null){
             getInstance().getSocket().connect();
             SocketUtils.getInstance().getSocket().emit("addUser",SharedPrefs.getInstance().get("USER_INFO", Doctor.class).getDoctorId(),2);
+            if(roomId != null){
+                getSocket().emit("joinRoom", roomId);
+            }
         }
     }
 
-    public void disconnectConnect(){
-        if(SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null){
-            getInstance().getSocket().disconnect();
+    public Boolean checkIsConnected(){
+        if(getSocket().connected()){
+            return true;
+        }
+        return false;
+    }
+
+    public void closeConnect(){
+        if(SharedPrefs.getInstance().get("USER_INFO", Patient.class) != null){
+            getInstance().getSocket().close();
         }
 
     }
