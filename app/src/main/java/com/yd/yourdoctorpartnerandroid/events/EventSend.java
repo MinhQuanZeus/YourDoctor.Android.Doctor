@@ -3,6 +3,7 @@ package com.yd.yourdoctorpartnerandroid.events;
 public class EventSend {
     // 1: thay doi thong tin nguoi dung hien tai
     // 2: thay doi noi dung chat
+    //3 : update list notify ở màn notification
     private int type;
 
     public EventSend(int type) {

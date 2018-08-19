@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import com.yd.yourdoctorpartnerandroid.R;
 
 import com.yd.yourdoctorpartnerandroid.adapters.NotificationAdapter;
+import com.yd.yourdoctorpartnerandroid.events.EventSend;
 import com.yd.yourdoctorpartnerandroid.managers.PaginationScrollListener;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
 import com.yd.yourdoctorpartnerandroid.models.Notification;
@@ -30,6 +31,10 @@ import com.yd.yourdoctorpartnerandroid.networks.getListNotification.GetListNotif
 import com.yd.yourdoctorpartnerandroid.networks.getListNotification.MainObjectNotification;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +80,7 @@ public class NotifyFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_notify, container, false);
         ButterKnife.bind(this, view);
+        EventBus.getDefault().register(this);
         currentPatient = SharedPrefs.getInstance().get("USER_INFO", Patient.class);
         notificationAdapter = new NotificationAdapter(getContext());
         setUpListNotification();
@@ -127,7 +133,7 @@ public class NotifyFragment extends Fragment {
     }
 
     private void loadFirstPage() {
-        Log.e("haha", currentPatient.getId());
+        if(pbNotificaton != null) pbNotificaton.setVisibility(View.VISIBLE);
         GetListNotificationService getListNotificationService = RetrofitFactory.getInstance().createService(GetListNotificationService.class);
         getListNotificationService.getListNotificationService(SharedPrefs.getInstance().get("JWT_TOKEN", String.class),currentPatient.getId(), 10 +"", currentPage + "").enqueue(new Callback<MainObjectNotification>() {
             @Override
@@ -142,11 +148,12 @@ public class NotifyFragment extends Fragment {
                         if (notifications.size() == 10) notificationAdapter.addLoadingFooter();
                         else isLastPage = true;
                     }
-                    if(pbNotificaton != null){
-                        pbNotificaton.setVisibility(View.GONE);
-                    }
+
                 }else if(response.code() == 401){
                     Utils.backToLogin(getActivity().getApplicationContext());
+                }
+                if(pbNotificaton != null){
+                    pbNotificaton.setVisibility(View.GONE);
                 }
             }
 
@@ -199,8 +206,27 @@ public class NotifyFragment extends Fragment {
 
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(EventSend eventSend) {
+        if(eventSend.getType() == 3){
+            try{
+                notificationAdapter.clear();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadFirstPage();
+                    }
+                }, 1000);
+            }catch(Exception e){
+
+            }
+
+        }
+    }
+
     @Override
     public void onDestroyView() {
+        EventBus.getDefault().unregister(this);
         super.onDestroyView();
     }
 }

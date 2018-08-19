@@ -170,7 +170,7 @@ public class BankingHistoryAdapter extends RecyclerView.Adapter<BankingHistoryAd
                 ivBankingHistory.setImageResource(R.drawable.your_doctor_logo);
                 tvTitleBanking.setText("Yêu cầu rút tiền với hệ thống");
                 tvContentBanking.setText("Số tiền giao dịch " + objectBanking.getAmount() +"đ, Số tiền hiện tại " + objectBanking.getRemainMoney() +"đ");
-                tvTimeBanking.setText("Thời gian tạo : " + Utils.convertTimeFromMonggo(objectBanking.getCreatedAt()));
+                tvTimeBanking.setText("Thời gian tạo : " + Utils.convertTime(objectBanking.getCreatedAt()));
 
                 switch (objectBanking.getStatus()){
                     case 1:{

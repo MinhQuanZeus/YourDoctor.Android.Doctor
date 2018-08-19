@@ -10,7 +10,7 @@ public class BankResponse {
     private String nameBank;
     private String nameBankEnglish;
     private String nameTransaction;
-    private String createdAt;
+    private long createdAt;
 
     public String getId() {
         return id;
@@ -44,11 +44,11 @@ public class BankResponse {
         this.nameTransaction = nameTransaction;
     }
 
-    public String getCreatedAt() {
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
 }

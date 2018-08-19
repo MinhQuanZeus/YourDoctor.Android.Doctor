@@ -9,7 +9,7 @@ public class ObjectBanking {
     private int type;
     private String nameBank;
     private String accountNumber;
-    private String createdAt;
+    private long createdAt;
 
     public int getStatus() {
         return status;
@@ -75,11 +75,11 @@ public class ObjectBanking {
         this.accountNumber = accountNumber;
     }
 
-    public String getCreatedAt() {
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
 }

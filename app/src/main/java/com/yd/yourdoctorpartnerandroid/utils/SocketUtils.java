@@ -45,11 +45,14 @@ public class SocketUtils {
     public void reConnect(){
 
         if(SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null){
-            getInstance().getSocket().connect();
-            SocketUtils.getInstance().getSocket().emit("addUser",SharedPrefs.getInstance().get("USER_INFO", Doctor.class).getDoctorId(),2);
-            if(roomId != null){
-                getSocket().emit("joinRoom", roomId);
+            if(!getSocket().connected()){
+                getInstance().getSocket().connect();
+                SocketUtils.getInstance().getSocket().emit("addUser",SharedPrefs.getInstance().get("USER_INFO", Doctor.class).getDoctorId(),2);
+                if(roomId != null){
+                    getSocket().emit("joinRoom", roomId);
+                }
             }
+
         }
     }
 
@@ -62,7 +65,7 @@ public class SocketUtils {
 
     public void closeConnect(){
         if(SharedPrefs.getInstance().get("USER_INFO", Patient.class) != null){
-            getInstance().getSocket().close();
+            getInstance().getSocket().disconnect();
         }
 
     }

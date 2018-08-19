@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,9 +75,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.toolbar)
     Toolbar tb_main;
 
-    ImageView iv_ava_user;
-    TextView tv_name_user;
-    TextView tv_money_user;
+    ImageView ivAvaUser;
+    ImageView ivAvaUserBackGroud;
+    TextView tvNameUser;
+    RatingBar rbMainDoctor;
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private BroadcastReceiver mRegistrationBroadcastReceiver;
@@ -104,9 +106,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(eventSend.getType() == 1){
             currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
             if(currentDoctor != null){
-                tv_name_user.setText(currentDoctor.getFullName());
-                ZoomImageViewUtils.loadImageManual(getApplicationContext(),currentDoctor.getAvatar(), iv_ava_user);
-                tv_money_user.setText(currentDoctor.getRemainMoney() + "" );
+                tvNameUser.setText(currentDoctor.getFullName());
+                ZoomImageViewUtils.loadImageManual(getApplicationContext(),currentDoctor.getAvatar().toString(),ivAvaUserBackGroud);
+                ZoomImageViewUtils.loadCircleImage(getApplicationContext(),currentDoctor.getAvatar().toString(),ivAvaUser);
+                tvNameUser.setText(currentDoctor.getFullName());
+                rbMainDoctor.setRating(currentDoctor.getCurrentRating());
             }
         }
     }
@@ -120,14 +124,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         setSupportActionBar(tb_main);
         View headerView = navigationView_main.inflateHeaderView(R.layout.nav_header_main);
-        iv_ava_user = headerView.findViewById(R.id.iv_ava_user);
-        tv_name_user = headerView.findViewById(R.id.tv_name_user);
-        tv_money_user = headerView.findViewById(R.id.tv_money_user);
+        ivAvaUser = headerView.findViewById(R.id.iv_ava_user);
+        tvNameUser = headerView.findViewById(R.id.tv_name_user);
+        ivAvaUserBackGroud = headerView.findViewById(R.id.iv_ava_user_back_groud);
+        rbMainDoctor = headerView.findViewById(R.id.rbMainDoctor);
         currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
         if(currentDoctor != null){
-            tv_name_user.setText(currentDoctor.getFullName());
-            ZoomImageViewUtils.loadImageManual(getApplicationContext(),currentDoctor.getAvatar(),iv_ava_user);
-            tv_money_user.setText(currentDoctor.getRemainMoney() + "" );
+            tvNameUser.setText(currentDoctor.getFullName());
+            ZoomImageViewUtils.loadImageManual(getApplicationContext(),currentDoctor.getAvatar().toString(),ivAvaUserBackGroud);
+            ZoomImageViewUtils.loadCircleImage(getApplicationContext(),currentDoctor.getAvatar().toString(),ivAvaUser);
+            tvNameUser.setText(currentDoctor.getFullName());
+            rbMainDoctor.setRating(currentDoctor.getCurrentRating());
         }
 
 
@@ -259,7 +266,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        DoctorApplication.self().getSocket().close();
+                        //DoctorApplication.self().getSocket().close();
+                        DoctorApplication.self().getSocket().disconnect();
                         Utils.backToLogin(getApplicationContext());
                     }
 

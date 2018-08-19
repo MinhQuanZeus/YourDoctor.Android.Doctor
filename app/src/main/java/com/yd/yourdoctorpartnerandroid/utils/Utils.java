@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.Format;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -55,18 +56,22 @@ public class Utils {
         return format.format(date);
     }
 
-    public static String convertTimeFromMonggo(String timeString) {
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH);
-        Date date = null;
-        Format format2;
-        try {
-            date = format.parse(timeString);
-        } catch (Exception e) {
-            date = new Date();
-        }
-        format2 = new SimpleDateFormat("HH:mm, dd/MM ");
-        return format2.format(date);
+//    public static String convertTimeFromMonggo(String timeString) {
+//        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH);
+//        Date date = null;
+//        Format format2;
+//        try {
+//            date = format.parse(timeString);
+//        } catch (Exception e) {
+//            date = new Date();
+//        }
+//        format2 = new SimpleDateFormat("HH:mm, dd/MM ");
+//        return format2.format(date);
+//
+//    }
 
+    public static String formatStringNumber(int number){
+        return NumberFormat.getNumberInstance(Locale.GERMAN).format(number);
     }
 
     public static void backToLogin(Context context) {

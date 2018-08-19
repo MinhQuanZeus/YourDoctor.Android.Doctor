@@ -21,17 +21,11 @@ public class CheckNetWordChangeService extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (NetworkUtils.isOnline(context)) {
-            if (NetworkUtils.isOnline(context)) {
-                if (SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null) {
-                    if(!SocketUtils.getInstance().checkIsConnected()){
-                        SocketUtils.getInstance().reConnect();
-                    }
-                }
-
+            if (SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null) {
+                SocketUtils.getInstance().reConnect();
             }
         }
     }
-
 }
 
 

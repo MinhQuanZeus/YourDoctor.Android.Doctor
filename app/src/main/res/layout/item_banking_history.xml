@@ -2,10 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
-    android:gravity="center_vertical"
-    android:layout_margin="10dp"
-    android:background="@color/gray200">
+    android:layout_height="110dp"
+    android:layout_margin="10dp">
     <ImageView
         android:id="@+id/iv_banking_history"
         android:layout_width="60dp"
@@ -13,7 +11,6 @@
         android:layout_centerVertical="true"
         android:layout_marginStart="10dp"
         android:layout_alignParentStart="true"/>
-
     <TextView
         android:id="@+id/tv_title_banking"
         android:layout_width="match_parent"
@@ -21,8 +18,7 @@
         android:layout_toRightOf="@id/iv_banking_history"
         android:textSize="17sp"
         android:textStyle="bold"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="5dp"/>
+        android:layout_marginStart="10dp" />
     <TextView
         android:id="@+id/tv_content_banking"
         android:layout_below="@id/tv_title_banking"
@@ -38,16 +34,15 @@
         android:id="@+id/tv_time_banking"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_content_banking"
         android:layout_marginStart="10dp"
         android:layout_toRightOf="@id/iv_banking_history"
-        android:layout_marginTop="5dp" />
+        android:layout_marginEnd="5dp"
+        android:layout_above="@id/tv_status_banking"/>
     <TextView
         android:id="@+id/tv_status_banking"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_time_banking"
         android:layout_marginStart="10dp"
         android:layout_toRightOf="@id/iv_banking_history"
-        android:layout_marginTop="5dp" />
+        android:layout_alignParentBottom="true"/>
 </RelativeLayout>

@@ -197,13 +197,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     ZoomImageViewUtils.loadCircleImage(context,notification.getSenderId().getAvatar(),ivNotification);
                     //ivNotification.setImageDrawable(context.getResources().getDrawable(R.drawable.your_doctor_logo));
                     tvContentNotification.setText(notification.getMessage());
-                    tvTime.setText(Utils.convertTimeFromMonggo(notification.getCreatedAt()));
+                    tvTime.setText(Utils.convertTime(notification.getCreatedAt()));
                     switch (notification.getType()){
                         case 1:{
-                            tvTitleNotification.setText("Thông báo chat với BN." + notification.getNameSender() );
+                            tvTitleNotification.setText("Thông báo chat từ BN." + notification.getNameSender() );
                             break;
                         }
                         case 2:{
+                            tvTitleNotification.setText("Thông báo video từ BN." + notification.getNameSender());
                             break;
                         }
                         case 3:{
@@ -211,6 +212,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                             break;
                         }
                         case 4:{
+                            tvTitleNotification.setText("Thông báo rút tiền." + notification.getNameSender() );
                             break;
                         }
                     }

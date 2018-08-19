@@ -155,16 +155,16 @@ public class PaymentHistoryAdapter extends RecyclerView.Adapter<PaymentHistoryAd
         public void setData(ObjectPaymentResponse objectPaymentResponse) {
             this.objectPaymentResponse = objectPaymentResponse;
             if (objectPaymentResponse != null && context != null) {
-                tvContentPayment.setText("Số tiền giao dịch " + objectPaymentResponse.getAmount() + " VND, "
-                        + "số tiền hiện tại " + objectPaymentResponse.getRemainMoney() + " VND");
+                tvContentPayment.setText("Thù lao: " + Utils.formatStringNumber(objectPaymentResponse.getAmount()) + " VND\n"
+                        + "Số dư hiện tại: " + Utils.formatStringNumber(objectPaymentResponse.getRemainMoney()) + " VND");
                 try{
-                    ZoomImageViewUtils.loadCircleImage(context, objectPaymentResponse.getFromUser().getAvatar(), ivPaymentHistory);
-                    tvTitlePayment.setText("Cuộc tư vấn " + objectPaymentResponse.getTypeAdvisoryID().getName()
+                    tvTitlePayment.setText("Tư vấn " + objectPaymentResponse.getTypeAdvisoryID().getName()
                             + " với BN." + objectPaymentResponse.getFromUser().getFullName());
+                    ZoomImageViewUtils.loadCircleImage(context, objectPaymentResponse.getFromUser().getAvatar(), ivPaymentHistory);
                 }catch (Exception e){
 
                 }
-                tvTimePayment.setText("Thời gian: " + Utils.convertTimeFromMonggo(objectPaymentResponse.getUpdatedAt()));
+                tvTimePayment.setText("Thời gian: " + Utils.convertTime(objectPaymentResponse.getUpdatedAt()));
             }
         }
 

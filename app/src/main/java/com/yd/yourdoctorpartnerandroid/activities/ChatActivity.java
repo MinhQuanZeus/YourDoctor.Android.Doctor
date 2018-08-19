@@ -63,6 +63,7 @@ import com.yd.yourdoctorpartnerandroid.networks.reportService.MainResponReport;
 import com.yd.yourdoctorpartnerandroid.networks.reportService.ReportRequest;
 import com.yd.yourdoctorpartnerandroid.networks.reportService.ReportService;
 import com.yd.yourdoctorpartnerandroid.utils.ImageUtils;
+import com.yd.yourdoctorpartnerandroid.utils.LoadDefaultModel;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.SocketUtils;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
@@ -119,6 +120,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @BindView(R.id.ivCancelChat)
     ImageView ivCancelChat;
+
+    @BindView(R.id.tv_content_question)
+    TextView tvContentQuestion;
 
     private boolean isDone;
 
@@ -185,6 +189,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 backToMainActivity();
             }
         });
+        tvContentQuestion.setMovementMethod(new ScrollingMovementMethod());
+
         if(!SocketUtils.getInstance().checkIsConnected()){
             Toast.makeText(getApplicationContext(),"Không kết nối được máy chủ",Toast.LENGTH_LONG);
             return;
@@ -216,6 +222,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             public void onResponse(Call<MainObjectChatHistory> call, Response<MainObjectChatHistory> response) {
                 mainObject = response.body();
                 if (response.code() == 200 && mainObject != null) {
+                    tvContentQuestion.setText("Nội dung : " + mainObject.getObjConversation().getContentTopic());
+                    //tvContentQuestion.setText(mainObject.getObjConversation().getContentTopic());
                     List<MainRecord> mainRecords = mainObject.getObjConversation().getRecords();
                     if(mainObject.getObjConversation().getStatus() == 2){
                         isDone = true;
@@ -226,9 +234,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         record.setType(mainRecord.getType());
                         record.setValue(mainRecord.getValue());
                         try {
-                            record.setCreatedAt(Utils.convertTimeFromMonggo(mainRecord.getCreated()));
+                            record.setCreatedAt(Utils.convertTime(mainRecord.getCreated()));
+                            Log.e("thanhcong", mainRecord.getCreated() + "");
                         } catch (Exception e) {
                             record.setCreatedAt(new Date().toString());
+                            Log.e("loiChat", record.getCreatedAt());
                         }
 
 
@@ -274,8 +284,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     patientChoice.setAvatar(mainObject.getInformationPatient().getPatientId().getAvatar());
                     patientChoice.setBirthday(mainObject.getInformationPatient().getPatientId().getBirthday());
                     patientChoice.setPhoneNumber(mainObject.getInformationPatient().getPatientId().getPhoneNumber());
-                    tbMainChat.setTitle("Bs." + patientChoice.getFullName());
-                    Log.e("patient is ", patientChoice.getlName());
+                    if(("Bn." + patientChoice.getFullName()).length() > 17){
+                        tbMainChat.setTitle(("Bn." + patientChoice.getFullName()).substring(0,17));
+                    }else {
+                        tbMainChat.setTitle("Bn." + patientChoice.getFullName());
+                    }
 
                     loadChatDisplay();
                 } else {
