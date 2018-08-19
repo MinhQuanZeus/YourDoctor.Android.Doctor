@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yd.yourdoctorpartnerandroid.R;
@@ -52,6 +53,9 @@ public class ListDoctorRankingSpecialistFragment extends Fragment {
     @BindView(R.id.pbRanking)
     ProgressBar progressBar;
 
+    @BindView(R.id.tv_error_ranking_list)
+    TextView tvErrorRankingList;
+
     private DoctorRankingSpecialistAdapter doctorRankingAdapter;
 
     LinearLayoutManager linearLayoutManager;
@@ -73,6 +77,7 @@ public class ListDoctorRankingSpecialistFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_list_doctor_ranking_specialist, container, false);
         butterKnife = ButterKnife.bind(this, view);
         doctorRankingAdapter = new DoctorRankingSpecialistAdapter(getContext());
+        tvErrorRankingList.setVisibility(View.GONE);
         setDoctorRankList(specialistId, rvListDoctorRanking);
 
         return view;
@@ -162,15 +167,25 @@ public class ListDoctorRankingSpecialistFragment extends Fragment {
 
                         if (doctorRankingList.size()==5) doctorRankingAdapter.addLoadingFooter();
                         else isLastPage = true;
+                    }else {
+                        if(tvErrorRankingList != null){
+                            tvErrorRankingList.setVisibility(View.VISIBLE);
+                            tvErrorRankingList.setText("Không có bác sĩ nào thuộc khoa này!");
+                        }
                     }
 
 
                 }else if(response.code() == 401){
                     Utils.backToLogin(getActivity().getApplicationContext());
+                }else {
+                    if(tvErrorRankingList != null){
+                        tvErrorRankingList.setVisibility(View.VISIBLE);
+                        tvErrorRankingList.setText("Không tải được dữ liệu!!");
+                    }
+
                 }
-                if(progressBar != null){
-                    progressBar.setVisibility(View.GONE);
-                }
+
+                if(progressBar != null) progressBar.setVisibility(View.GONE);
 
             }
 

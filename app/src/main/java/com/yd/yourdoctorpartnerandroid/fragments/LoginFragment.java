@@ -171,6 +171,7 @@ public class LoginFragment extends Fragment {
                     }
                     else{
                         SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
+                        Log.e("tokenLogin: ",SharedPrefs.getInstance().get(JWT_TOKEN,String.class));
                         if(SharedPrefs.getInstance().get(USER_INFO, Doctor.class) != null){
                             FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get(USER_INFO, Doctor.class).getDoctorId());
                         }
@@ -208,11 +209,12 @@ public class LoginFragment extends Fragment {
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
-                btnLogin.revertAnimation();
-                Log.e("login", t.toString());
+                if(btnLogin != null) btnLogin.revertAnimation();
                 enableAll();
                 if (t instanceof SocketTimeoutException) {
                     Toast.makeText(getActivity(), getResources().getText(R.string.error_timeout), Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(getContext(),"Không có kết nối mạng", Toast.LENGTH_LONG).show();
                 }
             }
         });
