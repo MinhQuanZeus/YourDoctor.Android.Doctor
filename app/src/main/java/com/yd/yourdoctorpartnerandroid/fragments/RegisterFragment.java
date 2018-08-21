@@ -252,6 +252,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                 getActivity().onBackPressed();
             }
         });
+        rl_certification.setFocusable(false);
+        cb_list_specialist.setFocusable(false);
         isInProcessAddingCertificate = false;
         certificateImageArrayList = new ArrayList<>();
         specialistsChoice = new ArrayList<>();

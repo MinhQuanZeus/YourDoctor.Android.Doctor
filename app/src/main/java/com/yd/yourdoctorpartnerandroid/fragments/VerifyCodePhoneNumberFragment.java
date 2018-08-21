@@ -109,7 +109,7 @@ public class VerifyCodePhoneNumberFragment extends Fragment {
 
             }
         });
-        pvCode.setAnimationEnable(true);
+        if(pvCode != null) pvCode.setAnimationEnable(true);
     }
 
     @Override
@@ -193,7 +193,7 @@ public class VerifyCodePhoneNumberFragment extends Fragment {
             public void onResponse(Call<CommonSuccessResponse> call, Response<CommonSuccessResponse> response) {
                 btnNext.revertAnimation();
                 if (response.code() == 200) {
-                    ScreenManager.openFragment(getActivity().getSupportFragmentManager(), new RegisterFragment().setPhoneNumber(phoneNumber), R.id.rl_container, true, true);
+                    ScreenManager.openFragment(getActivity().getSupportFragmentManager(), new RegisterFragment().setPhoneNumber(phoneNumber), R.id.fl_auth, true, true);
                 } else {
                     pvCode.setEnabled(true);
                     CommonErrorResponse commonErrorResponse = NetworkUtils.parseToCommonError(response);

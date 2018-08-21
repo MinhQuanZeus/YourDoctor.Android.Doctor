@@ -59,6 +59,9 @@ import com.yd.yourdoctorpartnerandroid.models.Patient;
 import com.yd.yourdoctorpartnerandroid.models.Record;
 import com.yd.yourdoctorpartnerandroid.networks.getPatientDetailService.GetPatientDetailService;
 import com.yd.yourdoctorpartnerandroid.networks.getPatientDetailService.MainObjectDetailPatient;
+import com.yd.yourdoctorpartnerandroid.networks.reportConversation.ReportConversation;
+import com.yd.yourdoctorpartnerandroid.networks.reportConversation.RequestReportConversation;
+import com.yd.yourdoctorpartnerandroid.networks.reportConversation.ResponseReportConversation;
 import com.yd.yourdoctorpartnerandroid.networks.reportService.MainResponReport;
 import com.yd.yourdoctorpartnerandroid.networks.reportService.ReportRequest;
 import com.yd.yourdoctorpartnerandroid.networks.reportService.ReportService;
@@ -343,7 +346,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     //showMessageConfirm(message);
                     try{
                         ConfirmEndChatFragment confirmEndChatFragment = new ConfirmEndChatFragment();
-                        confirmEndChatFragment.setData(currentDoctor,patientChoice,message);
+                        confirmEndChatFragment.setData(currentDoctor,patientChoice,message,chatHistoryID);
                         ScreenManager.openFragment(getSupportFragmentManager(), confirmEndChatFragment, R.id.rl_chat, true, true);
                     }catch (Exception e){
                         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
@@ -375,7 +378,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                     try{
                         ConfirmEndChatFragment confirmEndChatFragment = new ConfirmEndChatFragment();
-                        confirmEndChatFragment.setData(currentDoctor,patientChoice,message);
+                        confirmEndChatFragment.setData(currentDoctor,patientChoice,message,chatHistoryID);
                         ScreenManager.openFragment(getSupportFragmentManager(), confirmEndChatFragment, R.id.rl_chat, true, true);
                     }catch (Exception e){
                         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
@@ -467,6 +470,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+
+
 
     //Dialog Info
     private ImageView ivPatientChat;
@@ -568,7 +573,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 //TODO
-                reportPatient();
+                reportConversation();
             }
         });
         dialog.show();
@@ -576,21 +581,23 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private ProgressBar pbInforChat;
 
-    public void reportPatient() {
+    private void reportConversation() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         View view = inflater.inflate(R.layout.report_user_dialog, null);
         etReasonReport = view.findViewById(R.id.et_reason_report);
         pbInforChat = view.findViewById(R.id.pb_infor_chat);
-        if(pbInforChat != null) pbInforChat.setVisibility(View.GONE);
+        if(pbInforChat != null){
+            pbInforChat.setVisibility(View.GONE);
+        }
+
         builder.setView(view);
         if (patientChoice != null) {
-            builder.setTitle("Báo cáo BN." + patientChoice.getFullName());
+            builder.setTitle("Báo cáo cuộc tư vấn của BN." + patientChoice.getFullName());
         }
         builder.setPositiveButton("Báo cáo", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
 
             }
         });
@@ -605,34 +612,43 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         dialogReport.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(pbInforChat != null) pbInforChat.setVisibility(View.VISIBLE);
-                if (etReasonReport.getText().toString().equals("")) {
+                if(pbInforChat != null){
+                    pbInforChat.setVisibility(View.VISIBLE);
+                }
+                if (etReasonReport.getText().toString().equals("")){
                     Toast.makeText(getApplicationContext(), "Bạn phải nhập lý do", Toast.LENGTH_LONG).show();
-                    if(pbInforChat != null) pbInforChat.setVisibility(View.GONE);
+                    if(pbInforChat != null){
+                        pbInforChat.setVisibility(View.GONE);
+                    }
                 } else {
-                    ReportRequest reportRequest = new ReportRequest();
-                    reportRequest.setIdPersonBeingReported(patientChoiceId);
-                    reportRequest.setIdReporter(currentDoctor.getDoctorId());
-                    reportRequest.setReason(etReasonReport.getText().toString());
+                    RequestReportConversation reportRequest = new RequestReportConversation(currentDoctor.getDoctorId(),
+                            patientChoiceId, etReasonReport.getText().toString().trim(), chatHistoryID, 1);
 
-                    ReportService reportService = RetrofitFactory.getInstance().createService(ReportService.class);
-                    reportService.reportService(SharedPrefs.getInstance().get("JWT_TOKEN", String.class), reportRequest).enqueue(new Callback<MainResponReport>() {
+                    ReportConversation reportConversation = RetrofitFactory.getInstance().createService(ReportConversation.class);
+                    reportConversation.reportConversations(SharedPrefs.getInstance().get("JWT_TOKEN", String.class), reportRequest).enqueue(new Callback<ResponseReportConversation>() {
                         @Override
-                        public void onResponse(Call<MainResponReport> call, Response<MainResponReport> response) {
-                            Log.e("Anh le doctor  ", "post submitted to API." + response.body().toString());
+                        public void onResponse(Call<ResponseReportConversation> call, Response<ResponseReportConversation> response) {
                             if (response.code() == 200 && response.body().isSuccess()) {
                                 etReasonReport.setText("");
-                                Toast.makeText(getApplicationContext(), "Báo cáo người dùng thành công", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Báo cáo cuộc tư vấn thành công", Toast.LENGTH_LONG).show();
                             } else if (response.code() == 401) {
                                 Utils.backToLogin(getApplicationContext());
+                            }else {
+                                Toast.makeText(getApplicationContext(),"Báo cáo không thành công", Toast.LENGTH_LONG).show();
                             }
-                            if(pbInforChat != null) pbInforChat.setVisibility(View.GONE);
+
+                            if(pbInforChat != null){
+                                pbInforChat.setVisibility(View.GONE);
+                            }
+                            dialogReport.dismiss();
                         }
 
                         @Override
-                        public void onFailure(Call<MainResponReport> call, Throwable t) {
+                        public void onFailure(Call<ResponseReportConversation> call, Throwable t) {
                             Toast.makeText(getApplicationContext(), "Lỗi kết máy chủ", Toast.LENGTH_LONG).show();
-                            if(pbInforChat != null) pbInforChat.setVisibility(View.GONE);
+                            if(pbInforChat != null){
+                                pbInforChat.setVisibility(View.GONE);
+                            }
                         }
                     });
 
