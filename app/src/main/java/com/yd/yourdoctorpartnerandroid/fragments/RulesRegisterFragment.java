@@ -83,18 +83,15 @@ public class RulesRegisterFragment extends Fragment {
                 if (response.code() == 200) {
                     MainObjectRule mainObjectSpecialist = response.body();
                     if(mainObjectSpecialist != null){
-                        String textContentPatient = "";
                         String textContentDoctor = "";
                         for (RuleObject ruleObject:mainObjectSpecialist.getObjIntroAndRuleReturn()) {
-                            if(ruleObject.getType().equals("rulePatient")){
-
-                                textContentPatient = ruleObject.getContent();
-                            }else if(ruleObject.getType().equals("ruleDoctor")){
+                            if(ruleObject.getType().equals("ruleDoctor")){
                                 currentRuleObject = ruleObject;
                                 textContentDoctor = ruleObject.getContent();
+                                break;
                             }
                         }
-                        tvContentRule.setText(textContentDoctor + "\n" + textContentPatient);
+                        tvContentRule.setText(textContentDoctor);
                     }
                 }
                 pbRule.setVisibility(View.GONE);
