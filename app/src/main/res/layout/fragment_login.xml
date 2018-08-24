@@ -35,8 +35,6 @@
                 android:id="@+id/ed_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="46dp"
-                android:layout_marginRight="46dp"
                 android:drawableLeft="@drawable/ic_phone_black_24dp"
                 android:drawablePadding="12dp"
                 android:gravity="left"
@@ -61,8 +59,6 @@
                 android:id="@+id/ed_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="46dp"
-                android:layout_marginRight="46dp"
                 android:drawableLeft="@drawable/ic_lock_outline_black_24dp"
                 android:drawablePadding="12dp"
                 android:hint="@string/password"
@@ -169,3 +165,5 @@
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
+
+

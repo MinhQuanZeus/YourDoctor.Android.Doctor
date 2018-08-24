@@ -516,6 +516,7 @@ public class CallingFragment extends Fragment implements IKurentoFragment, Signa
         }
         rlCalling.setVisibility(View.GONE);
         rlTimer.setVisibility(View.VISIBLE);
+        if(videoCallSession != null) tvCalleeName.setText(videoCallSession.getCalleeName());
         countTime();
         timerTask.run();
         client.emit("connectedCall", "stop");

@@ -201,6 +201,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     TextInputLayout til_year_graduate;
     @BindView(R.id.til_place_working)
     TextInputLayout til_place_working;
+    @BindView(R.id.til_mname)
+    TextInputLayout tiiMname;
 
     @BindView(R.id.cb_list_specialist)
     ListView cb_list_specialist;
@@ -583,6 +585,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         boolean isValidate = true;
         String fname = edFname.getText().toString();
         String lname = edLname.getText().toString();
+        String mName = edMname.getText().toString();
         String password = edPassword.getText().toString();
         String yearGraduate = ed_year_graduate.getText().toString();
         String placeGraduate = ed_place_graduate.getText().toString();
@@ -593,15 +596,30 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         if (fname == null || fname.trim().length() == 0) {
             isValidate = false;
             tilFname.setError(getResources().getString(R.string.fname_required));
-        } else {
+        } else if(!Utils.verifyVietnameesName(fname)){
+            isValidate = false;
+            tilFname.setError("Họ không hợp lệ");
+        }
+        else {
             tilFname.setError(null);
         }
 
         if (lname == null || lname.trim().length() == 0) {
             isValidate = false;
             tillname.setError(getResources().getString(R.string.lname_required));
-        } else {
+        }else if(!Utils.verifyVietnameesName(lname)){
+            isValidate = false;
+            tillname.setError("Tên không hợp lệ");
+        }
+        else {
             tillname.setError(null);
+        }
+
+        if(mName != null && mName.trim().length() > 0){
+            if(!Utils.verifyVietnameesName(mName)){
+                isValidate = false;
+                tiiMname.setError("Tên đệm không hợp lệ");
+            }
         }
 
         if (!pattern.matcher(password).matches()) {

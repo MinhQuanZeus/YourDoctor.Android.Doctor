@@ -250,7 +250,7 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
         tv_mname.setText(currentDoctor.getMiddleName());
         tv_lname.setText(currentDoctor.getLastName());
         tv_phone.setText(currentDoctor.getPhoneNumber());
-        tv_remainMoney.setText(currentDoctor.getRemainMoney() + " đ");
+        tv_remainMoney.setText("Số dư : " + Utils.formatStringNumber(currentDoctor.getRemainMoney()) + " đ");
         tv_universityGraduate.setText(currentDoctor.getUniversityGraduate());
         tv_universityGraduate.setEnabled(false);
         tv_yearGraduate.setText(currentDoctor.getYearGraduate());
@@ -368,7 +368,7 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
         dialogChangePassword.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onValidatePassword(et_new_password.getText().toString(), et_confirm_new_password.getText().toString(), tv_message_change_password)) {
+                if (onValidatePassword(et_old_password.getText().toString(),et_new_password.getText().toString(), et_confirm_new_password.getText().toString(), tv_message_change_password)) {
                     pbProfileDoctor.setVisibility(View.VISIBLE);
                     PasswordRequest passwordRequest = new PasswordRequest();
                     passwordRequest.setId(currentDoctor.getDoctorId());
@@ -382,7 +382,7 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
                             tv_message_change_password.setVisibility(View.VISIBLE);
                             PasswordResponse passwordResponse = response.body();
                             if (response.code() == 200 && passwordResponse.isChangePasswordSuccess()) {
-                                tv_message_change_password.setText(passwordResponse.getMessage().toString());
+                                tv_message_change_password.setText("Thay đổi mật khẩu thành công");
                                 tv_message_change_password.setTextColor(getResources().getColor(R.color.colorPrimary));
                                 et_old_password.setText("");
                                 et_new_password.setText("");
@@ -394,7 +394,7 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
 
                             }else {
                                 tv_message_change_password.setTextColor(getResources().getColor(R.color.red));
-                                tv_message_change_password.setText("Không thể thay đổi mật khẩu do lỗi máy chủ!");
+                                tv_message_change_password.setText("Mật khẩu cũ không đúng!");
                             }
                             pbProfileDoctor.setVisibility(View.GONE);
 
@@ -487,7 +487,7 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
     }
 
     private void onUpdateUser() {
-        pbProfileDoctor.setVisibility(View.VISIBLE);
+        if(pbProfileDoctor != null) pbProfileDoctor.setVisibility(View.VISIBLE);
         if (mImageToBeAttached != null) {
             GetLinkImageService getLinkeImageService = RetrofitFactory.getInstance().createService(GetLinkImageService.class);
             getLinkeImageService.uploadImageToGetLink(getImageUpload()).enqueue(new Callback<MainGetLink>() {
@@ -498,14 +498,14 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
                         updateDoctorNetWork( response.body().getFilePath());
                     } else {
                         Toast.makeText(getContext(), "Không thể kết nối máy chủ", Toast.LENGTH_LONG).show();
-                        pbProfileDoctor.setVisibility(View.GONE);
+                        if(pbProfileDoctor != null) pbProfileDoctor.setVisibility(View.GONE);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<MainGetLink> call, Throwable t) {
                     Toast.makeText(getContext(), "Không thể kết nối máy chủ", Toast.LENGTH_LONG).show();
-                    pbProfileDoctor.setVisibility(View.GONE);
+                    if(pbProfileDoctor != null) pbProfileDoctor.setVisibility(View.GONE);
                 }
             });
         } else {
@@ -543,13 +543,13 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
                 } else {
                     Toast.makeText(getContext(), "Kết nối máy chủ không thành công", Toast.LENGTH_LONG).show();
                 }
-                pbProfileDoctor.setVisibility(View.GONE);
+                if(pbProfileDoctor != null) pbProfileDoctor.setVisibility(View.GONE);
             }
 
             @Override
             public void onFailure(Call<DoctorRespone> call, Throwable t) {
                 Toast.makeText(getContext(), "Kết nối máy chủ không thành công", Toast.LENGTH_LONG).show();
-                pbProfileDoctor.setVisibility(View.GONE);
+                if(pbProfileDoctor != null) pbProfileDoctor.setVisibility(View.GONE);
             }
         });
     }
@@ -621,11 +621,19 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
         return isValid;
     }
 
-    private boolean onValidatePassword(String newPassword, String confirmPassword, TextView tv_message_change_password) {
+    private boolean onValidatePassword(String oldPassword,String newPassword, String confirmPassword, TextView tv_message_change_password) {
 
         boolean isValidate = true;
         Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
-        if (!pattern.matcher(newPassword).matches()) {
+        if(oldPassword.equals("") || newPassword.equals("") || confirmPassword.equals("")){
+            tv_message_change_password.setText("Bạn phải nhập đầy đủ các ô mật khẩu!");
+            tv_message_change_password.setVisibility(View.VISIBLE);
+            isValidate = false;
+        } else if(oldPassword.equals(newPassword)){
+            tv_message_change_password.setText("Mật khẩu cũ và mật khẩu mới không thể giống nhau");
+            tv_message_change_password.setVisibility(View.VISIBLE);
+            isValidate = false;
+        } else if (!pattern.matcher(newPassword).matches()) {
             tv_message_change_password.setText(getResources().getString(R.string.password_rule));
             tv_message_change_password.setVisibility(View.VISIBLE);
             isValidate = false;

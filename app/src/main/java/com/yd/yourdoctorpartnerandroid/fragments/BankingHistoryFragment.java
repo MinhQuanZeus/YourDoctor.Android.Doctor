@@ -154,7 +154,7 @@ public class BankingHistoryFragment extends Fragment {
 
             @Override
             public void onFailure(Call<MainOjectBankingHistory> call, Throwable t) {
-                Log.d("Anhle", "Fail: " + t.getMessage());
+                Log.e("AnhleFail", ": " + t.toString());
                 Toast.makeText(getContext(),"Không thể tải được lịch sử thanh toán", Toast.LENGTH_LONG).show();
                 if(pbListBankHistory != null){
                     pbListBankHistory.setVisibility(View.GONE);

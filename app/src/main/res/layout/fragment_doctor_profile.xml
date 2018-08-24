@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.UserProfileFragment"
+    tools:context=".fragments.DoctorProfileFragment"
     android:background="@color/white">
 
     <RelativeLayout
@@ -158,7 +158,6 @@
                         android:layout_height="wrap_content"
                         android:drawablePadding="12dp"
                         android:gravity="left"
-                        android:maxLength="12"
                         android:padding="5dp"
                         android:textColor="@color/colorText"
                         android:textSize="16dp" />

@@ -665,7 +665,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
         if(progressBar != null) progressBar.setVisibility(View.VISIBLE);
         if (typeChatCurrent == 1) {
-            if (mEditText.getText().equals("")) {
+            if (mEditText.getText().toString().isEmpty()) {
                 Toast.makeText(this, "Bạn nên nhập tin nhắn trước", Toast.LENGTH_LONG).show();
                 if(progressBar != null) progressBar.setVisibility(View.GONE);
             } else {

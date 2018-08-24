@@ -9,9 +9,9 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface GetBankingHistory {
-    @GET("bankinghistorys/getHistoryBanking/{doctorID}?")
+    @GET("bankinghistorys/getHistoryBanking/{userId}?")
     Call<MainOjectBankingHistory> GetBankingHistory(@Header("Authorization") String jwt,
-                                                    @Path("doctorID") String id_doctor,
+                                                    @Path("userId") String id_doctor,
                                                     @Query("pageSize") String pageSize,
                                                     @Query("page") String page);
 }

@@ -76,7 +76,6 @@ public class Utils {
 
     public static void backToLogin(Context context) {
 
-
         try{
             FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get("USER_INFO", Doctor.class).getDoctorId());
             SocketUtils.getInstance().closeConnect();
@@ -88,8 +87,16 @@ public class Utils {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         }catch (Exception e){
+            Log.e("LogoutFailed " , e.toString());
         }
 
+
+    }
+
+    public static boolean verifyVietnameesName(String name){
+        return name.matches("^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶ"+
+                "ẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợ" +
+                "ụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+$");
 
     }
 

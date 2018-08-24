@@ -285,7 +285,7 @@ public class BankingFragment extends Fragment {
             check = false;
             tvMessageBanking.setVisibility(View.VISIBLE);
             tvMessageBanking.setText("Số tài khoản bị trống!");
-        } else if (!edNumberBank.getText().toString().matches("[1-9][0-9]{9,14}")) {
+        } else if (!edNumberBank.getText().toString().matches("[1-9][0-9]{8,14}")) {
             check = false;
             tvMessageBanking.setVisibility(View.VISIBLE);
             tvMessageBanking.setText("Số tài khoản không hợp lệ!");
