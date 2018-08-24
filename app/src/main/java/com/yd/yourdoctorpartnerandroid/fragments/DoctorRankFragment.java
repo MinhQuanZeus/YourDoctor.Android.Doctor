@@ -134,8 +134,9 @@ public class DoctorRankFragment extends Fragment {
             tabSpecialists.addTab(tabSpecialists.newTab().setText(specialist.getName()));
         }
 
-        adapter = new ViewPagerAdapter(getFragmentManager(), specialists);
+        adapter = new ViewPagerAdapter(this.getChildFragmentManager(), specialists);
         vpDoctorRanking.setAdapter(adapter);
+        vpDoctorRanking.setOffscreenPageLimit(1);
         vpDoctorRanking.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabSpecialists));
 
         tabSpecialists.getTabAt(0).select();

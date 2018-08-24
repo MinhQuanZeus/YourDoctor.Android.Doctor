@@ -201,8 +201,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     TextInputLayout til_year_graduate;
     @BindView(R.id.til_place_working)
     TextInputLayout til_place_working;
-    @BindView(R.id.til_mname)
-    TextInputLayout tiiMname;
 
     @BindView(R.id.cb_list_specialist)
     ListView cb_list_specialist;
@@ -618,7 +616,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         if(mName != null && mName.trim().length() > 0){
             if(!Utils.verifyVietnameesName(mName)){
                 isValidate = false;
-                tiiMname.setError("Tên đệm không hợp lệ");
+                tilMname.setError("Tên đệm không hợp lệ");
             }
         }
 

@@ -81,8 +81,9 @@ public class HistoryTransactionFragment extends Fragment {
             }
         });
 
-        HistoryTransactionFragment.ViewPagerAdapter adapter = new HistoryTransactionFragment.ViewPagerAdapter(getFragmentManager());
+        HistoryTransactionFragment.ViewPagerAdapter adapter = new HistoryTransactionFragment.ViewPagerAdapter(this.getChildFragmentManager());
         vpHistory.setAdapter(adapter);
+        vpHistory.setOffscreenPageLimit(1);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
