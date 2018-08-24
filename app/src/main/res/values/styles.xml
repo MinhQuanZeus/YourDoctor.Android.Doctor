@@ -8,7 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="customRatingBar" parent="android:style/Widget.Material.RatingBar.Small"></style>
+    <style name="customRatingBar" parent="android:style/Widget.Material.RatingBar.Small"/>
 
     <style name="PrimaryButton" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorButtonNormal">@color/colorPrimary</item>
@@ -18,5 +18,6 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 
 </resources>
