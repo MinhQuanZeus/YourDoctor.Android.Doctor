@@ -92,10 +92,13 @@ public class XMLController extends AsyncTask<String, Void, ArrayList<New>> {
     protected void onPostExecute(ArrayList<New> listItem) {
         super.onPostExecute(listItem);
         // Hủy dialog đi.
-        if(progressDialog != null){
-            progressDialog.dismiss();
-        }
+        try{
+            if(progressDialog != null){
+                progressDialog.dismiss();
+            }
+        }catch (Exception e){
 
+        }
         if (listItem != null) {
 
             for (New n : listItem
