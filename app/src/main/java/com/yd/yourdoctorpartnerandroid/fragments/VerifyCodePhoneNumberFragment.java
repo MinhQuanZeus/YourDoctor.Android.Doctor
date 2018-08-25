@@ -101,7 +101,7 @@ public class VerifyCodePhoneNumberFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                if(idExchangeRequest != null && !idExchangeRequest.equals("")){
+                if(idExchangeRequest != null && !idExchangeRequest.isEmpty()){
                     onVerifyExchangeBank();
                 }else {
                     onSubmit();
