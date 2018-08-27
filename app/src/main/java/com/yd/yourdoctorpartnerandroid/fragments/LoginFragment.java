@@ -165,9 +165,11 @@ public class LoginFragment extends Fragment {
                     if(response.body().getDoctor().getStatus() != 1){
                         Toast.makeText(getContext() , "Tài khoản đang bị khóa!", Toast.LENGTH_LONG).show();
                         btnLogin.revertAnimation();
+                        enableAll();
                     }else if(response.body().getDoctor().getRole() != 2){
                         Toast.makeText(getContext() , "Tài khoản này không phải tài khoản bác sĩ!", Toast.LENGTH_LONG).show();
                         btnLogin.revertAnimation();
+                        enableAll();
                     }
                     else{
                         SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
@@ -241,6 +243,7 @@ public class LoginFragment extends Fragment {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     getActivity().startActivity(intent);
                 }else {
+                    enableAll();
                     Toast.makeText(getContext(),"Đăng nhập không thành công",Toast.LENGTH_LONG).show();
                 }
                 btnLogin.revertAnimation();
@@ -250,6 +253,7 @@ public class LoginFragment extends Fragment {
             public void onFailure(Call<MainDetailDoctor> call, Throwable t) {
                 Toast.makeText(getContext(),"Đăng nhập không thành công",Toast.LENGTH_LONG).show();
                 btnLogin.revertAnimation();
+                enableAll();
             }
         });
     }

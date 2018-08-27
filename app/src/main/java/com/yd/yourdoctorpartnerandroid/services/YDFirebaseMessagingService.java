@@ -178,6 +178,41 @@ public class YDFirebaseMessagingService extends FirebaseMessagingService {
                             .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
                     break;
                 }
+                case 5: {
+                    if(remainMoney != null && !remainMoney.equals("") && SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null){
+                        doctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+                        try{
+                            doctor.setRemainMoney(Float.parseFloat(remainMoney));
+                            SharedPrefs.getInstance().put("USER_INFO", doctor);
+                            EventBus.getDefault().post(new EventSend(1));
+                        }catch (Exception e){
+                            Log.e("LoiMessageFirebase :", "remainMoney");
+                        }
+
+                    }
+
+                    intent = new Intent(getApplicationContext(), AuthActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    stackBuilder = TaskStackBuilder.create(this);
+                    stackBuilder.addNextIntent(intent);
+                    pendingIntent =
+                            stackBuilder.getPendingIntent(
+                                    0,
+                                    PendingIntent.FLAG_UPDATE_CURRENT
+                            );
+
+                    builder.setContentTitle("Thông báo báo cáo người dùng")  // required
+                            .setSmallIcon(R.drawable.your_doctor_logo) // required
+                            .setContentText(message)  // required
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setAutoCancel(true)
+                            .setStyle(new NotificationCompat.BigTextStyle()
+                                    .bigText(message))
+                            .setContentIntent(pendingIntent)
+                            .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+                    break;
+                }
             }
 
         } else {
@@ -269,6 +304,42 @@ public class YDFirebaseMessagingService extends FirebaseMessagingService {
                             .setTicker(message)
                             .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
                             .setPriority(Notification.PRIORITY_HIGH);
+                }
+                case 5: {
+                    if(remainMoney != null && !remainMoney.isEmpty() && SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null){
+                        doctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+                        try{
+                            doctor.setRemainMoney(Float.parseFloat(remainMoney));
+                            SharedPrefs.getInstance().put("USER_INFO", doctor);
+                            EventBus.getDefault().post(new EventSend(1));
+                        }catch (Exception e){
+                            Log.e("LoiMessageFirebase :", "remainMoney");
+                        }
+
+                    }
+                    intent = new Intent(getApplicationContext(), AuthActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    stackBuilder = TaskStackBuilder.create(this);
+                    stackBuilder.addNextIntent(intent);
+                    pendingIntent =
+                            stackBuilder.getPendingIntent(
+                                    0,
+                                    PendingIntent.FLAG_UPDATE_CURRENT
+                            );
+
+                    builder.setContentTitle("Thông báo báo cáo người dùng")                           // required
+                            .setSmallIcon(R.drawable.your_doctor_logo) // required
+                            .setContentText(message)  // required
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setAutoCancel(true)
+                            .setStyle(new NotificationCompat.BigTextStyle()
+                                    .bigText(message))
+                            .setContentIntent(pendingIntent)
+                            .setTicker(message)
+                            .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
+                            .setPriority(Notification.PRIORITY_HIGH);
+                    break;
                 }
 
             }

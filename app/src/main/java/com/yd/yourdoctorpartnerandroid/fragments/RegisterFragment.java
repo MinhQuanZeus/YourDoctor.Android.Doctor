@@ -215,7 +215,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     Toolbar toolbar;
 
 
-
     LinearLayoutManager linearLayoutManager;
     CertificateRegisterAdapter certificateRegisterAdapter;
 
@@ -379,7 +378,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
             public void onFailure(Call<MainObjectSpecialist> call, Throwable t) {
                 pb_register.setVisibility(View.GONE);
                 Toast.makeText(getContext(), "Không tải được danh sách chuyên khoa, Bạn nên tải lại trang", Toast.LENGTH_LONG).show();
-                getActivity().onBackPressed();
+                //getActivity().onBackPressed();
             }
         });
     }
@@ -439,7 +438,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     }
 
 
-
     private void onCreateUser() {
         countCertificate = 0;
         totalCertificate = certificateRegisterAdapter.getChosenCertificationList().size();
@@ -469,7 +467,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
 
                 } else {
                     Toast.makeText(getContext(), "Lỗi đã xảy ra, không thể tải lên trai chủ", Toast.LENGTH_LONG).show();
-                    pb_register.setVisibility(View.GONE);
                     refreshDataForFailed();
                 }
             }
@@ -478,13 +475,13 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
             public void onFailure(Call<MainGetLink> call, Throwable t) {
                 Toast.makeText(getContext(), "Lỗi đã xảy ra, không thể tải lên trai chủ", Toast.LENGTH_LONG).show();
                 refreshDataForFailed();
-                pb_register.setVisibility(View.GONE);
             }
         });
 
     }
 
     public void refreshDataForFailed() {
+        btnSignUp.revertAnimation();
         totalCertificate = 0;
         countCertificate = 0;
         listCertification.clear();
@@ -509,7 +506,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                 } else {
                     Toast.makeText(getContext(), "Không thể kết nối máy chủ", Toast.LENGTH_LONG).show();
                     refreshDataForFailed();
-                    pb_register.setVisibility(View.GONE);
                 }
             }
 
@@ -517,7 +513,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
             public void onFailure(Call<MainGetLink> call, Throwable t) {
                 Toast.makeText(getContext(), "Không thể kết nối máy chủ", Toast.LENGTH_LONG).show();
                 refreshDataForFailed();
-                pb_register.setVisibility(View.GONE);
             }
         });
 
@@ -545,11 +540,9 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
 
                         if (response.code() == 200 || response.code() == 201) {
                             Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_LONG).show();
-                            btnSignUp.revertAnimation();
                             //getActivity().onBackPressed();
                         } else {
                             Toast.makeText(getContext(), "Không thể tải dữ liệu, Đăng ký thất bại!", Toast.LENGTH_LONG).show();
-                            btnSignUp.revertAnimation();
 
                         }
                         refreshDataForFailed();
@@ -557,7 +550,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
 
                     @Override
                     public void onFailure(Call<RegisterResponse> call, Throwable t) {
-                        btnSignUp.revertAnimation();
                         refreshDataForFailed();
                         Toast.makeText(getContext(), "Không thể tải dữ liệu, Đăng ký thất bại!", Toast.LENGTH_LONG).show();
                     }
@@ -594,30 +586,32 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         if (fname == null || fname.trim().length() == 0) {
             isValidate = false;
             tilFname.setError(getResources().getString(R.string.fname_required));
-        } else if(!Utils.verifyVietnameesName(fname)){
+        } else if (!Utils.verifyVietnameesName(fname)) {
             isValidate = false;
             tilFname.setError("Họ không hợp lệ");
-        }
-        else {
+        } else {
             tilFname.setError(null);
         }
 
         if (lname == null || lname.trim().length() == 0) {
             isValidate = false;
             tillname.setError(getResources().getString(R.string.lname_required));
-        }else if(!Utils.verifyVietnameesName(lname)){
+        } else if (!Utils.verifyVietnameesName(lname)) {
             isValidate = false;
             tillname.setError("Tên không hợp lệ");
-        }
-        else {
+        } else {
             tillname.setError(null);
         }
 
-        if(mName != null && mName.trim().length() > 0){
-            if(!Utils.verifyVietnameesName(mName)){
+        if (mName != null && mName.length() > 0) {
+            if (!Utils.verifyVietnameesName(mName)) {
                 isValidate = false;
-                tilMname.setError("Tên đệm không hợp lệ");
+                tilMname.setError("Tên đệm Không hợp lệ");
+            } else {
+                tilMname.setError(null);
             }
+        } else {
+            tilMname.setError(null);
         }
 
         if (!pattern.matcher(password).matches()) {
@@ -644,7 +638,31 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
             isValidate = false;
             til_year_graduate.setError("Bạn nên nhập năm tốt nghiệp");
         } else {
-            til_year_graduate.setError(null);
+            try {
+
+                int year = Integer.parseInt(yearGraduate);
+
+                if (edBirthday == null || edBirthday.getText().toString().isEmpty()) {
+                    isValidate = false;
+                    til_year_graduate.setError("Bạn nên nhập ngày sinh trước");
+                } else {
+                    Calendar cal = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+                    cal.setTime(sdf.parse(edBirthday.getText().toString()));// all done
+
+                    if (year < cal.getTime().getYear() + 18) {
+                        isValidate = false;
+                        til_year_graduate.setError("Năm tốt nghiệp không hợp lệ");
+                    } else {
+                        til_year_graduate.setError(null);
+                    }
+                }
+
+
+            } catch (Exception e) {
+                isValidate = false;
+                til_year_graduate.setError("Năm tốt nghiệp không hợp lệ");
+            }
         }
 
         if (placeWorking == null || placeWorking.trim().length() == 0) {

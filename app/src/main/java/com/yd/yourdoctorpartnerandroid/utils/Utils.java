@@ -52,7 +52,7 @@ public class Utils {
     public static String convertTime(long time) {
         Date date = new Date(time);
         //yyyy MM dd HH:mm:ss
-        Format format = new SimpleDateFormat("HH:mm, dd/MM ");
+        Format format = new SimpleDateFormat("HH:mm, dd/MM");
         return format.format(date);
     }
 
@@ -100,5 +100,49 @@ public class Utils {
 
     }
 
+    public static String handleStringDescription(String theStrDes) {
+        if(theStrDes == null) return "";
+        int startString;
+        if (theStrDes.contains("</br>")) {
+            startString = theStrDes.lastIndexOf("</br>");
+
+            return theStrDes.substring(startString + 5);
+        }
+        return theStrDes;
+    }
+
+    public static String hanleStringImage(String theStrImage) {
+        if(theStrImage == null) return "";
+        try {
+            int startString;
+            int endString;
+            if (theStrImage.contains("<img")) {
+                if (theStrImage.contains("data-original=")) {
+                    startString = theStrImage.lastIndexOf("data-original=");
+
+                    if (theStrImage.contains("png")) {
+                        endString = theStrImage.lastIndexOf(".png");
+                    } else {
+                        endString = theStrImage.lastIndexOf(".jpg");
+                    }
+
+                    return theStrImage.substring(startString + 15, endString + 4);
+                } else if (theStrImage.contains("src=")) {
+                    startString = theStrImage.lastIndexOf("src=");
+
+                    if (theStrImage.contains("png")) {
+                        endString = theStrImage.lastIndexOf(".png");
+                    } else {
+                        endString = theStrImage.lastIndexOf(".jpg");
+                    }
+
+                    return theStrImage.substring(startString + 5, endString + 4);
+                }
+            }
+            return theStrImage;
+        } catch (Exception e) {
+            return "";
+        }
+    }
 
 }

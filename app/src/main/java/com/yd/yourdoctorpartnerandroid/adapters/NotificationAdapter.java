@@ -215,6 +215,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                             tvTitleNotification.setText("Thông báo rút tiền." + notification.getNameSender() );
                             break;
                         }
+                        case 5:{
+                            tvTitleNotification.setText("Thông báo báo cáo người dùng");
+                            break;
+                        }
                     }
 
                 }

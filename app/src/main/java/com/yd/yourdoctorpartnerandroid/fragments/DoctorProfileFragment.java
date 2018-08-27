@@ -612,11 +612,15 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
         if (placeWorking == null || placeWorking.trim().length() == 0) {
             til_placeWorking.setError("Bạn phải nhập nơi làm việc hiện tại");
             isValid =  false;
+        }else {
+            til_placeWorking.setError(null);
         }
 
         if (address == null || address.trim().length() == 0) {
             til_address.setError("Bạn phải nhập địa chỉ hiện tại");
             isValid =  false;
+        }else {
+            til_address.setError(null);
         }
         return isValid;
     }
