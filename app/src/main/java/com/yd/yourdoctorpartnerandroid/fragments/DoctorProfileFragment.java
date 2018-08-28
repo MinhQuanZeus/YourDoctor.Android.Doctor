@@ -250,7 +250,7 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
         tv_mname.setText(currentDoctor.getMiddleName());
         tv_lname.setText(currentDoctor.getLastName());
         tv_phone.setText(currentDoctor.getPhoneNumber());
-        tv_remainMoney.setText("Số dư : " + Utils.formatStringNumber(currentDoctor.getRemainMoney()) + " đ");
+        tv_remainMoney.setText(Utils.formatStringNumber(currentDoctor.getRemainMoney()) + " đ");
         tv_universityGraduate.setText(currentDoctor.getUniversityGraduate());
         tv_universityGraduate.setEnabled(false);
         tv_yearGraduate.setText(currentDoctor.getYearGraduate());

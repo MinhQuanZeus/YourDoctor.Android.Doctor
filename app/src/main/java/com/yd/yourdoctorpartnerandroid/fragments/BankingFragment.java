@@ -139,7 +139,7 @@ public class BankingFragment extends Fragment {
                         tvMessageBanking.setTextColor(getResources().getColor(R.color.green));
                         currentDoctor.setRemainMoney(currentDoctor.getRemainMoney()-amountChoice);
                         SharedPrefs.getInstance().put("USER_INFO", currentDoctor);
-                        EventBus.getDefault().post(new EventSend(1));
+                        EventBus.getDefault().postSticky(new EventSend(1));
 
                         VerifyCodePhoneNumberFragment verifyCodePhoneNumberFragment = new VerifyCodePhoneNumberFragment();
                         verifyCodePhoneNumberFragment.setData(response.body().getBankingId());
