@@ -234,7 +234,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             }
             case R.id.nav_profile_main: {
-                ScreenManager.openFragment(getSupportFragmentManager(), new DoctorProfileFragment(), R.id.rl_container, true, true);
+
+
+                DoctorProfileFragment doctorProfileFragment = new DoctorProfileFragment();
+                doctorProfileFragment.setDataFromMain(ivAvaUser,ivAvaUserBackGroud);
+                ScreenManager.openFragment(getSupportFragmentManager(), doctorProfileFragment, R.id.rl_container, true, true);
                 break;
             }
             case R.id.nav_ranking_docto_main: {

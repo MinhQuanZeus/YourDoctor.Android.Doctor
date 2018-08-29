@@ -47,6 +47,7 @@ import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorpartnerandroid.BuildConfig;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.adapters.DoctorCertificationAdapter;
+import com.yd.yourdoctorpartnerandroid.events.EventSend;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
 import com.yd.yourdoctorpartnerandroid.models.Specialist;
@@ -63,6 +64,7 @@ import com.yd.yourdoctorpartnerandroid.networks.getLinkImageService.MainGetLink;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
 import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -200,6 +202,12 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
     ProgressBar progress_change_password;
     AlertDialog dialogChangePassword;
 
+    ImageView ivAvaUser;
+    ImageView ivAvaUserBackGroud;
+    public void setDataFromMain(ImageView ivAvaUser,ImageView ivAvaUserBackGroud){
+        this.ivAvaUser = ivAvaUser;
+        this.ivAvaUserBackGroud = ivAvaUserBackGroud;
+    }
 
     public DoctorProfileFragment() {
         // Required empty public constructor
@@ -538,6 +546,14 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
                         currentDoctor.setPlaceWorking(doctorRespone.getInformationDoctor().getPlaceWorking());
                         SharedPrefs.getInstance().put(USER_INFO, currentDoctor);
                         Toast.makeText(getContext(), "Chỉnh sửa thành công", Toast.LENGTH_LONG).show();
+
+                        if(ivAvaUserBackGroud != null && ivAvaUser != null){
+                            ivAvaUserBackGroud.setImageResource(R.drawable.your_doctor_logo);
+                            ivAvaUser.setImageResource(R.drawable.your_doctor_logo);
+                            ZoomImageViewUtils.loadImageManual(getActivity().getApplicationContext(),currentDoctor.getAvatar().toString(),ivAvaUserBackGroud);
+                            ZoomImageViewUtils.loadCircleImage(getActivity().getApplicationContext(),currentDoctor.getAvatar().toString(),ivAvaUser);
+                        }
+
                         setScreenFunction(TYPE_CANCEL);
                     }
                 } else {
