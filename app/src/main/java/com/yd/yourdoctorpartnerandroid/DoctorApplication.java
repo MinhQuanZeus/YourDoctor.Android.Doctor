@@ -64,8 +64,9 @@ public class DoctorApplication extends android.app.Application{
                                 VideoCallSession videoCallSession = new VideoCallSession(data.getString("from"), data.getString("callerName"), data.getString("callerAvatar"),
                                         userInfo.getDoctorId(), userInfo.getFullName(), userInfo.getAvatar(), TypeCall.ANSWER);
                                 Intent intent = new Intent(DoctorApplication.this, VideoCallActivity.class);
-                                intent.putExtra("VideoCallSession", videoCallSession);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.putExtra("VideoCallSession", videoCallSession);
                                 DoctorApplication.self().startActivity(intent);
                             } catch (Exception e) {
                                 Log.d("MainActivityCall", e.toString());

@@ -72,6 +72,7 @@ import com.yd.yourdoctorpartnerandroid.utils.SocketUtils;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
 import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
@@ -213,6 +214,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
     @Override
     public void onBackPressed() {
         backToMainActivity();
@@ -278,25 +280,22 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 if (response.code() == 200) {
                     MainObjectDetailPatient mainObject = response.body();
-                    patientChoice = new Patient();
-                    patientChoice.setId(mainObject.getInformationPatient().getPatientId().get_id());
-                    patientChoice.setfName(mainObject.getInformationPatient().getPatientId().getFirstName());
-                    patientChoice.setmName(mainObject.getInformationPatient().getPatientId().getMiddleName());
-                    patientChoice.setlName(mainObject.getInformationPatient().getPatientId().getLastName());
-                    patientChoice.setAddress(mainObject.getInformationPatient().getPatientId().getAddress());
-                    patientChoice.setAvatar(mainObject.getInformationPatient().getPatientId().getAvatar());
-                    patientChoice.setBirthday(mainObject.getInformationPatient().getPatientId().getBirthday());
-                    patientChoice.setPhoneNumber(mainObject.getInformationPatient().getPatientId().getPhoneNumber());
-                    if(("Bn." + patientChoice.getFullName()).length() > 17){
-                        tbMainChat.setTitle(("Bn." + patientChoice.getFullName()).substring(0,17));
-                    }else {
-                        tbMainChat.setTitle("Bn." + patientChoice.getFullName());
+                    if(mainObject != null){
+                        patientChoice = new Patient();
+                        patientChoice.setId(mainObject.getInformationPatient().getPatientId().get_id());
+                        patientChoice.setfName(mainObject.getInformationPatient().getPatientId().getFirstName());
+                        patientChoice.setmName(mainObject.getInformationPatient().getPatientId().getMiddleName());
+                        patientChoice.setlName(mainObject.getInformationPatient().getPatientId().getLastName());
+                        patientChoice.setAddress(mainObject.getInformationPatient().getPatientId().getAddress());
+                        patientChoice.setAvatar(mainObject.getInformationPatient().getPatientId().getAvatar());
+                        patientChoice.setBirthday(mainObject.getInformationPatient().getPatientId().getBirthday());
+                        patientChoice.setPhoneNumber(mainObject.getInformationPatient().getPatientId().getPhoneNumber());
+                        tbMainChat.setTitle("Bn." + patientChoice.getlName());
+                        loadChatDisplay();
                     }
-
-                    loadChatDisplay();
                 } else {
                     if(progressBar != null)progressBar.setVisibility(View.GONE);
-                    Toast.makeText(getApplicationContext(), "loi khi tai patient", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Lỗi khi tải thông tin bệnh nhân", Toast.LENGTH_LONG).show();
 
                 }
 
@@ -304,7 +303,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onFailure(Call<MainObjectDetailPatient> call, Throwable t) {
-                Log.e("Anhle P error ", t.toString());
+                Toast.makeText(getApplicationContext(), "Lỗi khi tải thông tin bệnh nhân", Toast.LENGTH_LONG).show();
                 if(progressBar != null) progressBar.setVisibility(View.GONE);
             }
         });

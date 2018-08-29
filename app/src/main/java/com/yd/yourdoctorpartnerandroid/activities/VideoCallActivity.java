@@ -31,4 +31,9 @@ public class VideoCallActivity extends AppCompatActivity implements NPermission.
     public void onPermissionResult(String s, boolean b) {
 
     }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+    }
 }

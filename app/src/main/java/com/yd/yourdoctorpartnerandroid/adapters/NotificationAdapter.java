@@ -194,7 +194,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
             if (notification != null) {
                 if (context != null){
-                    ZoomImageViewUtils.loadCircleImage(context,notification.getSenderId().getAvatar(),ivNotification);
+                    try{
+                        ZoomImageViewUtils.loadCircleImage(context,notification.getSenderId().getAvatar(),ivNotification);
+                    }catch (Exception e){
+
+                    }
+
                     //ivNotification.setImageDrawable(context.getResources().getDrawable(R.drawable.your_doctor_logo));
                     tvContentNotification.setText(notification.getMessage());
                     tvTime.setText(Utils.convertTime(notification.getCreatedAt()));

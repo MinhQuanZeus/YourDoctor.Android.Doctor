@@ -115,10 +115,26 @@ public class IncomingCallFragment extends Fragment {
     private Emitter.Listener onCallerReject = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            Intent intent = new Intent(getActivity(), MainActivity.class);
-            getActivity().startActivity(intent);
-        }
-    };
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        getActivity().startActivity(intent);
+                    }
+                });
+
+            }
+        }};
+
 
     public void declined() {
         JSONObject obj = new JSONObject();
@@ -133,6 +149,8 @@ public class IncomingCallFragment extends Fragment {
             e.printStackTrace();
         }
         Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getActivity().startActivity(intent);
     }
 }

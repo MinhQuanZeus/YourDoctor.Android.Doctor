@@ -20,11 +20,16 @@ import retrofit2.Response;
 public class CheckNetWordChangeService extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (NetworkUtils.isOnline(context)) {
-            if (SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null) {
-                SocketUtils.getInstance().reConnect();
+        try{
+            if (NetworkUtils.isOnline(context)) {
+                if (SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null) {
+                    SocketUtils.getInstance().reConnect();
+                }
             }
+        }catch (Exception e){
+
         }
+
     }
 }
 
