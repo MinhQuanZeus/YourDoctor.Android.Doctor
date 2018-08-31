@@ -46,6 +46,8 @@ import android.widget.Toast;
 
 import com.yd.yourdoctorpartnerandroid.BuildConfig;
 import com.yd.yourdoctorpartnerandroid.R;
+import com.yd.yourdoctorpartnerandroid.activities.AuthActivity;
+import com.yd.yourdoctorpartnerandroid.activities.MainActivity;
 import com.yd.yourdoctorpartnerandroid.adapters.CertificateRegisterAdapter;
 import com.yd.yourdoctorpartnerandroid.models.Specialist;
 import com.yd.yourdoctorpartnerandroid.networks.registerDoctor.CertificateRequest;
@@ -540,6 +542,14 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
 
                         if (response.code() == 200 || response.code() == 201) {
                             Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_LONG).show();
+
+                            if(getContext() != null){
+                                Intent intent = new Intent(getContext(), AuthActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                getContext().getApplicationContext().startActivity(intent);
+                            }
+
                             //getActivity().onBackPressed();
                         } else {
                             Toast.makeText(getContext(), "Không thể tải dữ liệu, Đăng ký thất bại!", Toast.LENGTH_LONG).show();

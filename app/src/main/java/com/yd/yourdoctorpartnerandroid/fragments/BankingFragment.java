@@ -46,7 +46,7 @@ import retrofit2.Response;
  */
 public class BankingFragment extends Fragment {
 
-    public static final String VALIDATE_NUMBER_BANK = "/^[1-9][0-9]{9,14}$/";
+    public static final String VALIDATE_NUMBER_BANK = "^[0-9]{9,14}+$";
 
     @BindView(R.id.tb_banking)
     Toolbar tbBanking;
@@ -285,7 +285,7 @@ public class BankingFragment extends Fragment {
             check = false;
             tvMessageBanking.setVisibility(View.VISIBLE);
             tvMessageBanking.setText("Số tài khoản bị trống!");
-        } else if (!edNumberBank.getText().toString().matches("[1-9][0-9]{8,14}")) {
+        } else if (!edNumberBank.getText().toString().matches("^[0-9]{9,14}+$")) {
             check = false;
             tvMessageBanking.setVisibility(View.VISIBLE);
             tvMessageBanking.setText("Số tài khoản không hợp lệ!");

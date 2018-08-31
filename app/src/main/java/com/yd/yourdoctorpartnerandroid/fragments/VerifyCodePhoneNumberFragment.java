@@ -1,6 +1,7 @@
 package com.yd.yourdoctorpartnerandroid.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +14,8 @@ import android.widget.Toast;
 
 import com.chaos.view.PinView;
 import com.yd.yourdoctorpartnerandroid.R;
+import com.yd.yourdoctorpartnerandroid.activities.AuthActivity;
+import com.yd.yourdoctorpartnerandroid.activities.MainActivity;
 import com.yd.yourdoctorpartnerandroid.events.EventSend;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
@@ -157,6 +160,12 @@ public class VerifyCodePhoneNumberFragment extends Fragment {
                         pvCode.setText("");
 
                     }else {
+                        if(getContext() != null){
+                            Intent intent = new Intent(getContext(), MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            getContext().startActivity(intent);
+                        }
                         Toast.makeText(getContext(), response.body().getMessage(),Toast.LENGTH_LONG).show();
                         pvCode.setText("");
                     }

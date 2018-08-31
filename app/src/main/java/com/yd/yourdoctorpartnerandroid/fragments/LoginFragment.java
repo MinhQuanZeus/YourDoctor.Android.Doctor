@@ -162,12 +162,16 @@ public class LoginFragment extends Fragment {
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
 
                 if (response.code() == 200 || response.code() == 201) {
-                    if(response.body().getDoctor().getStatus() != 1){
-                        Toast.makeText(getContext() , "Tài khoản đang bị khóa!", Toast.LENGTH_LONG).show();
+                    if(response.body().getDoctor().getStatus() == 2){
+                        Toast.makeText(getContext() , "Tài khoản chưa được kích hoạt!", Toast.LENGTH_LONG).show();
                         btnLogin.revertAnimation();
                         enableAll();
                     }else if(response.body().getDoctor().getRole() != 2){
                         Toast.makeText(getContext() , "Tài khoản này không phải tài khoản bác sĩ!", Toast.LENGTH_LONG).show();
+                        btnLogin.revertAnimation();
+                        enableAll();
+                    }else if(response.body().getDoctor().getStatus() != 1 && response.body().getDoctor().getStatus() != 2){
+                        Toast.makeText(getContext() , "Tài khoản đang bị khóa!", Toast.LENGTH_LONG).show();
                         btnLogin.revertAnimation();
                         enableAll();
                     }

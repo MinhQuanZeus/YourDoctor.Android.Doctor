@@ -269,6 +269,7 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
         for(SpecialistDoctor specialist: currentDoctor.getIdSpecialist()){
             specialistTotal = specialistTotal + specialist.getName() + ", ";
         }
+        specialistTotal = specialistTotal.substring(0, specialistTotal.length() - 2);
         tv_specialist.setText(specialistTotal);
         tv_specialist.setEnabled(false);
         tv_certificates.setEnabled(false);
