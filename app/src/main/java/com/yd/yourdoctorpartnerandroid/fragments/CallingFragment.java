@@ -44,6 +44,7 @@ import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.models.TypeCall;
 import com.yd.yourdoctorpartnerandroid.models.VideoCallSession;
 import com.yd.yourdoctorpartnerandroid.utils.RxScheduler;
+import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -175,7 +176,7 @@ public class CallingFragment extends Fragment implements IKurentoFragment, Signa
         connectServer();
 
         if (videoCallSession.getType() == TypeCall.CALL) {
-            Picasso.with(getContext()).load(videoCallSession.getCalleeAvatar()).transform(new CropCircleTransformation()).into(ivCalleeAvatar);
+            ZoomImageViewUtils.loadCircleImage(getContext(),videoCallSession.getCalleeAvatar(),ivCalleeAvatar);
             tvCalleeName.setText(videoCallSession.getCalleeName());
             transactionToCalling(videoCallSession.getCallerId(), videoCallSession.getCalleeId(), true);
             mMediaPlayer = new MediaPlayer();

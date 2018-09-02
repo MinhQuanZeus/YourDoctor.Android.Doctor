@@ -35,20 +35,14 @@ import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
-import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorpartnerandroid.DoctorApplication;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.adapters.ChatAdapter;
-import com.yd.yourdoctorpartnerandroid.events.EventSend;
 import com.yd.yourdoctorpartnerandroid.fragments.ConfirmEndChatFragment;
-import com.yd.yourdoctorpartnerandroid.fragments.DoctorProfileFragment;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorpartnerandroid.networks.cancelChatService.CancelChatService;
 import com.yd.yourdoctorpartnerandroid.networks.cancelChatService.MainResponseCancelChat;
-import com.yd.yourdoctorpartnerandroid.networks.changePassword.ChangePasswordService;
-import com.yd.yourdoctorpartnerandroid.networks.changePassword.PasswordRequest;
-import com.yd.yourdoctorpartnerandroid.networks.changePassword.PasswordResponse;
 import com.yd.yourdoctorpartnerandroid.networks.getChatHistory.GetChatHistoryService;
 import com.yd.yourdoctorpartnerandroid.networks.getChatHistory.MainObjectChatHistory;
 import com.yd.yourdoctorpartnerandroid.networks.getChatHistory.MainRecord;
@@ -62,19 +56,12 @@ import com.yd.yourdoctorpartnerandroid.networks.getPatientDetailService.MainObje
 import com.yd.yourdoctorpartnerandroid.networks.reportConversation.ReportConversation;
 import com.yd.yourdoctorpartnerandroid.networks.reportConversation.RequestReportConversation;
 import com.yd.yourdoctorpartnerandroid.networks.reportConversation.ResponseReportConversation;
-import com.yd.yourdoctorpartnerandroid.networks.reportService.MainResponReport;
-import com.yd.yourdoctorpartnerandroid.networks.reportService.ReportRequest;
-import com.yd.yourdoctorpartnerandroid.networks.reportService.ReportService;
 import com.yd.yourdoctorpartnerandroid.utils.ImageUtils;
-import com.yd.yourdoctorpartnerandroid.utils.LoadDefaultModel;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.SocketUtils;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
 import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 

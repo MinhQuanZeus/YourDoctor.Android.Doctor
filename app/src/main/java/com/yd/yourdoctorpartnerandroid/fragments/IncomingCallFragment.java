@@ -21,6 +21,7 @@ import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.activities.MainActivity;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.models.VideoCallSession;
+import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,8 +78,8 @@ public class IncomingCallFragment extends Fragment {
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayer.setLooping(true);
         mMediaPlayer.start();
-        Picasso.with(getContext()).load(videoCallSession.getCallerAvatar()).transform(new CropCircleTransformation()).into(ivAvatar);
-        Picasso.with(getContext()).load(videoCallSession.getCallerAvatar()).into(ivAvatarBackground);
+        ZoomImageViewUtils.loadCircleImage(getContext(),videoCallSession.getCallerAvatar(),ivAvatar);
+        ZoomImageViewUtils.loadImageManual(getContext(),videoCallSession.getCallerAvatar(),ivAvatarBackground);
         tvUsername.setText(videoCallSession.getCallerName());
         client = DoctorApplication.self().getSocket();
         client.connect();
