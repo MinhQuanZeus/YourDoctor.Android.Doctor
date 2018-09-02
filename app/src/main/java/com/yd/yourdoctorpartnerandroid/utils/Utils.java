@@ -82,13 +82,15 @@ public class Utils {
             SharedPrefs.getInstance().remove("JWT_TOKEN");
             SharedPrefs.getInstance().remove("USER_INFO");
             LoadDefaultModel.getInstance().unregisterServiceCheckNetwork(context);
-            Intent intent = new Intent(context, AuthActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
+
         }catch (Exception e){
             Log.e("LogoutFailed " , e.toString());
         }
+
+        Intent intent = new Intent(context, AuthActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
 
 
     }

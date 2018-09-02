@@ -161,12 +161,12 @@ public class VerifyCodePhoneNumberFragment extends Fragment {
 
                     }else {
                         if(getContext() != null){
+                            Toast.makeText(getContext(), response.body().getMessage(),Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(getContext(), MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             getContext().startActivity(intent);
                         }
-                        Toast.makeText(getContext(), response.body().getMessage(),Toast.LENGTH_LONG).show();
                         pvCode.setText("");
                     }
 
