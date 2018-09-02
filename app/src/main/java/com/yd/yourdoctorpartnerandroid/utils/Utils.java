@@ -87,12 +87,14 @@ public class Utils {
             Log.e("LogoutFailed " , e.toString());
         }
 
-        Intent intent = new Intent(context, AuthActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        try{
+            Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+            homeIntent.addCategory( Intent.CATEGORY_HOME );
+            homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            context.startActivity(homeIntent);
+        }catch (Exception e){
 
-
+        }
     }
 
     public static boolean verifyVietnameesName(String name){
