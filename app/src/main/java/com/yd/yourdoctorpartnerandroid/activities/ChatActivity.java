@@ -524,6 +524,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showDialogInfo() {
+        if(patientChoice == null || mainObject == null) return;
         final Dialog dialog = new Dialog(ChatActivity.this);
         dialog.setContentView(R.layout.info_chat_dialog);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
@@ -541,7 +542,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             ZoomImageViewUtils.loadCircleImage(getApplicationContext(), patientChoice.getAvatar(), ivPatientChat);
             tvNamePatientChat.setText("BN. " + patientChoice.getFullName());
             tvBirthDayChat.setText("NS: " + patientChoice.getBirthday());
-            tvAddressChat.setText("ĐC: " + patientChoice.getAddress());
+            tvAddressChat.setText("Địa chỉ: " + patientChoice.getAddress());
         }
         if (mainObject.getObjConversation() != null) {
             tvContentChat.setText("Nội dung câu hỏi là: " + mainObject.getObjConversation().getContentTopic());

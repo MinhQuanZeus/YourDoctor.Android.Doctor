@@ -24,7 +24,7 @@ public class AuthActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
-        if(SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null){
+        if(SharedPrefs.getInstance().get("USER_INFO", Doctor.class) != null && SharedPrefs.getInstance().get("JWT_TOKEN", String.class) != null){
             FirebaseMessaging.getInstance().subscribeToTopic(SharedPrefs.getInstance().get("USER_INFO", Doctor.class).getDoctorId());
             LoadDefaultModel.getInstance().registerServiceCheckNetwork(getApplicationContext());
             Intent intent = new Intent(this, MainActivity.class);

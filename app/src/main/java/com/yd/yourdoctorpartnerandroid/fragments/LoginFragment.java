@@ -2,6 +2,7 @@ package com.yd.yourdoctorpartnerandroid.fragments;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -47,11 +48,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class LoginFragment extends Fragment {
 
+    private final String prefname = "my_data";
     public static final String JWT_TOKEN = "JWT_TOKEN";
     public static final String USER_INFO = "USER_INFO";
     @BindView(R.id.ed_phone)
@@ -87,14 +91,6 @@ public class LoginFragment extends Fragment {
 
     private void setUp(View view) {
         unbinder = ButterKnife.bind(this, view);
-        String phone = SharedPrefs.getInstance().get("phone",String.class);
-        String password = SharedPrefs.getInstance().get("password",String.class);
-
-        if(phone != null && phone!= "" && password != null && password != null){
-            checkBoxRemember.setChecked(true);
-            edPhone.setText(phone);
-            edPassword.setText(password);
-        }
 
         tvSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -185,13 +181,6 @@ public class LoginFragment extends Fragment {
                         FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
                         LoadDefaultModel.getInstance().registerServiceCheckNetwork(getActivity().getApplicationContext());
 
-                        if(checkBoxRemember.isChecked()){
-                            SharedPrefs.getInstance().put("phone",edPhone.getText().toString());
-                            SharedPrefs.getInstance().put("password",edPassword.getText().toString());
-                        }else {
-                            SharedPrefs.getInstance().put("phone","");
-                            SharedPrefs.getInstance().put("password","");
-                        }
                         getDetailDoctor();
 
                     }
@@ -287,6 +276,46 @@ public class LoginFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    public void savingPreferences() {
+        SharedPreferences pre = this.getActivity().getSharedPreferences(prefname, MODE_PRIVATE);
+        SharedPreferences.Editor editor = pre.edit();
+        String user = edPhone.getText().toString();
+        String pwd = edPassword.getText().toString();
+        boolean bchk = checkBoxRemember.isChecked();
+        if (!bchk) {
+            editor.clear();
+        } else {
+            editor.putString("user", user);
+            editor.putString("pwd", pwd);
+            editor.putBoolean("checked", bchk);
+        }
+        editor.commit();
+    }
+
+    public void restoringPreferences() {
+        SharedPreferences pre = this.getActivity().getSharedPreferences(prefname, MODE_PRIVATE);
+        boolean bchk = pre.getBoolean("checked", false);
+        if (bchk) {
+            String user = pre.getString("user", "");
+            String pwd = pre.getString("pwd", "");
+            edPhone.setText(user);
+            edPassword.setText(pwd);
+        }
+        checkBoxRemember.setChecked(bchk);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        restoringPreferences();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        savingPreferences();
     }
 
 }

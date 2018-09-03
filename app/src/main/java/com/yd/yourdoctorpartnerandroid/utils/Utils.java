@@ -75,25 +75,17 @@ public class Utils {
     }
 
     public static void backToLogin(Context context) {
-
-        try{
-            FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get("USER_INFO", Doctor.class).getDoctorId());
-            SocketUtils.getInstance().closeConnect();
-            SharedPrefs.getInstance().remove("JWT_TOKEN");
-            SharedPrefs.getInstance().remove("USER_INFO");
-            LoadDefaultModel.getInstance().unregisterServiceCheckNetwork(context);
-
-        }catch (Exception e){
-            Log.e("LogoutFailed " , e.toString());
-        }
-
-        try{
-            Intent homeIntent = new Intent(Intent.ACTION_MAIN);
-            homeIntent.addCategory( Intent.CATEGORY_HOME );
-            homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            context.startActivity(homeIntent);
-        }catch (Exception e){
-
+        String idUser = SharedPrefs.getInstance().get("USER_INFO", Doctor.class).getDoctorId();
+        if(idUser != null){
+            try{
+                SocketUtils.getInstance().closeConnect();
+                SharedPrefs.getInstance().clear();
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(idUser);
+                LoadDefaultModel.getInstance().unregisterServiceCheckNetwork(context);
+                System.exit(0);
+            }catch (Exception e){
+                Log.e("LogoutFailed " , e.toString());
+            }
         }
     }
 
