@@ -428,6 +428,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+        finish();
     }
 
     @Override
@@ -648,6 +649,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void handleSendMessageChat() {
         if(isDone){
             Toast.makeText(getApplicationContext(),"Cuộc tư vấn đã kết thúc", Toast.LENGTH_LONG).show();
+            mEditText.setText("");
             return;
         }
         if(progressBar != null) progressBar.setVisibility(View.VISIBLE);

@@ -515,6 +515,10 @@ public class CallingFragment extends Fragment implements IKurentoFragment, Signa
         if (videoCallSession.getType() == TypeCall.CALL) {
             mMediaPlayer.stop();
         }
+        if(videoCallSession != null){
+            tvCallingDoctor.setText(videoCallSession.getCallerName());
+        }
+
         rlCalling.setVisibility(View.GONE);
         rlTimer.setVisibility(View.VISIBLE);
         if(videoCallSession != null) tvCalleeName.setText(videoCallSession.getCalleeName());

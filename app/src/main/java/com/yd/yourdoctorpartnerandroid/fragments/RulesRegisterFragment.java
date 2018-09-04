@@ -85,7 +85,7 @@ public class RulesRegisterFragment extends Fragment {
                     if(mainObjectSpecialist != null){
                         String textContentDoctor = "";
                         for (RuleObject ruleObject:mainObjectSpecialist.getObjIntroAndRuleReturn()) {
-                            if(ruleObject.getType().equals("ruleDoctor")){
+                            if(ruleObject.getType().equals("doctor")){
                                 currentRuleObject = ruleObject;
                                 textContentDoctor = ruleObject.getContent();
                                 break;

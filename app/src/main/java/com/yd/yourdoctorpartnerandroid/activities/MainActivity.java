@@ -280,8 +280,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         //DoctorApplication.self().getSocket().close();
                         DoctorApplication.self().getSocket().disconnect();
                         Utils.backToLogin(getApplicationContext());
+                        finish();
                     }
-
                 })
                 .setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
                     @Override
