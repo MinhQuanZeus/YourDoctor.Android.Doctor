@@ -2,10 +2,10 @@ package com.yd.yourdoctorpartnerandroid.fragments;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,18 +19,17 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.yd.yourdoctorpartnerandroid.R;
-import com.yd.yourdoctorpartnerandroid.activities.ChatActivity;
 import com.yd.yourdoctorpartnerandroid.activities.MainActivity;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.models.Certification;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
-import com.yd.yourdoctorpartnerandroid.models.Specialist;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorpartnerandroid.networks.getDetailDoctor.GetDetailDoctorService;
 import com.yd.yourdoctorpartnerandroid.networks.getDetailDoctor.MainDetailDoctor;
 import com.yd.yourdoctorpartnerandroid.networks.models.AuthResponse;
 import com.yd.yourdoctorpartnerandroid.networks.models.CommonErrorResponse;
 import com.yd.yourdoctorpartnerandroid.networks.models.Login;
+import com.yd.yourdoctorpartnerandroid.models.SpecialistDoctor;
 import com.yd.yourdoctorpartnerandroid.networks.services.LoginService;
 import com.yd.yourdoctorpartnerandroid.utils.LoadDefaultModel;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
@@ -49,11 +48,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class LoginFragment extends Fragment {
 
+    private final String prefname = "my_data";
     public static final String JWT_TOKEN = "JWT_TOKEN";
     public static final String USER_INFO = "USER_INFO";
     @BindView(R.id.ed_phone)
@@ -68,6 +70,8 @@ public class LoginFragment extends Fragment {
     CircularProgressButton btnLogin;
     @BindView(R.id.checkBoxRemember)
     CheckBox checkBoxRemember;
+    @BindView(R.id.forgotpass)
+    com.yd.yourdoctorpartnerandroid.custormviews.MyTextView forgotPass;
     @BindView(R.id.tv_signup)
     TextView tvSignUp;
     private Unbinder unbinder;
@@ -87,17 +91,21 @@ public class LoginFragment extends Fragment {
 
     private void setUp(View view) {
         unbinder = ButterKnife.bind(this, view);
-        String phone = SharedPrefs.getInstance().get("phone",String.class);
-        String password = SharedPrefs.getInstance().get("password",String.class);
-        if(phone != null && phone!= "" && password != null && password != null){
-            checkBoxRemember.setChecked(true);
-            edPhone.setText(phone);
-            edPassword.setText(password);
-        }
+
         tvSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ScreenManager.openFragment(getActivity().getSupportFragmentManager(), new InputPhoneNumberFragment(), R.id.fl_auth, true, true);
+                ScreenManager.openFragment(getActivity().getSupportFragmentManager(), new RulesRegisterFragment(), R.id.fl_auth, true, true);
+            }
+        });
+
+        forgotPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                InputPhoneNumberFragment inputPhoneNumberFragment = new InputPhoneNumberFragment();
+                inputPhoneNumberFragment.setIsForgetPassword(true);
+                ScreenManager.openFragment(getActivity().getSupportFragmentManager(), inputPhoneNumberFragment, R.id.fl_auth, true, true);
+
             }
         });
 
@@ -150,48 +158,58 @@ public class LoginFragment extends Fragment {
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
 
                 if (response.code() == 200 || response.code() == 201) {
-                    SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
+                    if(response.body().getDoctor().getStatus() == 2){
+                        Toast.makeText(getContext() , "Tài khoản chưa được kích hoạt!", Toast.LENGTH_LONG).show();
+                        btnLogin.revertAnimation();
+                        enableAll();
+                    }else if(response.body().getDoctor().getRole() != 2){
+                        Toast.makeText(getContext() , "Tài khoản này không phải tài khoản bác sĩ!", Toast.LENGTH_LONG).show();
+                        btnLogin.revertAnimation();
+                        enableAll();
+                    }else if(response.body().getDoctor().getStatus() != 1 && response.body().getDoctor().getStatus() != 2){
+                        Toast.makeText(getContext() , "Tài khoản đang bị khóa!", Toast.LENGTH_LONG).show();
+                        btnLogin.revertAnimation();
+                        enableAll();
+                    }
+                    else{
+                        SharedPrefs.getInstance().put(JWT_TOKEN, response.body().getJwtToken());
+                        Log.e("tokenLogin: ",SharedPrefs.getInstance().get(JWT_TOKEN,String.class));
+                        if(SharedPrefs.getInstance().get(USER_INFO, Doctor.class) != null){
+                            FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get(USER_INFO, Doctor.class).getDoctorId());
+                        }
+                        SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
+                        FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
+                        LoadDefaultModel.getInstance().registerServiceCheckNetwork(getActivity().getApplicationContext());
 
-                    if(SharedPrefs.getInstance().get(USER_INFO, Doctor.class) != null){
-                        FirebaseMessaging.getInstance().unsubscribeFromTopic(SharedPrefs.getInstance().get(USER_INFO, Doctor.class).getDoctorId());
+                        getDetailDoctor();
+
                     }
 
-                    SharedPrefs.getInstance().put(USER_INFO, response.body().getDoctor());
-                    //for test
-                    Log.e("tokenDoctor", SharedPrefs.getInstance().get(JWT_TOKEN, String.class));
-                    Log.e("FireBase share ", response.body().getDoctor().getDoctorId());
-                    FirebaseMessaging.getInstance().subscribeToTopic(response.body().getDoctor().getDoctorId());
-                    SocketUtils.getInstance().reConnect();
-                    if(checkBoxRemember.isChecked()){
-                        SharedPrefs.getInstance().put("phone",edPhone.getText().toString());
-                        SharedPrefs.getInstance().put("password",edPassword.getText().toString());
-                    }else {
-                        SharedPrefs.getInstance().put("phone","");
-                        SharedPrefs.getInstance().put("password","");
-                    }
-
-
-
-                    getDetailDoctor();
                 }else {
                     enableAll();
-                    CommonErrorResponse commonErrorResponse = parseToCommonError(response);
-                    if (commonErrorResponse.getError() != null) {
-                        String error = Utils.getStringResourceByString(getContext(), commonErrorResponse.getError());
-                        Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
-                        Log.d("RESPONSE", error);
+                    try{
+                        CommonErrorResponse commonErrorResponse = parseToCommonError(response);
+                        if (commonErrorResponse.getError() != null) {
+                            String error = Utils.getStringResourceByString(getContext(), commonErrorResponse.getError());
+                            Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
+                            Log.d("RESPONSE", error);
+                        }
+                    }catch (Exception e){
+                        Toast.makeText(getActivity(), "Có lỗi không thể đăng nhập", Toast.LENGTH_SHORT).show();
                     }
+
                     btnLogin.revertAnimation();
                 }
             }
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
-                btnLogin.revertAnimation();
-                Log.e("login", t.toString());
+                if(btnLogin != null) btnLogin.revertAnimation();
                 enableAll();
                 if (t instanceof SocketTimeoutException) {
                     Toast.makeText(getActivity(), getResources().getText(R.string.error_timeout), Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(getContext(),"Không có kết nối mạng", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -199,8 +217,6 @@ public class LoginFragment extends Fragment {
 
     private void getDetailDoctor(){
         GetDetailDoctorService getDetailDoctorService = RetrofitFactory.getInstance().createService(GetDetailDoctorService.class);
-        Log.e("token", SharedPrefs.getInstance().get(JWT_TOKEN,String.class));
-        Log.e("idDoctor",SharedPrefs.getInstance().get(USER_INFO,Doctor.class).getDoctorId() );
         getDetailDoctorService.getDetailDoctor(SharedPrefs.getInstance().get(JWT_TOKEN,String.class),SharedPrefs.getInstance().get(USER_INFO,Doctor.class).getDoctorId()).enqueue(new Callback<MainDetailDoctor>() {
             @Override
             public void onResponse(Call<MainDetailDoctor> call, Response<MainDetailDoctor> response) {
@@ -208,30 +224,29 @@ public class LoginFragment extends Fragment {
                 if (response.code() == 200) {
                     Doctor doctor;
                     doctor = SharedPrefs.getInstance().get(USER_INFO,Doctor.class);
-
                     doctor.setCertificates((ArrayList<Certification>) response.body().getDetailDoctor().getCertificates());
-                    doctor.setIdSpecialist((ArrayList<Specialist>)response.body().getDetailDoctor().getIdSpecialist());
+                    doctor.setIdSpecialist((ArrayList<SpecialistDoctor>)response.body().getDetailDoctor().getIdSpecialist());
                     doctor.setUniversityGraduate(response.body().getDetailDoctor().getUniversityGraduate());
                     doctor.setYearGraduate(response.body().getDetailDoctor().getYearGraduate());
                     doctor.setPlaceWorking(response.body().getDetailDoctor().getPlaceWorking());
                     doctor.setCurrentRating(response.body().getDetailDoctor().getCurrentRating());
                     SharedPrefs.getInstance().put(USER_INFO,doctor);
-                    FirebaseMessaging.getInstance().subscribeToTopic(doctor.getDoctorId());
-                    SocketUtils.getInstance().reConnect();
-
-
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     getActivity().startActivity(intent);
-                    btnLogin.revertAnimation();
+                }else {
+                    enableAll();
+                    Toast.makeText(getContext(),"Đăng nhập không thành công",Toast.LENGTH_LONG).show();
                 }
+                btnLogin.revertAnimation();
             }
 
             @Override
             public void onFailure(Call<MainDetailDoctor> call, Throwable t) {
                 Toast.makeText(getContext(),"Đăng nhập không thành công",Toast.LENGTH_LONG).show();
                 btnLogin.revertAnimation();
+                enableAll();
             }
         });
     }
@@ -261,6 +276,46 @@ public class LoginFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    public void savingPreferences() {
+        SharedPreferences pre = this.getActivity().getSharedPreferences(prefname, MODE_PRIVATE);
+        SharedPreferences.Editor editor = pre.edit();
+        String user = edPhone.getText().toString();
+        String pwd = edPassword.getText().toString();
+        boolean bchk = checkBoxRemember.isChecked();
+        if (!bchk) {
+            editor.clear();
+        } else {
+            editor.putString("user", user);
+            editor.putString("pwd", pwd);
+            editor.putBoolean("checked", bchk);
+        }
+        editor.commit();
+    }
+
+    public void restoringPreferences() {
+        SharedPreferences pre = this.getActivity().getSharedPreferences(prefname, MODE_PRIVATE);
+        boolean bchk = pre.getBoolean("checked", false);
+        if (bchk) {
+            String user = pre.getString("user", "");
+            String pwd = pre.getString("pwd", "");
+            edPhone.setText(user);
+            edPassword.setText(pwd);
+        }
+        checkBoxRemember.setChecked(bchk);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        restoringPreferences();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        savingPreferences();
     }
 
 }

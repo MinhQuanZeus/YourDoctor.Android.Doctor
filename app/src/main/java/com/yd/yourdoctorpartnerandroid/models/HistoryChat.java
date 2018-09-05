@@ -12,15 +12,23 @@ public class HistoryChat {
     private int status;
     private PatientIdHistory patientId;
     private String contentTopic;
-    private String updatedAt;
-    private String createdAt;
+    private long updatedAt;
+    private long createdAt;
 
 
-    public String getCreatedAt() {
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -56,11 +64,4 @@ public class HistoryChat {
         this.patientId = patientID;
     }
 
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }

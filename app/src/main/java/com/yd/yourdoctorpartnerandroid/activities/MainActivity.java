@@ -2,16 +2,17 @@ package com.yd.yourdoctorpartnerandroid.activities;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -24,46 +25,46 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.nhancv.npermission.NPermission;
 import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorpartnerandroid.DoctorApplication;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.adapters.PagerAdapter;
+import com.yd.yourdoctorpartnerandroid.events.EventSend;
 import com.yd.yourdoctorpartnerandroid.fragments.AboutUsFragment;
-import com.yd.yourdoctorpartnerandroid.fragments.AdvisoryMenuFragment;
+import com.yd.yourdoctorpartnerandroid.fragments.BankingFragment;
 import com.yd.yourdoctorpartnerandroid.fragments.DoctorProfileFragment;
 import com.yd.yourdoctorpartnerandroid.fragments.DoctorRankFragment;
-import com.yd.yourdoctorpartnerandroid.fragments.UserProfileFragment;
 import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
-import com.yd.yourdoctorpartnerandroid.models.TypeCall;
-import com.yd.yourdoctorpartnerandroid.models.VideoCallSession;
 import com.yd.yourdoctorpartnerandroid.utils.Config;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
+import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NPermission.OnPermissionResult {
+import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.RECORD_AUDIO;
 
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    public static final int REQUEST_PERMISSION_CODE = 1;
     @BindView(R.id.tab_layout)
     TabLayout tabLayout;
 
     @BindView(R.id.view_pager)
     ViewPager viewPager;
-
-    @BindView(R.id.fab_question)
-    FloatingActionButton fab_question;
 
     @BindView(R.id.draw_layout_main)
     DrawerLayout draw_layout_main;
@@ -74,16 +75,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.toolbar)
     Toolbar tb_main;
 
-    ImageView iv_ava_user;
-    TextView tv_name_user;
-    TextView tv_money_user;
+    ImageView ivAvaUser;
+    ImageView ivAvaUserBackGroud;
+    TextView tvNameUser;
+    RatingBar rbMainDoctor;
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     private Socket socket;
-    private Doctor userInfo;
-    private NPermission nPermission;
+    private Doctor currentDoctor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,71 +92,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         setupUI();
         setupSocket();
-//        Log.d("MainActivity", "USER_INFO");
-//        Log.d("MainActivity", SharedPrefs.getInstance().get("USER_INFO", Patient.class).toString());
-//        Log.d("MainActivity", SharedPrefs.getInstance().get("JWT_TOKEN", String.class));
-//        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//
-//                // Kiểm tra Intent Filter có khớp cái nào không.
-//                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
-//                    // GCM đã được đăng ký thành công.
-//                    // Đăng ký vào topic có tên "Global".
-//                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
-//                    displayFirebaseRegId();
-//
-//                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
-//                    // Khi có tin nhắn mới về.
-//                    String message = intent.getStringExtra("message");
-//                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-//                   // txtMessage.setText(message);
-//                }
-//            }
-//        };
-//
-        nPermission = new NPermission(true);
-        nPermission.requestPermission(this, Manifest.permission.CAMERA);
-        displayFirebaseRegId();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
 
     private void setupSocket() {
         socket = DoctorApplication.self().getSocket();
         socket.connect();
     }
-    private void displayFirebaseRegId() {
-        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
 
-        String regId = pref.getString("regId", null);
-        SharedPrefs.getInstance().get("regId", String.class);
-        Log.e(TAG, "Firebase reg id: " + SharedPrefs.getInstance().get("regId", String.class));
-
-//        if (!TextUtils.isEmpty(regId))
-//            Toast.makeText(this, "Firebase Reg Id: " + regId, Toast.LENGTH_SHORT).show();
-//
-//        else
-//            Toast.makeText(this, "Firebase Reg Id is not received yet", Toast.LENGTH_SHORT).show();
-//           // txtRegId.setText("Firebase Reg Id is not received yet!");
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(EventSend eventSend) {
+        if(eventSend.getType() == 1){
+            currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+            if(currentDoctor != null){
+                tvNameUser.setText(currentDoctor.getFullName());
+                ivAvaUserBackGroud.setImageResource(R.drawable.your_doctor_logo);
+                ivAvaUser.setImageResource(R.drawable.your_doctor_logo);
+                ZoomImageViewUtils.loadImageManual(getApplicationContext(),currentDoctor.getAvatar().toString(),ivAvaUserBackGroud);
+                ZoomImageViewUtils.loadCircleImage(getApplicationContext(),currentDoctor.getAvatar().toString(),ivAvaUser);
+                tvNameUser.setText(currentDoctor.getFullName());
+                rbMainDoctor.setRating(currentDoctor.getCurrentRating());
+            }
+        }
     }
 
 
 
     private void setupUI() {
         ButterKnife.bind(this);
-        userInfo = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+        if (!checkPermission()) {
+            requestPermission();
+        }
         setSupportActionBar(tb_main);
         View headerView = navigationView_main.inflateHeaderView(R.layout.nav_header_main);
-        iv_ava_user = headerView.findViewById(R.id.iv_ava_user);
-        tv_name_user = headerView.findViewById(R.id.tv_name_user);
-        tv_money_user = headerView.findViewById(R.id.tv_money_user);
+        ivAvaUser = headerView.findViewById(R.id.iv_ava_user);
+        tvNameUser = headerView.findViewById(R.id.tv_name_user);
+        ivAvaUserBackGroud = headerView.findViewById(R.id.iv_ava_user_back_groud);
+        rbMainDoctor = headerView.findViewById(R.id.rbMainDoctor);
+        currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+        if(currentDoctor != null){
+            tvNameUser.setText(currentDoctor.getFullName());
+            ZoomImageViewUtils.loadImageManual(getApplicationContext(),currentDoctor.getAvatar().toString(),ivAvaUserBackGroud);
+            ZoomImageViewUtils.loadCircleImage(getApplicationContext(),currentDoctor.getAvatar().toString(),ivAvaUser);
+            tvNameUser.setText(currentDoctor.getFullName());
+            rbMainDoctor.setRating(currentDoctor.getCurrentRating());
+        }
+
 
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-
-        Picasso.with(this).load("https://kenh14cdn.com/2016/160722-star-tzuyu-1469163381381-1473652430446.jpg").transform(new CropCircleTransformation()).into(iv_ava_user);
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, draw_layout_main, tb_main, R.string.app_name, R.string.app_name);
         draw_layout_main.setDrawerListener(toggle);
@@ -163,13 +154,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView_main.setNavigationItemSelectedListener(this);
 
-        fab_question.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                ScreenManager.openFragment(getSupportFragmentManager(), new AdvisoryMenuFragment(), R.id.rl_container, true, true);
-            }
-        });
 
         tb_main.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,8 +175,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(), 4);
         viewPager.setAdapter(pagerAdapter);
-        viewPager.setCurrentItem(1);
+        viewPager.setOffscreenPageLimit(1);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+        tabLayout.getTabAt(1).select();
+        viewPager.setCurrentItem(1);
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -222,12 +210,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (draw_layout_main.isDrawerOpen(GravityCompat.START)) {
             draw_layout_main.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            handleLogOut();
         }
-//        Intent intent = new Intent(Intent.ACTION_MAIN);
-//        intent.addCategory(Intent.CATEGORY_HOME);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startActivity(intent);
+
     }
 
     @Override
@@ -248,18 +233,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         if (item == null) return false;
         switch (item.getItemId()) {
-            case R.id.nav_create_advisory_main: {
-                ScreenManager.openFragment(getSupportFragmentManager(), new AdvisoryMenuFragment(), R.id.rl_container, true, true);
-                break;
-            }
-            case R.id.nav_favorite_doctor_main: {
-                break;
-            }
             case R.id.nav_exchange_money_main: {
+                ScreenManager.openFragment(getSupportFragmentManager(), new BankingFragment(), R.id.rl_container, true, true);
                 break;
             }
             case R.id.nav_profile_main: {
-                ScreenManager.openFragment(getSupportFragmentManager(), new DoctorProfileFragment(), R.id.rl_container, true, true);
+
+
+                DoctorProfileFragment doctorProfileFragment = new DoctorProfileFragment();
+                doctorProfileFragment.setDataFromMain(ivAvaUser,ivAvaUserBackGroud);
+                ScreenManager.openFragment(getSupportFragmentManager(), doctorProfileFragment, R.id.rl_container, true, true);
                 break;
             }
             case R.id.nav_ranking_docto_main: {
@@ -268,13 +251,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             case R.id.navAboutUs:{
                 ScreenManager.openFragment(getSupportFragmentManager(), new AboutUsFragment(), R.id.rl_container, true, true);
-
                 break;
             }
             case R.id.nav_logout_main: {
-                //Test
                 handleLogOut();
-                //ScreenManager.openFragment(getSupportFragmentManager(), new DoctorProfileFragment(), R.id.rl_container, true, true);
                 break;
 
             }
@@ -287,17 +267,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        fab_question.setVisibility(View.VISIBLE);
-        // Đăng ký receiver vào LocalBroadcastManager.
-      //  LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-      //          new IntentFilter(Config.REGISTRATION_COMPLETE));
-
-        // Đăng ký bộ nhận tin nhắn.
-       // LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-              //  new IntentFilter(Config.PUSH_NOTIFICATION));
-
-        // Xóa các notification khi app được bật.
-       // NotificationUtils.clearNotifications(getApplicationContext());
     }
 
     private void handleLogOut(){
@@ -308,9 +277,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //DoctorApplication.self().getSocket().close();
+                        DoctorApplication.self().getSocket().disconnect();
                         Utils.backToLogin(getApplicationContext());
+                        finish();
                     }
-
                 })
                 .setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
                     @Override
@@ -323,22 +294,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onPause() {
         super.onPause();
-        fab_question.setVisibility(View.INVISIBLE);
-       // LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    }
+
+    public boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(getApplicationContext(),
+                RECORD_AUDIO);
+        int result1 = ContextCompat.checkSelfPermission(getApplicationContext(),
+                CAMERA);
+        return result == PackageManager.PERMISSION_GRANTED &&
+                result1 == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
-    public void onPermissionResult(String s, boolean b) {
-        switch (s) {
-            case Manifest.permission.CAMERA:
-                if (!b) {
-                    nPermission.requestPermission(this, Manifest.permission.CAMERA);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_PERMISSION_CODE:
+                if (grantResults.length > 0) {
+                    boolean StoragePermission = grantResults[0] ==
+                            PackageManager.PERMISSION_GRANTED;
+                    boolean RecordPermission = grantResults[1] ==
+                            PackageManager.PERMISSION_GRANTED;
+
+                    if (StoragePermission && RecordPermission) {
+                        Toast.makeText(this, "Permission Granted",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        requestPermission();
+                    }
                 }
-                break;
-            default:
                 break;
         }
     }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this, new
+                String[]{RECORD_AUDIO, CAMERA}, REQUEST_PERMISSION_CODE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
 }
 
 

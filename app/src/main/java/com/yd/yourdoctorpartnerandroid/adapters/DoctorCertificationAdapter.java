@@ -17,6 +17,7 @@ import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.events.ItemClickListener;
 import com.yd.yourdoctorpartnerandroid.models.Certification;
+import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
 
 import java.util.List;
 
@@ -68,7 +69,7 @@ public class DoctorCertificationAdapter extends RecyclerView.Adapter<DoctorCerti
                 PhotoView certification_photo_view = dialog.findViewById(R.id.certification_photo_view);
                 Button btn_cancel_from_photo_view = dialog.findViewById(R.id.btn_cancel_from_photo_view);
 
-                Picasso.with(context).load(certificationChoice.getPathImage()).into(certification_photo_view);
+                ZoomImageViewUtils.loadImageManual(context,certificationChoice.getPathImage(), certification_photo_view);
 
                 btn_cancel_from_photo_view.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -105,7 +106,7 @@ public class DoctorCertificationAdapter extends RecyclerView.Adapter<DoctorCerti
 
             this.certificationModel = certificationModel;
             if (certificationModel != null) {
-                Picasso.with(context).load(certificationModel.getPathImage()).into(iv_certification_profile);
+                ZoomImageViewUtils.loadImageManual(context,certificationModel.getPathImage(),iv_certification_profile);
             }
         }
 

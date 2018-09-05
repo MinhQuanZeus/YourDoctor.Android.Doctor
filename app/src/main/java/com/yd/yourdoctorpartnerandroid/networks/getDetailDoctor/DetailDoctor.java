@@ -2,12 +2,17 @@ package com.yd.yourdoctorpartnerandroid.networks.getDetailDoctor;
 
 
 import com.yd.yourdoctorpartnerandroid.models.Certification;
-import com.yd.yourdoctorpartnerandroid.models.Specialist;
+import com.yd.yourdoctorpartnerandroid.models.SpecialistDoctor;
 
 import java.util.List;
 
 public class DetailDoctor {
     private List<Certification> certificates;
+    private List<SpecialistDoctor> idSpecialist;
+    private String universityGraduate;
+    private String yearGraduate;
+    private String placeWorking;
+    private float currentRating;
 
     public List<Certification> getCertificates() {
         return certificates;
@@ -17,11 +22,11 @@ public class DetailDoctor {
         this.certificates = certificates;
     }
 
-    public List<Specialist> getIdSpecialist() {
+    public List<SpecialistDoctor> getIdSpecialist() {
         return idSpecialist;
     }
 
-    public void setIdSpecialist(List<Specialist> idSpecialist) {
+    public void setIdSpecialist(List<SpecialistDoctor> idSpecialist) {
         this.idSpecialist = idSpecialist;
     }
 
@@ -57,9 +62,5 @@ public class DetailDoctor {
         this.currentRating = currentRating;
     }
 
-    private List<Specialist> idSpecialist;
-    private String universityGraduate;
-    private String yearGraduate;
-    private String placeWorking;
-    private float currentRating;
+
 }

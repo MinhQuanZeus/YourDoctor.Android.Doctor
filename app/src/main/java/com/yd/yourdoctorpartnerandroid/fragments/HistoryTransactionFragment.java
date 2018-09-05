@@ -10,9 +10,18 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.yd.yourdoctorpartnerandroid.R;
+import com.yd.yourdoctorpartnerandroid.events.EventSend;
+import com.yd.yourdoctorpartnerandroid.models.Doctor;
 import com.yd.yourdoctorpartnerandroid.models.Specialist;
+import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
+import com.yd.yourdoctorpartnerandroid.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
@@ -30,6 +39,11 @@ public class HistoryTransactionFragment extends Fragment {
     @BindView(R.id.vpHistory)
     ViewPager vpHistory;
 
+    @BindView(R.id.tv_remain_money_history)
+    TextView tvRemainMoneyHistory;
+
+    private Doctor currentDoctor;
+
 
     public HistoryTransactionFragment() {
         // Required empty public constructor
@@ -42,10 +56,13 @@ public class HistoryTransactionFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history_transaction, container, false);
         ButterKnife.bind(this, view);
+        EventBus.getDefault().register(this);
         setUpData();
         return view;
     }
     private void setUpData(){
+        currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+        if(currentDoctor != null) tvRemainMoneyHistory.setText("Số dư tài khoản : " + Utils.formatStringNumber(currentDoctor.getRemainMoney()) +" đ");
         vpHistory.setCurrentItem(0);
         tabHistory.setupWithViewPager(vpHistory);
         tabHistory.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -64,8 +81,25 @@ public class HistoryTransactionFragment extends Fragment {
             }
         });
 
-        HistoryTransactionFragment.ViewPagerAdapter adapter = new HistoryTransactionFragment.ViewPagerAdapter(getFragmentManager());
+        HistoryTransactionFragment.ViewPagerAdapter adapter = new HistoryTransactionFragment.ViewPagerAdapter(this.getChildFragmentManager());
         vpHistory.setAdapter(adapter);
+        vpHistory.setOffscreenPageLimit(1);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(EventSend eventSend) {
+        if(eventSend.getType() == 1){
+            currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
+            if(currentDoctor != null){
+                tvRemainMoneyHistory.setText("Số dư tài khoản : " + Utils.formatStringNumber(currentDoctor.getRemainMoney()) +" đ");
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     class ViewPagerAdapter extends FragmentStatePagerAdapter {
@@ -84,13 +118,13 @@ public class HistoryTransactionFragment extends Fragment {
                     return new ListChatHistoryFragment();
                 }
                 case 1:{
-                    return new NotifyFragment();
+                    return new VideoCallHistoryFragment();
                 }
                 case 2:{
                     return new ListPaymentHistoryFragment();
                 }
                 case 3:{
-                    return new NotifyFragment();
+                    return new BankingHistoryFragment();
                 }
             }
             return null;

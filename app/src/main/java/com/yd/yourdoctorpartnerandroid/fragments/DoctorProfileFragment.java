@@ -1,7 +1,6 @@
 package com.yd.yourdoctorpartnerandroid.fragments;
 
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
@@ -12,18 +11,22 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.PorterDuff;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +39,7 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,8 +47,15 @@ import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorpartnerandroid.BuildConfig;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.adapters.DoctorCertificationAdapter;
+import com.yd.yourdoctorpartnerandroid.events.EventSend;
+import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
+import com.yd.yourdoctorpartnerandroid.models.Specialist;
+import com.yd.yourdoctorpartnerandroid.models.SpecialistDoctor;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
+import com.yd.yourdoctorpartnerandroid.networks.changePassword.ChangePasswordService;
+import com.yd.yourdoctorpartnerandroid.networks.changePassword.PasswordRequest;
+import com.yd.yourdoctorpartnerandroid.networks.changePassword.PasswordResponse;
 import com.yd.yourdoctorpartnerandroid.networks.changeProfileDoctor.DoctorRequest;
 import com.yd.yourdoctorpartnerandroid.networks.changeProfileDoctor.DoctorRespone;
 import com.yd.yourdoctorpartnerandroid.networks.changeProfileDoctor.changeProfileDoctorService;
@@ -53,6 +64,7 @@ import com.yd.yourdoctorpartnerandroid.networks.getLinkImageService.MainGetLink;
 import com.yd.yourdoctorpartnerandroid.utils.SharedPrefs;
 import com.yd.yourdoctorpartnerandroid.utils.Utils;
 import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -63,10 +75,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -98,31 +112,24 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
     private Bitmap mImageToBeAttached;
     private String filename;
 
-    @BindView(R.id.iv_avatar)
-    ImageView iv_avatar;
-
-    @BindView(R.id.iv_upload_avatar)
-    ImageView iv_upload_avatar;
-
-    Unbinder butterKnife;
 
     @BindView(R.id.tv_fname)
     TextView tv_fname;
-
     @BindView(R.id.tv_mname)
     TextView tv_mname;
-
     @BindView(R.id.tv_lname)
     TextView tv_lname;
 
     @BindView(R.id.rb_doctorRanking)
     RatingBar rb_doctorRanking;
-
     @BindView(R.id.tv_remainMoney)
     TextView tv_remainMoney;
-
     @BindView(R.id.tv_phone)
     EditText tv_phone;
+    @BindView(R.id.tv_universityGraduate)
+    EditText tv_universityGraduate;
+    @BindView(R.id.tv_yearGraduate)
+    EditText tv_yearGraduate;
 
     @BindView(R.id.radio_male)
     RadioButton rbMale;
@@ -130,44 +137,77 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
     RadioButton rbOther;
     @BindView(R.id.radio_female)
     RadioButton rbFmale;
-
     @BindView(R.id.rg_gender)
     RadioGroup rg_gender;
 
     @BindView(R.id.ed_birthday)
     EditText ed_birthday;
-
     @BindView(R.id.ed_address)
     EditText ed_address;
-
-    @BindView(R.id.tv_universityGraduate)
-    EditText tv_universityGraduate;
-
-    @BindView(R.id.tv_yearGraduate)
-    EditText tv_yearGraduate;
-
     @BindView(R.id.ed_placeWorking)
     EditText ed_placeWorking;
 
+
     @BindView(R.id.tv_certificates)
     EditText tv_certificates;
-
     @BindView(R.id.tv_specialist)
     EditText tv_specialist;
-
     @BindView(R.id.rv_image_certificates)
     RecyclerView rv_image_certificates;
-
-    @BindView(R.id.btn_change_password)
-    Button btn_change_password;
-
-    @BindView(R.id.btn_edit_profile)
-    Button btn_edit_profile;
 
     @BindView(R.id.pbProfileDoctor)
     ProgressBar pbProfileDoctor;
 
-    private Doctor infoDoctor;
+
+
+
+    @BindView(R.id.iv_avatar)
+    CircleImageView ivAvatar;
+    @BindView(R.id.iv_upload_avatar)
+    CircleImageView ivUploadAvatar;
+
+    @BindView(R.id.tb_main)
+    Toolbar tbMain;
+
+    @BindView(R.id.rl_mainButton)
+    RelativeLayout rlMainButton;
+    @BindView(R.id.rl_YesNoButton)
+    RelativeLayout rlYesNoButton;
+
+    @BindView(R.id.btn_no)
+    Button btnNo;
+    @BindView(R.id.btn_yes)
+    Button btnYes;
+
+    @BindView(R.id.btn_change_password)
+    Button btnChangePassword;
+    @BindView(R.id.btn_edit_profile)
+    Button btnEditProfile;
+
+    @BindView(R.id.til_place_working)
+    TextInputLayout til_placeWorking;
+
+    @BindView(R.id.til_address)
+    TextInputLayout til_address;
+
+    private Doctor currentDoctor;
+
+    private Unbinder unbinder;
+
+    //handle password
+    EditText et_old_password;
+    EditText et_new_password;
+    EditText et_confirm_new_password;
+    TextView tv_message_change_password;
+    ProgressBar progress_change_password;
+    AlertDialog dialogChangePassword;
+
+    ImageView ivAvaUser;
+    ImageView ivAvaUserBackGroud;
+    public void setDataFromMain(ImageView ivAvaUser,ImageView ivAvaUserBackGroud){
+        this.ivAvaUser = ivAvaUser;
+        this.ivAvaUserBackGroud = ivAvaUserBackGroud;
+    }
 
     public DoctorProfileFragment() {
         // Required empty public constructor
@@ -184,236 +224,73 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
         return view;
     }
 
-    private void setupUI(View view){
+    private void setupUI(View view) {
 
-        butterKnife = ButterKnife.bind(DoctorProfileFragment.this, view);
-        infoDoctor = SharedPrefs.getInstance().get("USER_INFO",Doctor.class);
-        btn_change_password.setOnClickListener(this);
-        btn_edit_profile.setOnClickListener(this);
-        if(infoDoctor!=null){
-            Picasso.with(getContext()).load(infoDoctor.getAvatar().toString()).transform(new CropCircleTransformation()).into(iv_avatar);
-            tv_fname.setText(infoDoctor.getFirstName());
-            tv_mname.setText(infoDoctor.getMiddleName());
-            tv_lname.setText(infoDoctor.getLastName());
-            rb_doctorRanking.setRating(infoDoctor.getCurrentRating());
-            tv_remainMoney.setText(infoDoctor.getRemainMoney()+" VND");
-            tv_phone.setText(infoDoctor.getPhoneNumber());
-            switch (infoDoctor.getGender()){
-                case 1:{
-                    rbMale.setChecked(true);
-                    rbFmale.setChecked(false);
-                    rbOther.setChecked(false);
-                    rbFmale.setEnabled(false);
-                    rbOther.setEnabled(false);
-                    break;
-                }
-                case 2:{
-                    rbFmale.setChecked(true);
-                    rbMale.setChecked(false);
-                    rbOther.setChecked(false);
-                    rbMale.setEnabled(false);
-                    rbOther.setEnabled(false);
-                    break;
-                }
-                case 3:{
-                    rbMale.setChecked(false);
-                    rbFmale.setChecked(false);
-                    rbOther.setChecked(true);
-                    rbMale.setEnabled(false);
-                    rbFmale.setEnabled(false);
-                    break;
-                }
-            }
-        }
-        ed_birthday.setText(infoDoctor.getBirthday());
-        ed_address.setText(infoDoctor.getAddress());
-        tv_universityGraduate.setText(infoDoctor.getUniversityGraduate());
-        tv_yearGraduate.setText(infoDoctor.getYearGraduate());
-        ed_placeWorking.setText(infoDoctor.getPlaceWorking());
-        String spec = "";
-        for (int i = 0; i <infoDoctor.getIdSpecialist().size();i++){
-            spec += infoDoctor.getIdSpecialist().get(i).getName() + ", ";
-        }
-        tv_specialist.setText(spec);
-//        tv_name_doctor.setText("Lê Thế Anh");
-//        rb_doctorranking.setRating((float) 3);
-//        rb_doctorranking.setMax(5);
-//
-//        ((AppCompatActivity)getActivity()).setSupportActionBar(tb_back_from_profile_doctor);
-//        final ActionBar actionbar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-//        actionbar.setDisplayHomeAsUpEnabled(true);
-//        actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
-//        actionbar.setTitle("Trang cá nhân bác sĩ");
-//
-//        tb_back_from_profile_doctor.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                ScreenManager.backFragment(getFragmentManager());
-//            }
-//        });
+        unbinder = ButterKnife.bind(this, view);
+        currentDoctor = SharedPrefs.getInstance().get(USER_INFO, Doctor.class);
+        isChangeInfo = false;
 
-        DoctorCertificationAdapter doctorCertificationAdapter = new DoctorCertificationAdapter(infoDoctor.getCertificates(),getContext());
-        rv_image_certificates.setAdapter(doctorCertificationAdapter);
-
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),3,GridLayoutManager.VERTICAL,false);
-        rv_image_certificates.setLayoutManager(gridLayoutManager);
-        disableControl();
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        butterKnife.unbind();
-    }
-
-    private void disableControl(){
-        tv_phone.setEnabled(false);
-        tv_universityGraduate.setEnabled(false);
-        tv_yearGraduate.setEnabled(false);
-        tv_specialist.setEnabled(false);
-        tv_certificates.setEnabled(false);
-        ed_birthday.setEnabled(false);
-        ed_address.setEnabled(false);
-        ed_placeWorking.setEnabled(false);
-        iv_upload_avatar.setVisibility(View.INVISIBLE);
-    }
-
-    private void enableControl(){
-        ed_birthday.setEnabled(true);
-        ed_address.setEnabled(true);
-        ed_placeWorking.setEnabled(true);
-        iv_upload_avatar.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btn_edit_profile:{
-                enableControl();
-                setUpCalendar();
-                 break;
-            }
-//            case R.id.btn_change_password:{
-//                showDialogChangePassword();
-//                break;
-//            }
-//            case R.id.btn_yes: {
-//                onSubmit();
-//                break;
-//            }
-//            case R.id.btn_no: {
-//                setScreenFunction(TYPE_CANCEL);
-//                break;
-//            }
-        }
-    }
-    ///
-    private void onSubmit() {
-        String birthday = ed_birthday.getText().toString();
-        String address = ed_address.getText().toString();
-        String placeWorking = ed_placeWorking.getText().toString();
-        int gender = getGender();
-        if (infoDoctor.getGender() != gender) isChangeInfo = true;
-        if (!infoDoctor.getBirthday().equals(birthday)) isChangeInfo = true;
-        if (!infoDoctor.getAddress().equals(address)) isChangeInfo = true;
-        if (!infoDoctor.getPlaceWorking().equals(placeWorking)) isChangeInfo = true;
-        if (!isChangeInfo) {
-            Toast.makeText(getContext(), "Bạn không thay đổi bất kỳ thông tin nào!", Toast.LENGTH_LONG).show();
-            return;
-        } else{
-            Doctor newDoctor = infoDoctor;
-            newDoctor.setAddress(address);
-            newDoctor.setBirthday(birthday);
-            newDoctor.setPlaceWorking(placeWorking);
-            newDoctor.setGender(gender);
-            onUpdateUser(newDoctor);
-        }
-
-    }
-    private void onUpdateUser(final Doctor newDoctor) {
-        pbProfileDoctor.setVisibility(View.VISIBLE);
-        if (mImageToBeAttached != null) {
-            GetLinkImageService getLinkeImageService = RetrofitFactory.getInstance().createService(GetLinkImageService.class);
-            getLinkeImageService.uploadImageToGetLink(SharedPrefs.getInstance().get("JWT_TOKEN", String.class),getImageUpload()).enqueue(new Callback<MainGetLink>() {
-                @Override
-                public void onResponse(Call<MainGetLink> call, Response<MainGetLink> response) {
-
-                    if (response.code() == 200) {
-                        updateDoctorNetWork(newDoctor, response.body().getFilePath());
-                    } else {
-                        Toast.makeText(getContext(), "Không thể kết nối máy chủ", Toast.LENGTH_LONG).show();
-                        pbProfileDoctor.setVisibility(View.GONE);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<MainGetLink> call, Throwable t) {
-                    Toast.makeText(getContext(), "Không thể kết nối máy chủ", Toast.LENGTH_LONG).show();
-                    pbProfileDoctor.setVisibility(View.GONE);
-                }
-            });
-        } else {
-            updateDoctorNetWork(newDoctor, null);
-        }
-
-    }
-
-    private void updateDoctorNetWork(Doctor newDoctor, String linkImage) {
-        DoctorRequest doctorRequest;
-        if (linkImage == null) {
-            doctorRequest = new DoctorRequest(newDoctor.getDoctorId(),newDoctor.getBirthday(),
-                    newDoctor.getAddress(),newDoctor.getPlaceWorking(),
-                    newDoctor.getAvatar(),newDoctor.getGender());
-        } else {
-            doctorRequest = new DoctorRequest(newDoctor.getDoctorId(),newDoctor.getBirthday(),
-                    newDoctor.getAddress(),newDoctor.getPlaceWorking(),linkImage,newDoctor.getGender());
-        }
-        changeProfileDoctorService changeProfileDoctorService = RetrofitFactory.getInstance().createService(changeProfileDoctorService.class);
-        changeProfileDoctorService.changeProfileDoctorService(SharedPrefs.getInstance().get(JWT_TOKEN, String.class), doctorRequest).enqueue(new Callback<DoctorRespone>() {
+        tbMain.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        tbMain.setTitle(R.string.profile_page);
+        tbMain.setTitleTextColor(getResources().getColor(R.color.primary_text));
+        tbMain.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
-            public void onResponse(Call<DoctorRespone> call, Response<DoctorRespone> response) {
-                if (response.code() == 200) {
-                    DoctorRespone doctorRespone = response.body();
-                    if (doctorRespone != null) {
-                        infoDoctor.setGender(doctorRespone.getUpdateSuccess().getGender());
-                        infoDoctor.setAddress(doctorRespone.getUpdateSuccess().getAddress());
-                        infoDoctor.setAvatar(doctorRespone.getUpdateSuccess().getAvatar());
-                        infoDoctor.setBirthday(doctorRespone.getUpdateSuccess().getBirthday());
-                        infoDoctor.setPlaceWorking(doctorRespone.getUpdateSuccess().getPlaceWorking());
-                        SharedPrefs.getInstance().put(USER_INFO, infoDoctor);
-                        Toast.makeText(getContext(), "Chỉnh sửa thành công", Toast.LENGTH_LONG).show();
-                        setScreenFunction(TYPE_CANCEL);
-                    }
-                } else {
-                    Toast.makeText(getContext(), "Kết nối máy chủ không thành công", Toast.LENGTH_LONG).show();
-                }
-                pbProfileDoctor.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onFailure(Call<DoctorRespone> call, Throwable t) {
-                Toast.makeText(getContext(), "Kết nối máy chủ không thành công", Toast.LENGTH_LONG).show();
-                pbProfileDoctor.setVisibility(View.GONE);
+            public void onClick(View v) {
+                ScreenManager.backFragment(getFragmentManager());
             }
         });
+        // can not edit phone, and remain money
+        tv_phone.setEnabled(false);
+        tv_remainMoney.setEnabled(false);
+
+        //set on click
+        btnChangePassword.setOnClickListener(this);
+        btnEditProfile.setOnClickListener(this);
+        ivUploadAvatar.setOnClickListener(this);
+        btnNo.setOnClickListener(this);
+        btnYes.setOnClickListener(this);
+
+        DoctorCertificationAdapter doctorCertificationAdapter = new DoctorCertificationAdapter(currentDoctor.getCertificates(),getContext());
+        rv_image_certificates.setAdapter(doctorCertificationAdapter);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),3,GridLayoutManager.VERTICAL,false);
+        rv_image_certificates.setLayoutManager(gridLayoutManager);
+        tv_fname.setText(currentDoctor.getFirstName());
+        tv_mname.setText(currentDoctor.getMiddleName());
+        tv_lname.setText(currentDoctor.getLastName());
+        tv_phone.setText(currentDoctor.getPhoneNumber());
+        tv_remainMoney.setText(Utils.formatStringNumber(currentDoctor.getRemainMoney()) + " đ");
+        tv_universityGraduate.setText(currentDoctor.getUniversityGraduate());
+        tv_universityGraduate.setEnabled(false);
+        tv_yearGraduate.setText(currentDoctor.getYearGraduate());
+        tv_yearGraduate.setEnabled(false);
+        rb_doctorRanking.setRating(currentDoctor.getCurrentRating());
+        String specialistTotal = "";
+
+        for(SpecialistDoctor specialist: currentDoctor.getIdSpecialist()){
+            specialistTotal = specialistTotal + specialist.getName() + ", ";
+        }
+        specialistTotal = specialistTotal.substring(0, specialistTotal.length() - 2);
+        tv_specialist.setText(specialistTotal);
+        tv_specialist.setEnabled(false);
+        tv_certificates.setEnabled(false);
+
+        setUpCalendar();
+        setScreenFunction(TYPE_CANCEL);
     }
+
     private void setScreenFunction(int type) {
         if (type == TYPE_EDIT) {
-            enableControl();
-//            rlMainButton.setVisibility(View.GONE);
-//            rlYesNoButton.setVisibility(View.VISIBLE);
+            enableAll();
+            rlMainButton.setVisibility(View.GONE);
+            rlYesNoButton.setVisibility(View.VISIBLE);
         } else if (type == TYPE_CANCEL) {
             isChangeInfo = false;
-            tv_fname.setText(infoDoctor.getFirstName());
-            tv_mname.setText(infoDoctor.getMiddleName());
-            tv_lname.setText(infoDoctor.getLastName());
-            ZoomImageViewUtils.loadCircleImage(getContext(), infoDoctor.getAvatar().toString(), iv_avatar);
-            tv_phone.setText(infoDoctor.getPhoneNumber());
-            ed_address.setText(infoDoctor.getAddress());
-            ed_birthday.setText(infoDoctor.getBirthday());
-            tv_remainMoney.setText(infoDoctor.getRemainMoney() + " đ");
-            switch (infoDoctor.getGender()) {
+            ZoomImageViewUtils.loadCircleImage(getContext(), currentDoctor.getAvatar().toString(), ivAvatar);
+            ed_address.setText(currentDoctor.getAddress());
+            ed_birthday.setText(currentDoctor.getBirthday());
+            ed_placeWorking.setText(currentDoctor.getPlaceWorking());
+
+            switch (currentDoctor.getGender()) {
                 case 1: {
                     rbMale.setChecked(true);
                     rbFmale.setChecked(false);
@@ -433,27 +310,119 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
                     break;
                 }
             }
-            disableControl();
-//            rlMainButton.setVisibility(View.VISIBLE);
-//            rlYesNoButton.setVisibility(View.GONE);
+            disableAll();
+            rlMainButton.setVisibility(View.VISIBLE);
+            rlYesNoButton.setVisibility(View.GONE);
         }
         mImageToBeAttached = null;
         pbProfileDoctor.setVisibility(View.GONE);
     }
-    ///
-    private int getGender() {
-        int checked = 1;
-        if (rbMale.isChecked()) {
-            checked = 1;
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_change_password: {
+                showDialogChangePassword();
+                break;
+            }
+            case R.id.iv_upload_avatar: {
+                //imageUtils.displayAttachImageDialog();
+                displayAttachImageDialog();
+                break;
+            }
+            case R.id.btn_edit_profile: {
+                setScreenFunction(TYPE_EDIT);
+                break;
+            }
+            case R.id.btn_yes: {
+                onSubmit();
+                break;
+            }
+            case R.id.btn_no: {
+                setScreenFunction(TYPE_CANCEL);
+                break;
+            }
         }
-        if (rbFmale.isChecked()) {
-            checked = 2;
-        }
-        if (rbOther.isChecked()) {
-            checked = 3;
-        }
-        return checked;
     }
+
+    private void showDialogChangePassword() {
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View view = inflater.inflate(R.layout.change_password_dialog, null);
+        et_old_password = view.findViewById(R.id.et_old_password);
+        et_new_password = view.findViewById(R.id.et_new_password);
+        et_confirm_new_password = view.findViewById(R.id.et_confirm_new_password);
+        et_old_password.getBackground().mutate().setColorFilter(getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.SRC_ATOP);
+        et_new_password.getBackground().mutate().setColorFilter(getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.SRC_ATOP);
+        et_confirm_new_password.getBackground().mutate().setColorFilter(getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.SRC_ATOP);
+        tv_message_change_password = view.findViewById(R.id.tv_message_change_password);
+        progress_change_password = view.findViewById(R.id.progress_change_password);
+        builder.setView(view);
+        builder.setTitle("Thay đổi mật khẩu");
+
+        builder.setPositiveButton("Thay đổi", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        dialogChangePassword = builder.create();
+        dialogChangePassword.show();
+        dialogChangePassword.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onValidatePassword(et_old_password.getText().toString(),et_new_password.getText().toString(), et_confirm_new_password.getText().toString(), tv_message_change_password)) {
+                    pbProfileDoctor.setVisibility(View.VISIBLE);
+                    PasswordRequest passwordRequest = new PasswordRequest();
+                    passwordRequest.setId(currentDoctor.getDoctorId());
+                    passwordRequest.setOldPassword(et_old_password.getText().toString());
+                    passwordRequest.setNewPassword(et_new_password.getText().toString());
+
+                    ChangePasswordService changePasswordService = RetrofitFactory.getInstance().createService(ChangePasswordService.class);
+                    changePasswordService.changePasswordService(SharedPrefs.getInstance().get(JWT_TOKEN, String.class), passwordRequest).enqueue(new Callback<PasswordResponse>() {
+                        @Override
+                        public void onResponse(Call<PasswordResponse> call, Response<PasswordResponse> response) {
+                            tv_message_change_password.setVisibility(View.VISIBLE);
+                            PasswordResponse passwordResponse = response.body();
+                            if (response.code() == 200 && passwordResponse.isChangePasswordSuccess()) {
+                                tv_message_change_password.setText("Thay đổi mật khẩu thành công");
+                                tv_message_change_password.setTextColor(getResources().getColor(R.color.colorPrimary));
+                                et_old_password.setText("");
+                                et_new_password.setText("");
+                                et_confirm_new_password.setText("");
+                                Toast.makeText(getContext(),"Thay đổi mật khẩu thành công!", Toast.LENGTH_LONG).show();
+                                dialogChangePassword.dismiss();
+                            } else if(response.code() == 401) {
+                                Utils.backToLogin(getActivity().getApplicationContext());
+
+                            }else {
+                                tv_message_change_password.setTextColor(getResources().getColor(R.color.red));
+                                tv_message_change_password.setText("Mật khẩu cũ không đúng!");
+                            }
+                            pbProfileDoctor.setVisibility(View.GONE);
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<PasswordResponse> call, Throwable t) {
+                            tv_message_change_password.setVisibility(View.VISIBLE);
+                            tv_message_change_password.setText("Không kết nối được với máy chủ!");
+                            pbProfileDoctor.setVisibility(View.GONE);
+
+                        }
+                    });
+                }
+
+            }
+        });
+    }
+
 
     private void setUpCalendar() {
         final Calendar myCalendar = Calendar.getInstance();
@@ -484,12 +453,227 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
     }
 
     private void updateBirthDay(Calendar myCalendar) {
-        String myFormat = "dd/MM/yyyy"; //In which you need put here
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR , -100 );
 
-        ed_birthday.setText(sdf.format(myCalendar.getTime()));
+        if (myCalendar.getTimeInMillis() >= (Calendar.getInstance().getTimeInMillis())) {
+            Toast.makeText(getContext(), "Bạn không thể chọn ngày sinh của bạn sau thời gian hiện tại", Toast.LENGTH_LONG).show();
+        }else if(myCalendar.getTimeInMillis() <= calendar.getTimeInMillis()){
+            Toast.makeText(getContext(), "Năm sinh của bạn không hợp lệ", Toast.LENGTH_LONG).show();
+        }else {
+            String myFormat = "dd/MM/yyyy";
+            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+            ed_birthday.setText(sdf.format(myCalendar.getTime()));
+        }
     }
-    ///////////////////////////////////
+
+    private Doctor newDoctor;
+    private void onSubmit() {
+
+        String birthday = ed_birthday.getText().toString();
+        String address = ed_address.getText().toString();
+        String placeWorking =  ed_placeWorking.getText().toString();
+        int gender = getGender();
+
+        if (currentDoctor.getGender() != gender) isChangeInfo = true;
+        if (!currentDoctor.getBirthday().equals(birthday)) isChangeInfo = true;
+        if (!currentDoctor.getAddress().equals(address)) isChangeInfo = true;
+        if (!currentDoctor.getPlaceWorking().equals(placeWorking)) isChangeInfo = true;
+
+        if (!isChangeInfo) {
+            Toast.makeText(getContext(), "Bạn không thay đổi bất kỳ thông tin nào!", Toast.LENGTH_LONG).show();
+            return;
+        } else if (onValidate()) {
+
+            newDoctor = currentDoctor;
+            newDoctor.setAddress(address);
+            newDoctor.setBirthday(birthday);
+            newDoctor.setPlaceWorking(placeWorking);
+            newDoctor.setGender(gender);
+            onUpdateUser();
+        }
+
+    }
+
+    private void onUpdateUser() {
+        if(pbProfileDoctor != null) pbProfileDoctor.setVisibility(View.VISIBLE);
+        if (mImageToBeAttached != null) {
+            GetLinkImageService getLinkeImageService = RetrofitFactory.getInstance().createService(GetLinkImageService.class);
+            getLinkeImageService.uploadImageToGetLink(getImageUpload()).enqueue(new Callback<MainGetLink>() {
+                @Override
+                public void onResponse(Call<MainGetLink> call, Response<MainGetLink> response) {
+
+                    if (response.code() == 200) {
+                        updateDoctorNetWork( response.body().getFilePath());
+                    } else {
+                        Toast.makeText(getContext(), "Không thể kết nối máy chủ", Toast.LENGTH_LONG).show();
+                        if(pbProfileDoctor != null) pbProfileDoctor.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<MainGetLink> call, Throwable t) {
+                    Toast.makeText(getContext(), "Không thể kết nối máy chủ", Toast.LENGTH_LONG).show();
+                    if(pbProfileDoctor != null) pbProfileDoctor.setVisibility(View.GONE);
+                }
+            });
+        } else {
+            updateDoctorNetWork(null);
+        }
+
+    }
+
+    private void updateDoctorNetWork(String linkImage) {
+        DoctorRequest doctorRequest;
+        if (linkImage == null) {
+            doctorRequest = new DoctorRequest(newDoctor.getDoctorId(),newDoctor.getBirthday(),
+                    newDoctor.getAddress(),newDoctor.getPlaceWorking(),
+                    newDoctor.getAvatar(),newDoctor.getGender());
+        } else {
+            doctorRequest = new DoctorRequest(newDoctor.getDoctorId(),newDoctor.getBirthday(),
+                    newDoctor.getAddress(),newDoctor.getPlaceWorking(),linkImage,newDoctor.getGender());
+        }
+        changeProfileDoctorService changeProfileDoctorService = RetrofitFactory.getInstance().createService(changeProfileDoctorService.class);
+        changeProfileDoctorService.changeProfileDoctorService(SharedPrefs.getInstance().get(JWT_TOKEN, String.class), doctorRequest).enqueue(new Callback<DoctorRespone>() {
+            @Override
+            public void onResponse(Call<DoctorRespone> call, Response<DoctorRespone> response) {
+                if (response.code() == 200) {
+                    DoctorRespone doctorRespone = response.body();
+                    if (doctorRespone != null) {
+                        currentDoctor.setGender(doctorRespone.getInformationDoctor().getGender());
+                        currentDoctor.setAddress(doctorRespone.getInformationDoctor().getAddress());
+                        currentDoctor.setAvatar(doctorRespone.getInformationDoctor().getAvatar());
+                        currentDoctor.setBirthday(doctorRespone.getInformationDoctor().getBirthday());
+                        currentDoctor.setPlaceWorking(doctorRespone.getInformationDoctor().getPlaceWorking());
+                        SharedPrefs.getInstance().put(USER_INFO, currentDoctor);
+                        Toast.makeText(getContext(), "Chỉnh sửa thành công", Toast.LENGTH_LONG).show();
+
+                        if(ivAvaUserBackGroud != null && ivAvaUser != null){
+                            ivAvaUserBackGroud.setImageResource(R.drawable.your_doctor_logo);
+                            ivAvaUser.setImageResource(R.drawable.your_doctor_logo);
+                            ZoomImageViewUtils.loadImageManual(getActivity().getApplicationContext(),currentDoctor.getAvatar().toString(),ivAvaUserBackGroud);
+                            ZoomImageViewUtils.loadCircleImage(getActivity().getApplicationContext(),currentDoctor.getAvatar().toString(),ivAvaUser);
+                        }
+
+                        setScreenFunction(TYPE_CANCEL);
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Kết nối máy chủ không thành công", Toast.LENGTH_LONG).show();
+                }
+                if(pbProfileDoctor != null) pbProfileDoctor.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Call<DoctorRespone> call, Throwable t) {
+                Toast.makeText(getContext(), "Kết nối máy chủ không thành công", Toast.LENGTH_LONG).show();
+                if(pbProfileDoctor != null) pbProfileDoctor.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void enableAll() {
+        ed_address.setEnabled(true);
+        ed_birthday.setEnabled(true);
+        ed_placeWorking.setEnabled(true);
+        ivUploadAvatar.setVisibility(View.VISIBLE);
+        rbFmale.setEnabled(true);
+        rbMale.setEnabled(true);
+        rbOther.setEnabled(true);
+    }
+
+    private void disableAll() {
+        ed_address.setEnabled(false);
+        ed_birthday.setEnabled(false);
+        ed_placeWorking.setEnabled(false);
+        ivUploadAvatar.setVisibility(View.GONE);
+
+        switch (currentDoctor.getGender()) {
+            case 1: {
+                rbFmale.setEnabled(false);
+                rbOther.setEnabled(false);
+                break;
+            }
+            case 2: {
+                rbMale.setEnabled(false);
+                rbOther.setEnabled(false);
+                break;
+            }
+            case 3: {
+                rbMale.setEnabled(false);
+                rbFmale.setEnabled(false);
+                break;
+            }
+        }
+
+    }
+
+    private int getGender() {
+        int checked = 1;
+        if (rbMale.isChecked()) {
+            checked = 1;
+        }
+        if (rbFmale.isChecked()) {
+            checked = 2;
+        }
+        if (rbOther.isChecked()) {
+            checked = 3;
+        }
+        return checked;
+    }
+
+    private boolean onValidate() {
+        boolean isValid = true;
+        String placeWorking = ed_placeWorking.getText().toString();
+        String address = ed_address.getText().toString();
+
+        if (placeWorking == null || placeWorking.trim().length() == 0) {
+            til_placeWorking.setError("Bạn phải nhập nơi làm việc hiện tại");
+            isValid =  false;
+        }else {
+            til_placeWorking.setError(null);
+        }
+
+        if (address == null || address.trim().length() == 0) {
+            til_address.setError("Bạn phải nhập địa chỉ hiện tại");
+            isValid =  false;
+        }else {
+            til_address.setError(null);
+        }
+        return isValid;
+    }
+
+    private boolean onValidatePassword(String oldPassword,String newPassword, String confirmPassword, TextView tv_message_change_password) {
+
+        boolean isValidate = true;
+        Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
+        if(oldPassword.equals("") || newPassword.equals("") || confirmPassword.equals("")){
+            tv_message_change_password.setText("Bạn phải nhập đầy đủ các ô mật khẩu!");
+            tv_message_change_password.setVisibility(View.VISIBLE);
+            isValidate = false;
+        } else if(oldPassword.equals(newPassword)){
+            tv_message_change_password.setText("Mật khẩu cũ và mật khẩu mới không thể giống nhau");
+            tv_message_change_password.setVisibility(View.VISIBLE);
+            isValidate = false;
+        } else if (!pattern.matcher(newPassword).matches()) {
+            tv_message_change_password.setText(getResources().getString(R.string.password_rule));
+            tv_message_change_password.setVisibility(View.VISIBLE);
+            isValidate = false;
+        } else if (!newPassword.equals(confirmPassword)) {
+            tv_message_change_password.setText(getResources().getString(R.string.confirm_password_error));
+            tv_message_change_password.setVisibility(View.VISIBLE);
+            isValidate = false;
+        } else {
+            tv_message_change_password.setVisibility(View.GONE);
+        }
+        return isValidate;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
     private void displayAttachImageDialog() {
         CharSequence[] items;
         if (mImageToBeAttached != null)
@@ -584,7 +768,7 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
         if (mImageToBeAttached != null) {
             mImageToBeAttached.recycle();
             mImageToBeAttached = null;
-            ZoomImageViewUtils.loadCircleImage(getContext(), infoDoctor.getAvatar(), iv_avatar);
+            ZoomImageViewUtils.loadCircleImage(getContext(), currentDoctor.getAvatar(), ivAvatar);
         }
     }
 
@@ -649,14 +833,15 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
         updateUI();
     }
 
+
     public void updateUI() {
         if (mImageToBeAttached != null) {
             Log.e("UserProfileImage", "not null");
-            iv_avatar.setImageBitmap(mImageToBeAttached);
+            ivAvatar.setImageBitmap(mImageToBeAttached);
             isChangeInfo = true;
         } else {
             Log.e("UserProfileImage", "is null");
-            iv_avatar.setImageResource(R.drawable.patient_avatar);
+            ivAvatar.setImageResource(R.drawable.patient_avatar);
         }
     }
 
@@ -681,6 +866,7 @@ public class DoctorProfileFragment extends Fragment implements  View.OnClickList
                 break;
         }
     }
-    ///////////////////////////
+
+
 
 }

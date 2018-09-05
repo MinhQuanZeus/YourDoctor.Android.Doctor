@@ -5,7 +5,8 @@
     android:background="@color/white"
     android:layout_marginStart="20dp"
     android:layout_marginEnd="20dp"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:clickable="true">
 
     <EditText
         android:id="@+id/et_reason_report"

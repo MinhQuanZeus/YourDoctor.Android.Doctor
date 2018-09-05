@@ -25,19 +25,9 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/gradientbackground"
+                android:background="@color/colorPrimary"
+                app:titleTextColor="@color/white"
                 app:title="Your Doctor" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab_question"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_alignParentEnd="true"
-                android:layout_below="@id/toolbar"
-                android:layout_marginEnd="10dp"
-                android:layout_marginTop="10dp"
-                app:backgroundTint="@color/primary_text"
-                app:srcCompat="@drawable/ic_question_answer_black_24dp" />
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/view_pager"

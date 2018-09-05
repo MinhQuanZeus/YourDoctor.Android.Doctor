@@ -1,5 +1,8 @@
 package com.yd.yourdoctorpartnerandroid.utils;
 
+import android.content.Context;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -10,6 +13,7 @@ import com.yd.yourdoctorpartnerandroid.networks.getAllTypesAdvisory.GetAllTypesA
 import com.yd.yourdoctorpartnerandroid.networks.getAllTypesAdvisory.MainObjectTypeAdivosry;
 import com.yd.yourdoctorpartnerandroid.networks.getSpecialistService.GetSpecialistService;
 import com.yd.yourdoctorpartnerandroid.networks.getSpecialistService.MainObjectSpecialist;
+import com.yd.yourdoctorpartnerandroid.services.CheckNetWordChangeService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +28,21 @@ public class LoadDefaultModel {
 
     private static LoadDefaultModel loadDefaultModel;
 
+    private CheckNetWordChangeService checkNetWordChangeService;
+    private IntentFilter intentFilter;
+
     public LoadDefaultModel() {
-        loadSpecialist();
-        loadTypeAdvisory();
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        checkNetWordChangeService = new CheckNetWordChangeService();
+    }
+
+    public void registerServiceCheckNetwork(Context context){
+        context.registerReceiver(checkNetWordChangeService, intentFilter);
+    }
+
+    public void unregisterServiceCheckNetwork(Context context){
+        context.unregisterReceiver(checkNetWordChangeService);
     }
 
     public List<Specialist> getSpecialists() {
@@ -47,39 +63,6 @@ public class LoadDefaultModel {
         this.typeAdvisories = typeAdvisories;
     }
 
-    public void loadSpecialist() {
-        GetSpecialistService getSpecialistService = RetrofitFactory.getInstance().createService(GetSpecialistService.class);
-        getSpecialistService.getMainObjectSpecialist().enqueue(new Callback<MainObjectSpecialist>() {
-            @Override
-            public  void onResponse(Call<MainObjectSpecialist> call, Response<MainObjectSpecialist> response) {
-                Log.e("AnhLe", "success: " + response.body());
-                MainObjectSpecialist mainObjectSpecialist = response.body();
-                specialists = (ArrayList<Specialist>) mainObjectSpecialist.getListSpecialist();
-            }
-
-            @Override
-            public void onFailure(Call<MainObjectSpecialist> call, Throwable t) {
-                Toast.makeText(null, "Kết nốt mạng có vấn đề , không thể tải dữ liệu", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    public void loadTypeAdvisory() {
-        GetAllTypesAdvisoryService getAllTypesAdvisoryService = RetrofitFactory.getInstance().createService(GetAllTypesAdvisoryService.class);
-        getAllTypesAdvisoryService.getMainObjectTypeAdvisories(SharedPrefs.getInstance().get("JWT_TOKEN", String.class)).enqueue(new Callback<MainObjectTypeAdivosry>() {
-            @Override
-            public void onResponse(Call<MainObjectTypeAdivosry> call, Response<MainObjectTypeAdivosry> response) {
-                Log.e("AnhLe", "success: " + response.body());
-                MainObjectTypeAdivosry mainObjectTypeAdivosry = response.body();
-                typeAdvisories = (ArrayList<TypeAdvisory>) mainObjectTypeAdivosry.getTypeAdvisories();
-            }
-
-            @Override
-            public void onFailure(Call<MainObjectTypeAdivosry> call, Throwable t) {
-                Toast.makeText(null, "Kết nốt mạng có vấn đề , không thể tải dữ liệu", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
 
     public static LoadDefaultModel getInstance() {
         if (loadDefaultModel == null) {

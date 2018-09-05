@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Specialist {
 
-    @SerializedName("specialistId")
+    @SerializedName("_id")
     @Expose
     String id;
     String name;
@@ -57,12 +57,6 @@ public class Specialist {
 
     @Override
     public String toString() {
-        return "Specialist{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", image='" + image + '\'' +
-                ", description='" + description + '\'' +
-                ", listQuestion=" + listQuestion +
-                '}';
+        return name;
     }
 }
