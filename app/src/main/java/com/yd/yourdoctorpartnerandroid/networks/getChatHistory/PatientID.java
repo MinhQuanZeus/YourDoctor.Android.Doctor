@@ -8,11 +8,12 @@ public class PatientID {
     private String address;
     private String birthday;
     private String phoneNumber;
-    private long remainMoney;
+    private float remainMoney;
     private int gender;
     private String avatar;
 
     public PatientID() {
+
     }
 
     public String get_id() {
@@ -71,8 +72,12 @@ public class PatientID {
         this.phoneNumber = phoneNumber;
     }
 
-    public long getRemainMoney() {
+    public float getRemainMoney() {
         return remainMoney;
+    }
+
+    public void setRemainMoney(float remainMoney) {
+        this.remainMoney = remainMoney;
     }
 
     public void setRemainMoney(long remainMoney) {
@@ -94,4 +99,13 @@ public class PatientID {
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
+
+    public String getFullName() {
+        if(!this.middleName.isEmpty()) {
+            return this.firstName + " " + this.middleName + " " + this.lastName;
+        }else {
+            return this.firstName + " " + this.lastName;
+        }
+    }
+
 }

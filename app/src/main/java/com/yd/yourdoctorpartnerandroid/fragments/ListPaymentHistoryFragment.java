@@ -20,6 +20,7 @@ import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.adapters.ChatHistoryAdapter;
 import com.yd.yourdoctorpartnerandroid.adapters.PaymentHistoryAdapter;
 import com.yd.yourdoctorpartnerandroid.managers.PaginationScrollListener;
+import com.yd.yourdoctorpartnerandroid.models.Doctor;
 import com.yd.yourdoctorpartnerandroid.models.Patient;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorpartnerandroid.networks.getPaymentHistory.GetPaymentHistoryListService;
@@ -58,7 +59,7 @@ public class ListPaymentHistoryFragment extends Fragment {
     @BindView(R.id.pbListPaymentHistory)
     ProgressBar pbListPaymentHistory;
 
-    Patient currentPatient;
+    Doctor currentDoctor;
 
 
     public ListPaymentHistoryFragment() {
@@ -73,7 +74,7 @@ public class ListPaymentHistoryFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_list_payment_history, container, false);
         ButterKnife.bind(this, view);
         paymentHistoryAdapter = new PaymentHistoryAdapter(getContext());
-        currentPatient = SharedPrefs.getInstance().get("USER_INFO", Patient.class);
+        currentDoctor = SharedPrefs.getInstance().get("USER_INFO", Doctor.class);
         setUpListPaymentHistory();
         return view;
     }
@@ -125,7 +126,7 @@ public class ListPaymentHistoryFragment extends Fragment {
 
     private void loadFirstPage() {
         GetPaymentHistoryListService getPaymentHistoryListService = RetrofitFactory.getInstance().createService(GetPaymentHistoryListService.class);
-        getPaymentHistoryListService.getPaymentHistoryListService(SharedPrefs.getInstance().get("JWT_TOKEN", String.class), currentPatient.getId(), 10 + "", currentPage + "").enqueue(new Callback<MainHistoryPaymentResponse>() {
+        getPaymentHistoryListService.getPaymentHistoryListService(SharedPrefs.getInstance().get("JWT_TOKEN", String.class), currentDoctor.getDoctorId(), 10 + "", currentPage + "").enqueue(new Callback<MainHistoryPaymentResponse>() {
             @Override
             public void onResponse(Call<MainHistoryPaymentResponse> call, Response<MainHistoryPaymentResponse> response) {
                 if (response.code() == 200) {
@@ -140,9 +141,12 @@ public class ListPaymentHistoryFragment extends Fragment {
                             paymentHistoryAdapter.addLoadingFooter();
                         else isLastPage = true;
                     }
-                    pbListPaymentHistory.setVisibility(View.GONE);
+                    if(pbListPaymentHistory != null){
+                        pbListPaymentHistory.setVisibility(View.GONE);
+                    }
+
                 } else if (response.code() == 401) {
-                    Utils.backToLogin(getContext());
+                    Utils.backToLogin(getActivity().getApplicationContext());
                 }
             }
 
@@ -150,7 +154,9 @@ public class ListPaymentHistoryFragment extends Fragment {
             public void onFailure(Call<MainHistoryPaymentResponse> call, Throwable t) {
                 Log.d("Anhle", "Fail: " + t.getMessage());
                 Toast.makeText(getContext(),"Không thể tải được lịch sử thanh toán", Toast.LENGTH_LONG).show();
-                pbListPaymentHistory.setVisibility(View.GONE);
+                if(pbListPaymentHistory != null){
+                    pbListPaymentHistory.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -158,7 +164,7 @@ public class ListPaymentHistoryFragment extends Fragment {
 
     private void loadNextPage() {
         GetPaymentHistoryListService getPaymentHistoryListService = RetrofitFactory.getInstance().createService(GetPaymentHistoryListService.class);
-        getPaymentHistoryListService.getPaymentHistoryListService(SharedPrefs.getInstance().get("JWT_TOKEN", String.class), currentPatient.getId(), 10 + "", currentPage + "").enqueue(new Callback<MainHistoryPaymentResponse>() {
+        getPaymentHistoryListService.getPaymentHistoryListService(SharedPrefs.getInstance().get("JWT_TOKEN", String.class), currentDoctor.getDoctorId(), 10 + "", currentPage + "").enqueue(new Callback<MainHistoryPaymentResponse>() {
             @Override
             public void onResponse(Call<MainHistoryPaymentResponse> call, Response<MainHistoryPaymentResponse> response) {
                 if (response.code() == 200) {
@@ -178,18 +184,15 @@ public class ListPaymentHistoryFragment extends Fragment {
                             paymentHistoryAdapter.addLoadingFooter();  // 5
                         else isLastPage = true;
                     }
-                    pbListPaymentHistory.setVisibility(View.GONE);
                 } else if (response.code() == 401) {
-                    Utils.backToLogin(getContext());
+                    Utils.backToLogin(getActivity().getApplicationContext());
                 }
-
             }
 
             @Override
             public void onFailure(Call<MainHistoryPaymentResponse> call, Throwable t) {
                 Log.d("Anhle", "Fail: " + t.getMessage());
                 Toast.makeText(getContext(),"Không thể tải thêm được lịch sử thanh toán", Toast.LENGTH_LONG).show();
-                pbListPaymentHistory.setVisibility(View.GONE);
             }
         });
 

@@ -21,6 +21,7 @@ import com.yd.yourdoctorpartnerandroid.models.Specialist;
 import com.yd.yourdoctorpartnerandroid.networks.RetrofitFactory;
 import com.yd.yourdoctorpartnerandroid.networks.getSpecialistService.GetSpecialistService;
 import com.yd.yourdoctorpartnerandroid.networks.getSpecialistService.MainObjectSpecialist;
+import com.yd.yourdoctorpartnerandroid.utils.LoadDefaultModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,34 +64,42 @@ public class SpecialistInfoFragment extends Fragment {
 
     private void setupUI() {
         //TODO
-
-
-        specialists= new ArrayList<>();
+        specialists = LoadDefaultModel.getInstance().getSpecialists();
         rvListSpecialist.setLayoutManager(new GridLayoutManager(getContext(), 3));
         rvListSpecialist.setFocusable(false);
-
-        GetSpecialistService getSpecialistService = RetrofitFactory.getInstance().createService(GetSpecialistService.class);
-        getSpecialistService.getMainObjectSpecialist().enqueue(new Callback<MainObjectSpecialist>() {
-            @Override
-            public  void onResponse(Call<MainObjectSpecialist> call, Response<MainObjectSpecialist> response) {
-                if(response.code() == 200){
-                    Log.e("specialistInfo", "success: " + response.body());
-                    MainObjectSpecialist mainObjectSpecialist = response.body();
-                    specialists = mainObjectSpecialist.getListSpecialist();
-
-                    specialistAdapter = new SpecialistAdapter(specialists,getContext());
-                    rvListSpecialist.setAdapter(specialistAdapter);
-                    //specialistAdapter.notifyDataSetChanged();
-                    pbSpecialist.setVisibility(View.GONE);
+        if (specialists == null) {
+            GetSpecialistService getSpecialistService = RetrofitFactory.getInstance().createService(GetSpecialistService.class);
+            getSpecialistService.getMainObjectSpecialist().enqueue(new Callback<MainObjectSpecialist>() {
+                @Override
+                public void onResponse(Call<MainObjectSpecialist> call, Response<MainObjectSpecialist> response) {
+                    if (response.code() == 200) {
+                        MainObjectSpecialist mainObjectSpecialist = response.body();
+                        specialists = mainObjectSpecialist.getListSpecialist();
+                        LoadDefaultModel.getInstance().setSpecialists(specialists);
+                        specialistAdapter = new SpecialistAdapter(specialists, getContext());
+                        rvListSpecialist.setAdapter(specialistAdapter);
+                    }
+                    if(pbSpecialist != null){
+                        pbSpecialist.setVisibility(View.GONE);
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<MainObjectSpecialist> call, Throwable t) {
-                Toast.makeText(getContext(), "Kết nốt mạng có vấn đề , không thể tải dữ liệu", Toast.LENGTH_LONG).show();
+                @Override
+                public void onFailure(Call<MainObjectSpecialist> call, Throwable t) {
+                    Toast.makeText(getContext(), "Kết nốt mạng có vấn đề , không thể tải dữ liệu", Toast.LENGTH_LONG).show();
+                    if(pbSpecialist != null){
+                        pbSpecialist.setVisibility(View.GONE);
+                    }
+                }
+            });
+        } else {
+            specialistAdapter = new SpecialistAdapter(specialists, getContext());
+            rvListSpecialist.setAdapter(specialistAdapter);
+            if(pbSpecialist != null){
                 pbSpecialist.setVisibility(View.GONE);
             }
-        });
+        }
+
 
     }
 

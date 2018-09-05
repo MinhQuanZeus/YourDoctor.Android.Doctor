@@ -194,16 +194,22 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
             if (notification != null) {
                 if (context != null){
-                    ZoomImageViewUtils.loadCircleImage(context,notification.getSenderId().getAvatar(),ivNotification);
+                    try{
+                        ZoomImageViewUtils.loadCircleImage(context,notification.getSenderId().getAvatar(),ivNotification);
+                    }catch (Exception e){
+
+                    }
+
                     //ivNotification.setImageDrawable(context.getResources().getDrawable(R.drawable.your_doctor_logo));
                     tvContentNotification.setText(notification.getMessage());
-                    tvTime.setText(Utils.convertTimeFromMonggo(notification.getCreatedAt()));
+                    tvTime.setText(Utils.convertTime(notification.getCreatedAt()));
                     switch (notification.getType()){
                         case 1:{
-                            tvTitleNotification.setText("Thông báo chat với BN." + notification.getNameSender() );
+                            tvTitleNotification.setText("Thông báo chat từ BN." + notification.getNameSender() );
                             break;
                         }
                         case 2:{
+                            tvTitleNotification.setText("Thông báo video từ BN." + notification.getNameSender());
                             break;
                         }
                         case 3:{
@@ -211,6 +217,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                             break;
                         }
                         case 4:{
+                            tvTitleNotification.setText("Thông báo rút tiền." + notification.getNameSender() );
+                            break;
+                        }
+                        case 5:{
+                            tvTitleNotification.setText("Thông báo báo cáo người dùng");
                             break;
                         }
                     }

@@ -2,6 +2,7 @@ package com.yd.yourdoctorpartnerandroid.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import com.squareup.picasso.Picasso;
 import com.yd.yourdoctorpartnerandroid.R;
 import com.yd.yourdoctorpartnerandroid.events.ItemClickListener;
 import com.yd.yourdoctorpartnerandroid.models.Doctor;
+import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +65,6 @@ public class DoctorRankingSpecialistAdapter extends RecyclerView.Adapter<DoctorR
                 break;
             case LOADING:
                 View v2 = inflater.inflate(R.layout.item_process, parent, false);
-                // v2.setOnClickListener(onClickListener);
                 viewHolder = new LoadingVH(v2);
                 break;
         }
@@ -85,23 +86,7 @@ public class DoctorRankingSpecialistAdapter extends RecyclerView.Adapter<DoctorR
 
         switch (getItemViewType(position)) {
             case ITEM:
-                //DoctorRankingSpecialistAdapter.DoctorRankingSpecialistViewHolder movieVH = (DoctorRankingSpecialistAdapter.DoctorRankingSpecialistViewHolder) holder;
-
                 holder.setData(rankingDoctorList.get(position), position);
-
-                holder.setItemClickListener(new ItemClickListener() {
-                    @Override
-                    public void onClick(View view, int position, boolean isLongClick) {
-                        //MusicTypeModel musicTypeModel = (MusicTypeModel) v.getTag();
-                        // Log.d(TAG,"onClick: "+musicTypeModel.getKey());
-//                MusicTypeModel musicTypeModel = holder.getMusicTypeModel();
-////                ScreenManager.openFragment(fragmentActivity.getSupportFragmentManager(),new TopSongFragment(),R.id.rl_container,true);
-////                EventBus.getDefault().postSticky(new OnClickMusicTypeModel(holder.getMusicTypeModel()));
-
-                        // ScreenManager.openFragment(((FragmentActivity)context).getSupportFragmentManager(), new DoctorProfileFragment(), R.id.rl_container, true);
-
-                    }
-                });
                 break;
             case LOADING:
                 break;
@@ -170,30 +155,21 @@ public class DoctorRankingSpecialistAdapter extends RecyclerView.Adapter<DoctorR
         return rankingDoctorList == null ? 0 : rankingDoctorList.size();
     }
 
-    public class DoctorRankingSpecialistViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        TextView tv_number_rank;
-        TextView tv_name_doctor_ranking;
-        ImageView iv_item_doctor_ranking;
-        RatingBar rb_doctorranking;
-        ImageView iv_btnChat;
-        ImageView iv_btnVideoCall;
-        ImageView iv_btnFavorite;
+    public class DoctorRankingSpecialistViewHolder extends RecyclerView.ViewHolder {
+        TextView tvNumberRank;
+        TextView tvNameDoctorRanking;
+        ImageView ivItemDoctorRanking;
+        RatingBar rbDoctorRanking;
 
-        private ItemClickListener itemClickListener;
         private Doctor doctorModel;
 
         public DoctorRankingSpecialistViewHolder(View itemView) {
             super(itemView);
-            tv_number_rank = itemView.findViewById(R.id.tv_number_rank);
-            tv_name_doctor_ranking = itemView.findViewById(R.id.tv_name_doctor_ranking);
-            iv_item_doctor_ranking = itemView.findViewById(R.id.iv_item_doctor_ranking);
-            rb_doctorranking = itemView.findViewById(R.id.rb_doctorranking);
-            iv_btnChat = itemView.findViewById(R.id.iv_btnChat);
-            iv_btnVideoCall = itemView.findViewById(R.id.iv_btnVideoCall);
-            iv_btnFavorite = itemView.findViewById(R.id.iv_btnFavorite);
+            tvNumberRank = itemView.findViewById(R.id.tvNumberRank);
+            tvNameDoctorRanking = itemView.findViewById(R.id.tvNameDoctorRanking);
+            ivItemDoctorRanking = itemView.findViewById(R.id.ivItemDoctorRanking);
+            rbDoctorRanking = itemView.findViewById(R.id.rbDoctorRanking);
 
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
         }
 
         public void setData(Doctor doctorModel, int positon) {
@@ -202,34 +178,18 @@ public class DoctorRankingSpecialistAdapter extends RecyclerView.Adapter<DoctorR
 
             if (doctorModel != null) {
                 if (context == null) Log.d("Anhle", "context bi null");
-
-                Picasso.with(context).load(doctorModel.getAvatar()).transform(new CropCircleTransformation()).into(iv_item_doctor_ranking);
-//                tv_name_doctor_ranking.setText(doctorModel.getFirst_name() + " " + doctorModel.getLast_name());
-//                rb_doctorranking.setRating(doctorModel.getCurrent_rating());
-                tv_number_rank.setText((positon + 1) + "");
+                ZoomImageViewUtils.loadCircleImage(context,doctorModel.getAvatar(),ivItemDoctorRanking);
+                tvNameDoctorRanking.setText(doctorModel.getFullName());
+                rbDoctorRanking.setRating(doctorModel.getCurrentRating());
+                tvNumberRank.setText((positon + 1) + "");
 
             }
         }
-
 
         public Doctor getdoctorModel() {
             return doctorModel;
         }
 
-        public void setItemClickListener(ItemClickListener itemClickListener) {
-            this.itemClickListener = itemClickListener;
-        }
-
-        @Override
-        public void onClick(View v) {
-            itemClickListener.onClick(v, getAdapterPosition(), false);
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            itemClickListener.onClick(v, getAdapterPosition(), true);
-            return true;
-        }
     }
 
     protected class LoadingVH extends DoctorRankingSpecialistViewHolder {

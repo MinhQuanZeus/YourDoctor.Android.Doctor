@@ -1,7 +1,7 @@
 package com.yd.yourdoctorpartnerandroid.networks.changeProfileDoctor;
 
 public class DoctorRequest {
-    private String id;
+    private String doctorId;
     private String birthday;
     private String address;
     private String placeWorking;
@@ -9,7 +9,7 @@ public class DoctorRequest {
     private int gender;
 
     public DoctorRequest(String id,String birthday, String address, String placeWorking, String avatar, int gender) {
-        this.id = id;
+        this.doctorId = id;
         this.birthday = birthday;
         this.address = address;
         this.placeWorking = placeWorking;
@@ -18,11 +18,11 @@ public class DoctorRequest {
     }
 
     public String getId() {
-        return id;
+        return doctorId;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.doctorId = id;
     }
 
     public String getBirthday() {

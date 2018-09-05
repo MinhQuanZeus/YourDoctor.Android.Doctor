@@ -3,15 +3,15 @@ package com.yd.yourdoctorpartnerandroid.networks.changeProfileDoctor;
 import com.yd.yourdoctorpartnerandroid.networks.changeProfileDoctor.UpdateSuccess;
 
 public class DoctorRespone {
-    private UpdateSuccess updateSuccess;
+    private UpdateSuccess informationDoctor;
     private boolean success;
 
-    public UpdateSuccess getUpdateSuccess() {
-        return updateSuccess;
+    public UpdateSuccess getInformationDoctor() {
+        return informationDoctor;
     }
 
-    public void setUpdateSuccess(UpdateSuccess updateSuccess) {
-        this.updateSuccess = updateSuccess;
+    public void setInformationDoctor(UpdateSuccess informationDoctor) {
+        this.informationDoctor = informationDoctor;
     }
 
     public boolean isSuccess() {

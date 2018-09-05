@@ -10,6 +10,7 @@ import android.util.Xml;
 
 import com.yd.yourdoctorpartnerandroid.adapters.NewsAdapter;
 import com.yd.yourdoctorpartnerandroid.models.New;
+import com.yd.yourdoctorpartnerandroid.utils.Utils;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -92,10 +93,13 @@ public class XMLController extends AsyncTask<String, Void, ArrayList<New>> {
     protected void onPostExecute(ArrayList<New> listItem) {
         super.onPostExecute(listItem);
         // Hủy dialog đi.
-        if(progressDialog != null){
-            progressDialog.dismiss();
-        }
+        try{
+            if(progressDialog != null){
+                progressDialog.dismiss();
+            }
+        }catch (Exception e){
 
+        }
         if (listItem != null) {
 
             for (New n : listItem
@@ -160,8 +164,8 @@ public class XMLController extends AsyncTask<String, Void, ArrayList<New>> {
 
                 } else if (name.equalsIgnoreCase("description")) {
                     //  description = handleStringDescription(result);
-                    description = handleStringDescription(result.toString());
-                    image = hanleStringImage(result.toString());
+                    description = Utils.handleStringDescription(result.toString());
+                    image = Utils.hanleStringImage(result.toString());
                 } else if (name.equalsIgnoreCase("pubDate")) {
                     pubDate = result;
                 }
@@ -186,46 +190,5 @@ public class XMLController extends AsyncTask<String, Void, ArrayList<New>> {
         }
     }
 
-    private String handleStringDescription(String theStrDes) {
-        int startString;
-        if (theStrDes.contains("</br>")) {
-            startString = theStrDes.lastIndexOf("</br>");
 
-            return theStrDes.substring(startString + 5);
-        }
-        return theStrDes;
-    }
-
-    private String hanleStringImage(String theStrImage) {
-        try {
-            int startString;
-            int endString;
-            if (theStrImage.contains("<img")) {
-                if (theStrImage.contains("data-original=")) {
-                    startString = theStrImage.lastIndexOf("data-original=");
-
-                    if (theStrImage.contains("png")) {
-                        endString = theStrImage.lastIndexOf(".png");
-                    } else {
-                        endString = theStrImage.lastIndexOf(".jpg");
-                    }
-
-                    return theStrImage.substring(startString + 15, endString + 4);
-                } else if (theStrImage.contains("src=")) {
-                    startString = theStrImage.lastIndexOf("src=");
-
-                    if (theStrImage.contains("png")) {
-                        endString = theStrImage.lastIndexOf(".png");
-                    } else {
-                        endString = theStrImage.lastIndexOf(".jpg");
-                    }
-
-                    return theStrImage.substring(startString + 5, endString + 4);
-                }
-            }
-            return theStrImage;
-        } catch (Exception e) {
-            return "";
-        }
-    }
 }

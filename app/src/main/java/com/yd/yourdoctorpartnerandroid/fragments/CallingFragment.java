@@ -44,6 +44,7 @@ import com.yd.yourdoctorpartnerandroid.managers.ScreenManager;
 import com.yd.yourdoctorpartnerandroid.models.TypeCall;
 import com.yd.yourdoctorpartnerandroid.models.VideoCallSession;
 import com.yd.yourdoctorpartnerandroid.utils.RxScheduler;
+import com.yd.yourdoctorpartnerandroid.utils.ZoomImageViewUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,12 +79,11 @@ import static android.Manifest.permission.RECORD_AUDIO;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CallingFragment extends Fragment implements IKurentoFragment, NPermission.OnPermissionResult, SignalingEvents, PeerConnectionClient.PeerConnectionEvents {
+public class CallingFragment extends Fragment implements IKurentoFragment, SignalingEvents, PeerConnectionClient.PeerConnectionEvents {
     public static final String STREAM_HOST = "https://kurento-socket.herokuapp.com/";
     public static final String TAG = "KurentoActivity";
     private SurfaceViewRenderer vGLSurfaceViewCallFull;
     private SurfaceViewRenderer vGLSurfaceViewCallPip;
-    private NPermission nPermission;
     private EglBase rootEglBase;
     private ProxyRenderer localProxyRenderer;
     private ProxyRenderer remoteProxyRenderer;
@@ -146,8 +146,6 @@ public class CallingFragment extends Fragment implements IKurentoFragment, NPerm
         vGLSurfaceViewCallPip = (SurfaceViewRenderer) viewFragment.findViewById(R.id.vGLSurfaceViewCallPip);
         vGLSurfaceViewCallFull = (SurfaceViewRenderer) viewFragment.findViewById(R.id.vGLSurfaceViewCallFull);
 
-
-        nPermission = new NPermission(true);
         rlTimer.setVisibility(View.GONE);
         getActivity().setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
 
@@ -178,7 +176,7 @@ public class CallingFragment extends Fragment implements IKurentoFragment, NPerm
         connectServer();
 
         if (videoCallSession.getType() == TypeCall.CALL) {
-            Picasso.with(getContext()).load(videoCallSession.getCalleeAvatar()).transform(new CropCircleTransformation()).into(ivCalleeAvatar);
+            ZoomImageViewUtils.loadCircleImage(getContext(),videoCallSession.getCalleeAvatar(),ivCalleeAvatar);
             tvCalleeName.setText(videoCallSession.getCalleeName());
             transactionToCalling(videoCallSession.getCallerId(), videoCallSession.getCalleeId(), true);
             mMediaPlayer = new MediaPlayer();
@@ -205,31 +203,6 @@ public class CallingFragment extends Fragment implements IKurentoFragment, NPerm
     public CallingFragment setVideoCallSession(VideoCallSession videoCallSession) {
         this.videoCallSession = videoCallSession;
         return this;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        nPermission.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    @Override
-    public void onPermissionResult(String s, boolean b) {
-        switch (s) {
-            case Manifest.permission.CAMERA:
-                this.isGranted = b;
-                if (!isGranted) {
-                    nPermission.requestPermission(getActivity(), Manifest.permission.CAMERA);
-                } else {
-                    //nPermission.requestPermission(this, Manifest.permission.RECORD_AUDIO);
-                    startCall();
-                }
-                break;
-            default:
-                break;
-        }
     }
 
     @Override
@@ -508,10 +481,10 @@ public class CallingFragment extends Fragment implements IKurentoFragment, NPerm
     }
 
     public void startCall() {
-        if (!(Build.VERSION.SDK_INT < 23 || !checkPermission())) {
-            nPermission.requestPermission(getActivity(), Manifest.permission.CAMERA);
-            return;
-        }
+//        if (!(Build.VERSION.SDK_INT < 23 || !checkPermission())) {
+//            nPermission.requestPermission(getActivity(), Manifest.permission.CAMERA);
+//            return;
+//        }
 
         if (rtcClient == null) {
             Log.e(TAG, "AppRTC client is not allocated for a call.");
@@ -542,8 +515,13 @@ public class CallingFragment extends Fragment implements IKurentoFragment, NPerm
         if (videoCallSession.getType() == TypeCall.CALL) {
             mMediaPlayer.stop();
         }
+        if(videoCallSession != null){
+            tvCallingDoctor.setText(videoCallSession.getCallerName());
+        }
+
         rlCalling.setVisibility(View.GONE);
         rlTimer.setVisibility(View.VISIBLE);
+        if(videoCallSession != null) tvCalleeName.setText(videoCallSession.getCalleeName());
         countTime();
         timerTask.run();
         client.emit("connectedCall", "stop");
